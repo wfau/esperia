@@ -229,7 +229,7 @@ gaia01 dmr      06:00:AC:10:09:18  172.16.9.24   Oneliwyth
 gaia01 dmr      06:00:AC:10:09:19  172.16.9.25   Vaeni
 gaia01 dmr      06:00:AC:10:09:1A  172.16.9.26   Elinad
 gaia01 dmr      06:00:AC:10:09:1B  172.16.9.27   Frilicien
-gaia01 dmr      06:00:AC:10:09:1C  172.16.9.18   Herakith
+gaia01 dmr      06:00:AC:10:09:1C  172.16.9.28   Herakith
 gaia01 dmr      06:00:AC:10:09:1D  172.16.9.29   Sevimma
 gaia01 dmr      06:00:AC:10:09:1E  172.16.9.30   Gledrili
 gaia01 dmr      06:00:AC:10:09:1F  172.16.9.31   Olalewiel
