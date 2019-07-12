@@ -1,0 +1,63 @@
+#
+# <meta:header>
+#   <meta:licence>
+#     Copyright (c) 2019, ROE (http://www.roe.ac.uk/)
+#
+#     This information is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     This information is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#   </meta:licence>
+# </meta:header>
+#
+#
+
+# -----------------------------------------------------
+# Check the network config.
+#[user@headnode]
+
+    cat /etc/netplan/01-netcfg.yaml
+
+--START--
+# This file describes the network interfaces available on your system
+# For more information, see netplan(5).
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    enp4s4f0:
+      addresses: [ 192.41.108.47/24 ]
+      gateway4: 192.41.108.126
+      nameservers:
+          search: [ roe.ac.uk ]
+          addresses:
+              - "195.194.120.1"
+              - "195.194.120.2"
+              - "8.8.8.8"
+
+    enp5s0:
+      addresses: [ 172.16.1.11/16 ]
+--END--
+
+
+
+# TODO
+# Install docker
+# Install config files
+# Run container (autostart)
+
+# Update clients
+# Remove work01 external IP
+# Config external IP
+
+
+
+

@@ -1,0 +1,70 @@
+#
+# <meta:header>
+#   <meta:licence>
+#     Copyright (c) 2019, ROE (http://www.roe.ac.uk/)
+#
+#     This information is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     This information is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#   </meta:licence>
+# </meta:header>
+#
+#
+
+# -----------------------------------------------------
+# Create our local settings.
+#[user@desktop]
+
+    if [ ! -e "${HOME:?}/esperia.settings" ]
+    then
+        cat > "${HOME:?}/esperia.settings" << EOF
+source "\${HOME:?}/projects.settings"
+ESPERIA_REPO='git@github.com:Zarquan/esperia.git'
+ESPERIA_HOME="\${PROJECTS_ROOT:?}/esperia"
+ESPERIA_CODE="\${ESPERIA_HOME:?}/github-zrq"
+EOF
+    fi
+
+# -----------------------------------------------------
+# Checkout or update our code.
+#[user@desktop]
+
+    makeproject esperia
+
+--START--
+Checking [/var/local/projects/esperia]
+Creating [/var/local/projects/esperia]
+Checking [/var/local/projects/esperia]
+Checking [/var/local/projects/esperia/github-zrq]
+Creating [/var/local/projects/esperia/github-zrq]
+/var/local/projects/esperia ~
+Cloning into 'github-zrq'...
+remote: Enumerating objects: 7, done.
+remote: Counting objects: 100% (7/7), done.
+remote: Compressing objects: 100% (7/7), done.
+remote: Total 7 (delta 1), reused 0 (delta 0), pack-reused 0
+Receiving objects: 100% (7/7), 13.29 KiB | 3.32 MiB/s, done.
+Resolving deltas: 100% (1/1), done.
+~
+--END--
+
+# -----------------------------------------------------
+# Create our notes directory.
+#[user@desktop]
+
+    source "${HOME:?}/esperia.settings"
+    pushd "${ESPERIA_CODE}"
+
+        mkdir --parents 'doc/notes/zrq'
+
+    popd
+

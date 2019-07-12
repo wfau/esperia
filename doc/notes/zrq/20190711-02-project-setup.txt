@@ -1,0 +1,163 @@
+#
+# <meta:header>
+#   <meta:licence>
+#     Copyright (c) 2019, ROE (http://www.roe.ac.uk/)
+#
+#     This information is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     This information is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#   </meta:licence>
+# </meta:header>
+#
+#
+
+# -----------------------------------------------------
+# Create our ssh config.
+#[user@desktop]
+
+    gedit "${HOME}/.ssh/config"
+
+        ....
+
+        Host esperia
+            HostName 192.41.108.47
+            User dmr
+            IdentityFile ~/.ssh/dmr.roe.ac.uk.rsa
+            ServerAliveInterval 60
+            ServerAliveCountMax 5
+
+
+# -----------------------------------------------------
+# Login to the head node.
+#[user@desktop]
+
+    ssh esperia
+
+
+# -----------------------------------------------------
+# Update the system.
+#[user@headnode]
+
+    sudo apt-get update
+
+    sudo apt-get upgrade
+
+
+# -----------------------------------------------------
+# Reboot to complete the update.
+#[user@headnode]
+
+    sudo reboot
+    ....
+
+    ssh esperia
+
+
+# -----------------------------------------------------
+# Create the esperia group and add our users.
+#[user@headnode]
+
+    sudo groupadd --system esperia
+
+    sudo usermod --append --groups esperia dmr
+    sudo usermod --append --groups esperia msh
+
+
+# -----------------------------------------------------
+# Logut to update our groups.
+#[user@headnode]
+
+    exit
+    ....
+
+    ssh esperia
+
+
+# -----------------------------------------------------
+# Create our projects settings.
+#[user@headnode]
+
+    if [ ! -e "${HOME:?}/projects.settings" ]
+    then
+        cat > "${HOME:?}/projects.settings" << EOF
+PROJECTS_ROOT=/var/local/projects
+EOF
+    fi
+
+# -----------------------------------------------------
+# Create our projects directory.
+#[user@headnode]
+
+    source "${HOME:?}/projects.settings"
+
+    if [ ! -e "${PROJECTS_ROOT:?}" ]
+    then
+        sudo mkdir --parents "${PROJECTS_ROOT:?}"
+        sudo chgrp esperia   "${PROJECTS_ROOT:?}"
+        sudo chmod u=rwxs    "${PROJECTS_ROOT:?}"
+        sudo chmod g=rwxs    "${PROJECTS_ROOT:?}"
+        sudo chmod o=rx      "${PROJECTS_ROOT:?}"
+    fi
+
+
+# -----------------------------------------------------
+# Create our project settings.
+#[user@headnode]
+
+    if [ ! -e "${HOME:?}/esperia.settings" ]
+    then
+        cat > "${HOME:?}/esperia.settings" << EOF
+source "\${HOME:?}/projects.settings"
+ESPERIA_REPO='git@github.com:Zarquan/esperia.git'
+ESPERIA_HOME="\${PROJECTS_ROOT:?}/esperia"
+ESPERIA_CODE="\${ESPERIA_HOME:?}/github-zrq"
+EOF
+    fi
+
+# -----------------------------------------------------
+# Checkout our project source code.
+#[user@headnode]
+
+    source "${HOME:?}/esperia.settings"
+
+    echo "Checking [${ESPERIA_HOME}]"
+    if [ ! -e "${ESPERIA_HOME}" ]
+    then
+        echo "Creating [${ESPERIA_HOME}]"
+        mkdir --parents "${ESPERIA_HOME}"
+    fi
+
+    echo "Checking [$(dirname ${ESPERIA_CODE})]"
+    if [ ! -e "$(dirname ${ESPERIA_CODE})" ]
+    then
+        echo "Creating [$(dirname ${ESPERIA_CODE})]"
+        mkdir --parents "$(dirname ${ESPERIA_CODE})"
+    fi
+
+    echo "Checking [${ESPERIA_CODE}]"
+    if [ ! -e "${ESPERIA_CODE}" ]
+    then
+        echo "Creating [${ESPERIA_CODE}]"
+        pushd "$(dirname ${ESPERIA_CODE})"
+            git clone "${ESPERIA_REPO}" "$(basename ${ESPERIA_CODE})"
+        popd
+    else
+        echo "Updating [${ESPERIA_CODE}]"
+        pushd "${ESPERIA_CODE}"
+            git pull
+        popd
+    fi
+
+
+
+
+

@@ -1,0 +1,36 @@
+# DHCP range for gaia01
+dhcp-range=set:gaia01,172.16.9.1,255.255.0.0,static,6h
+
+# DHCP hosts for gaia01
+dhcp-host=06:00:AC:10:09:01:172.16.9.1,Cinna
+dhcp-host=06:00:AC:10:09:02:172.16.9.2,Edieldan
+dhcp-host=06:00:AC:10:09:03:172.16.9.3,Adwiraven
+dhcp-host=06:00:AC:10:09:04:172.16.9.4,Craygord
+dhcp-host=06:00:AC:10:09:05:172.16.9.5,Haoniel
+dhcp-host=06:00:AC:10:09:06:172.16.9.6,Moif
+dhcp-host=06:00:AC:10:09:07:172.16.9.7,Asterran
+dhcp-host=06:00:AC:10:09:08:172.16.9.8,Kalec
+dhcp-host=06:00:AC:10:09:09:172.16.9.9,Ocyssa
+dhcp-host=06:00:AC:10:09:0A:172.16.9.10,Adwelarin
+dhcp-host=06:00:AC:10:09:0B:172.16.9.11,Erardossa
+dhcp-host=06:00:AC:10:09:0C:172.16.9.12,Astomar
+dhcp-host=06:00:AC:10:09:0D:172.16.9.13,Aciamma
+dhcp-host=06:00:AC:10:09:0E:172.16.9.14,Welak
+dhcp-host=06:00:AC:10:09:0F:172.16.9.15,Deranna
+dhcp-host=06:00:AC:10:09:10:172.16.9.16,Girelath
+dhcp-host=06:00:AC:10:09:11:172.16.9.17,Adraeswen
+dhcp-host=06:00:AC:10:09:12:172.16.9.18,Birakith
+dhcp-host=06:00:AC:10:09:13:172.16.9.19,Gometh
+dhcp-host=06:00:AC:10:09:14:172.16.9.20,Alauseth
+dhcp-host=06:00:AC:10:09:15:172.16.9.21,Jeremeth
+dhcp-host=06:00:AC:10:09:16:172.16.9.22,Acerawyr
+dhcp-host=06:00:AC:10:09:17:172.16.9.23,Pethiel
+dhcp-host=06:00:AC:10:09:18:172.16.9.24,Oneliwyth
+dhcp-host=06:00:AC:10:09:19:172.16.9.25,Vaeni
+dhcp-host=06:00:AC:10:09:1A:172.16.9.26,Elinad
+dhcp-host=06:00:AC:10:09:1B:172.16.9.27,Frilicien
+dhcp-host=06:00:AC:10:09:1C:172.16.9.18,Herakith
+dhcp-host=06:00:AC:10:09:1D:172.16.9.29,Sevimma
+dhcp-host=06:00:AC:10:09:1E:172.16.9.30,Gledrili
+dhcp-host=06:00:AC:10:09:1F:172.16.9.31,Olalewiel
+dhcp-host=06:00:AC:10:09:20:172.16.9.32,Tralidus
