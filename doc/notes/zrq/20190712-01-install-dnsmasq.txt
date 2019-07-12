@@ -338,6 +338,7 @@ dmr sudo docker esperia
     docker run \
         --rm \
         --tty \
+        --privileged \
         --interactive \
         --name dnsmasq \
         --network host \
@@ -367,17 +368,14 @@ dnsmasq[1]: cleared cache
 
 
 # -----------------------------------------------------
-# Stop the dnsmasq container on work01.
-#[user@work01]
-
-    docker stop $(docker ps -aq)
-    docker rm   $(docker ps -aq)
-
-
-# -----------------------------------------------------
 # -----------------------------------------------------
 # Update the nameservers on the worker nodes.
 #[user@work01]
+#[user@work02]
+#[user@work03]
+#[user@work04]
+#[user@gaia01]
+#[user@gaia02]
 
     sudo vi /etc/netplan/01-netcfg.yaml
 
@@ -401,8 +399,64 @@ dnsmasq[1]: cleared cache
 
 
     sudo netplan generate
-
     sudo netplan apply
+
+# -----------------------------------------------------
+# Update the nameservers on the worker nodes.
+#[user@trop03]
+#[user@trop04]
+
+    sudo vi /etc/resolv.conf
+
+    ~   search esperia roe.ac.uk
+    ~   nameserver 172.16.1.11
+
+
+# -----------------------------------------------------
+# Test the name resolution on the worker nodes.
+#[user@work01]
+#[user@work02]
+#[user@work03]
+#[user@work04]
+#[user@gaia01]
+#[user@gaia02]
+#[user@trop03]
+#[user@trop04]
+
+
+    host gaia01
+
+--START--
+gaia01.esperia has address 172.16.1.9
+--END--
+
+
+    host Falidon
+
+--START--
+Falidon.esperia has address 172.16.0.29
+--END--
+
+
+    host trop01
+
+--START--
+trop01.roe.ac.uk has address 129.215.175.96
+--END--
+
+
+    host trop03
+
+--START--
+trop03.esperia has address 172.16.1.5
+--END--
+
+
+    host trop03.roe.ac.uk
+
+--START--
+trop03.roe.ac.uk has address 129.215.175.98
+--END--
 
 
 # -----------------------------------------------------
@@ -414,17 +468,23 @@ dnsmasq[1]: cleared cache
 
     docker run \
         --detach \
+        --privileged \
         --name dnsmasq \
         --network host \
         --restart always \
         --volume ${ESPERIA_CODE}/src/dnsmasq:/etc/dnsmasq \
         storytel/dnsmasq
 
+--START--
+dc8a000f00086059b70c489e527bbcad83df094703560e5208351e981916c0f8
+--END--
+
+
     docker ps -a
 
 --START--
 CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS                  PORTS               NAMES
-5110550b502d        storytel/dnsmasq    "dnsmasq"           1 second ago        Up Less than a second                       dnsmasq
+dc8a000f0008        storytel/dnsmasq    "dnsmasq"           1 second ago        Up Less than a second                       dnsmasq
 --END--
 
 
@@ -435,14 +495,37 @@ CONTAINER ID        IMAGE               COMMAND             CREATED             
     docker logs --since 5m --follow dnsmasq
 
 --START--
+dnsmasq[1]: started, version 2.78 cachesize 150
+dnsmasq[1]: compile time options: IPv6 GNU-getopt no-DBus no-i18n no-IDN DHCP DHCPv6 no-Lua TFTP no-conntrack ipset auth no-DNSSEC loop-detect inotify
+dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.10.1, lease time 6h
+dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.3.1, lease time 6h
+dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.6.1, lease time 6h
+dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.4.1, lease time 6h
+dnsmasq-dhcp[1]: DHCP, IP range 172.16.252.1 -- 172.16.252.252, lease time 6h
+dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.2.1, lease time 6h
+dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.9.1, lease time 6h
+dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.0.1, lease time 6h
+dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.5.1, lease time 6h
+dnsmasq-dhcp[1]: DHCP, sockets bound exclusively to interface br1
+dnsmasq[1]: using local addresses only for domain esperia
+dnsmasq[1]: using local addresses only for domain 16.172.in-addr.arpa
+dnsmasq[1]: using nameserver 8.8.8.8#53
+dnsmasq[1]: using nameserver 195.194.120.2#53
+dnsmasq[1]: using nameserver 195.194.120.1#53
+dnsmasq[1]: cleared cache
+--END--
+
+--START--
+dnsmasq-dhcp[1]: DHCPDISCOVER(br1) 172.16.5.14 06:00:ac:10:05:0e
+dnsmasq-dhcp[1]: DHCPOFFER(br1) 172.16.5.14 06:00:ac:10:05:0e
+dnsmasq-dhcp[1]: DHCPREQUEST(br1) 172.16.5.14 06:00:ac:10:05:0e
+dnsmasq-dhcp[1]: DHCPACK(br1) 172.16.5.14 06:00:ac:10:05:0e Fosauri
 --END--
 
 
 
 
 # TODO
-
-# Update clients
 # Remove work01 public IP
 # Update headnode public IP
 
