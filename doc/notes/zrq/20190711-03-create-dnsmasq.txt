@@ -78,14 +78,14 @@
                             printf("# DHCP hosts for %s", $1);
                             }
                         printf("\n");
-                        printf("dhcp-host=%s:%s,%s", $3, $4, $5);
+                        printf("dhcp-host=%s,%s,%s", $3, $4, $5);
                         }
                     }
                 END {
                     printf("\n");
                     }
                     ' ../ischnura/esperia-machines.txt \
-                | tee "${nodename}-dhcp-hosts.txt"
+                | tee "${nodename}-dhcp-hosts.conf"
 
                 #
                 # Generate the dns-hosts file.
@@ -109,10 +109,12 @@
                     printf("\n");
                     }
                     ' ../ischnura/esperia-machines.txt \
-                | tee "${nodename}-host-records.txt"
+                | tee "${nodename}-host-records.conf"
 
             done
 
+        popd
+    popd
 
 
 

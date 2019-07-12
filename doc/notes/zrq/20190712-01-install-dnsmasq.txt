@@ -156,6 +156,63 @@ num   pkts bytes target     prot opt in     out     source               destina
 
 
 # -----------------------------------------------------
+# Add a rule to allow dns queries.
+#[user@headnode]
+
+    sudo iptables \
+        --table filter \
+        --insert INPUT 3 \
+            -i br1 \
+            -p udp \
+            --dport 53 \
+            -j ACCEPT
+
+    sudo iptables \
+        --table filter \
+        --insert INPUT 4 \
+            -i br1 \
+            -p tcp \
+            --dport 53 \
+            -j ACCEPT
+
+
+# -----------------------------------------------------
+# List the iptables INPUT filter.
+#[user@headnode]
+
+    sudo iptables \
+        --verbose \
+        --line-numbers \
+        --table filter \
+        --list INPUT
+
+--START--
+Chain INPUT (policy DROP 0 packets, 0 bytes)
+num   pkts bytes target     prot opt in     out     source               destination
+1        0     0 ACCEPT     udp  --  br1    any     anywhere             anywhere             udp dpt:bootps
+2        0     0 ACCEPT     tcp  --  br1    any     anywhere             anywhere             tcp dpt:bootps
+3        0     0 ACCEPT     udp  --  br1    any     anywhere             anywhere             udp dpt:domain
+4        0     0 ACCEPT     tcp  --  br1    any     anywhere             anywhere             tcp dpt:domain
+5     279K  182M override   all  --  any    any     anywhere             anywhere
+6      121  9371 ACCEPT     all  --  lo     any     anywhere             anywhere
+7      186 62386 ACCEPT     udp  --  any    any     172.16.0.0/16        anywhere
+8        0     0 ACCEPT     tcp  --  any    any     172.16.0.0/16        anywhere
+9        0     0 ACCEPT     tcp  --  any    any     195.194.120.0/22     anywhere             tcp dpt:ssh
+10       0     0 ACCEPT     tcp  --  any    any     195.194.121.0/24     anywhere             tcp dpt:ssh
+11       0     0 ACCEPT     tcp  --  any    any     192.108.120.0/24     anywhere             tcp dpt:ssh
+12       0     0 ACCEPT     tcp  --  any    any     192.41.108.0/24      anywhere             tcp dpt:ssh
+13       0     0 ACCEPT     tcp  --  any    any     EdLAN.net.ed.ac.uk/16  anywhere             tcp dpt:ssh
+14       7   420 ACCEPT     tcp  --  any    any     polymer.andrews.metagrid.co.uk  anywhere             tcp dpt:ssh
+15       0     0 ACCEPT     tcp  --  any    any     monomer.andrews.metagrid.co.uk  anywhere             tcp dpt:ssh
+16       0     0 ACCEPT     all  --  enp4s4f0 any     anywhere             anywhere             ctstate RELATED,ESTABLISHED
+17    251K  122M DROP       udp  --  enp4s4f0 any     anywhere             anywhere             udp dpt:bootps
+18       0     0 DROP       tcp  --  enp4s4f0 any     anywhere             anywhere             tcp dpt:bootps
+19    6684  458K LOG        all  --  any    any     anywhere             anywhere             LOG level warning prefix "drop "
+20    6684  458K DROP       all  --  any    any     anywhere             anywhere
+--END--
+
+
+# -----------------------------------------------------
 # List the iptables OUTPUT chain.
 #[user@headnode]
 
@@ -189,39 +246,6 @@ num   pkts bytes target     prot opt in     out     source               destina
         --table filter \
         --delete OUTPUT 1
 
-
-# -----------------------------------------------------
-# List the iptables INPUT filter.
-#[user@headnode]
-
-    sudo iptables \
-        --verbose \
-        --line-numbers \
-        --table filter \
-        --list INPUT
-
---START--
-Chain INPUT (policy DROP 0 packets, 0 bytes)
-num   pkts bytes target     prot opt in     out     source               destination
-1        0     0 ACCEPT     udp  --  br1    any     anywhere             anywhere             udp dpt:bootps
-2        0     0 ACCEPT     tcp  --  br1    any     anywhere             anywhere             tcp dpt:bootps
-3     270K  177M override   all  --  any    any     anywhere             anywhere
-4       71  5443 ACCEPT     all  --  lo     any     anywhere             anywhere
-5      186 62386 ACCEPT     udp  --  any    any     172.16.0.0/16        anywhere
-6        0     0 ACCEPT     tcp  --  any    any     172.16.0.0/16        anywhere
-7        0     0 ACCEPT     tcp  --  any    any     195.194.120.0/22     anywhere             tcp dpt:ssh
-8        0     0 ACCEPT     tcp  --  any    any     195.194.121.0/24     anywhere             tcp dpt:ssh
-9        0     0 ACCEPT     tcp  --  any    any     192.108.120.0/24     anywhere             tcp dpt:ssh
-10       0     0 ACCEPT     tcp  --  any    any     192.41.108.0/24      anywhere             tcp dpt:ssh
-11       0     0 ACCEPT     tcp  --  any    any     EdLAN.net.ed.ac.uk/16  anywhere             tcp dpt:ssh
-12       5   300 ACCEPT     tcp  --  any    any     polymer.andrews.metagrid.co.uk  anywhere             tcp dpt:ssh
-13       0     0 ACCEPT     tcp  --  any    any     monomer.andrews.metagrid.co.uk  anywhere             tcp dpt:ssh
-14       0     0 ACCEPT     all  --  enp4s4f0 any     anywhere             anywhere             ctstate RELATED,ESTABLISHED
-15    245K  118M DROP       udp  --  enp4s4f0 any     anywhere             anywhere             udp dpt:bootps
-16       0     0 DROP       tcp  --  enp4s4f0 any     anywhere             anywhere             tcp dpt:bootps
-17    6515  448K LOG        all  --  any    any     anywhere             anywhere             LOG level warning prefix "drop "
-18    6515  448K DROP       all  --  any    any     anywhere             anywhere
---END--
 
 
 # -----------------------------------------------------
@@ -306,16 +330,91 @@ dmr sudo docker esperia
 
 
 # -----------------------------------------------------
-# Run the dnsmasq container.
+# Run the dnsmasq container interactively.
 #[user@headnode]
 
     source "${HOME}/esperia.settings"
 
+    docker run \
+        --rm \
+        --tty \
+        --interactive \
+        --name dnsmasq \
+        --network host \
+        --volume ${ESPERIA_CODE}/src/dnsmasq:/etc/dnsmasq \
+        storytel/dnsmasq
+
+--START--
+dnsmasq[1]: started, version 2.78 cachesize 150
+dnsmasq[1]: compile time options: IPv6 GNU-getopt no-DBus no-i18n no-IDN DHCP DHCPv6 no-Lua TFTP no-conntrack ipset auth no-DNSSEC loop-detect inotify
+dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.10.1, lease time 6h
+dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.3.1, lease time 6h
+dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.6.1, lease time 6h
+dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.4.1, lease time 6h
+dnsmasq-dhcp[1]: DHCP, IP range 172.16.252.1 -- 172.16.252.252, lease time 6h
+dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.2.1, lease time 6h
+dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.9.1, lease time 6h
+dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.0.1, lease time 6h
+dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.5.1, lease time 6h
+dnsmasq-dhcp[1]: DHCP, sockets bound exclusively to interface br1
+dnsmasq[1]: using local addresses only for domain esperia
+dnsmasq[1]: using local addresses only for domain 16.172.in-addr.arpa
+dnsmasq[1]: using nameserver 8.8.8.8#53
+dnsmasq[1]: using nameserver 195.194.120.2#53
+dnsmasq[1]: using nameserver 195.194.120.1#53
+dnsmasq[1]: cleared cache
+--END--
+
+
+# -----------------------------------------------------
+# Stop the dnsmasq container on work01.
+#[user@work01]
+
+    docker stop $(docker ps -aq)
+    docker rm   $(docker ps -aq)
+
+
+# -----------------------------------------------------
+# -----------------------------------------------------
+# Update the nameservers on the worker nodes.
+#[user@work01]
+
+    sudo vi /etc/netplan/01-netcfg.yaml
+
+
+        bridges:
+          br1:
+            addresses: [ 172.16.1.1/16 ]
+            interfaces: [ eno1 ]
+            dhcp4: false
+            optional: true
+            nameservers:
+              search:
+                - ""
+    -           - "gaiauk"
+    -           - "lsstuk"
+    +           - "esperia"
+                - "roe.ac.uk"
+              addresses:
+    -           - "172.16.1.1"
+    +           - "172.16.1.11"
+
+
+
+    sudo netplan generate
+
+    sudo netplan apply
+
+
+# -----------------------------------------------------
+# Run the dnsmasq container as a daemon.
+#[user@headnode]
+
     docker ps -a
 
 --START--
-CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
 --END--
+
 
     docker stop $(docker ps -aq)
     docker rm   $(docker ps -aq)
@@ -328,36 +427,9 @@ CONTAINER ID        IMAGE               COMMAND             CREATED             
         --volume ${ESPERIA_CODE}/src/dnsmasq:/etc/dnsmasq \
         storytel/dnsmasq
 
-
-    docker run \
-        --rm \
-        --tty \
-        --interactive \
-        --name dnsmasq \
-        --network host \
-        --volume ${ESPERIA_CODE}/src/dnsmasq:/etc/dnsmasq \
-        storytel/dnsmasq
-            sh
-
-
-
-
---START--
-Unable to find image 'storytel/dnsmasq:latest' locally
-latest: Pulling from storytel/dnsmasq
-ff3a5c916c92: Pull complete
-be8a008d89ab: Pull complete
-Digest: sha256:73f265e405ac8e94c43913e1b3e10b759df2b6508b6922a635d5b68b48f907ec
-Status: Downloaded newer image for storytel/dnsmasq:latest
-2ca2e37a496eb489bf0e83a2e6ed95f554fb4c32ea5912ec5ece11cb6d457374
---END--
-
-
     docker ps -a
 
 --START--
-CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS                        PORTS               NAMES
-2ca2e37a496e        storytel/dnsmasq    "dnsmasq"           8 seconds ago       Restarting (2) 1 second ago                       dnsmasq
 --END--
 
 
@@ -376,8 +448,8 @@ CONTAINER ID        IMAGE               COMMAND             CREATED             
 # TODO
 
 # Update clients
-# Remove work01 external IP
-# Config external IP
+# Remove work01 public IP
+# Update headnode public IP
 
 
 
