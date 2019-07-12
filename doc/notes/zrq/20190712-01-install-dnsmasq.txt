@@ -48,11 +48,332 @@ network:
 --END--
 
 
+# -----------------------------------------------------
+# Backup the network config.
+#[user@headnode]
+
+    cp /etc/netplan/01-netcfg.yaml ${HOME}/01-netcfg.bak
+
+
+# -----------------------------------------------------
+# Configure the bridged network and nameserver.
+#[user@headnode]
+
+    sudo vi /etc/netplan/01-netcfg.yaml
+
+        # This file describes the network interfaces available on your system
+        # For more information, see netplan(5).
+        network:
+          version: 2
+          renderer: networkd
+          ethernets:
+
+            enp4s4f0:
+              dhcp4: false
+              optional: true
+              addresses:
+                - "192.41.108.47/24"
+              gateway4: 192.41.108.126
+
+            enp5s0:
+              dhcp4: false
+              optional: true
+
+          bridges:
+
+            br1:
+              dhcp4: false
+              optional: true
+              addresses:
+                - "172.16.1.11/16"
+              interfaces:
+                - "enp5s0"
+              nameservers:
+                search:
+                  - ""
+                  - "esperia"
+                  - "roe.ac.uk"
+                addresses:
+                  - "172.16.1.1"
+                  - "172.16.1.11"
+
+# -----------------------------------------------------
+# Deploy the new network configuration.
+#[user@headnode]
+
+    sudo netplan generate
+
+    sudo netplan apply
+
+
+# -----------------------------------------------------
+# List the iptables INPUT chain.
+#[user@headnode]
+
+    sudo iptables \
+        --verbose \
+        --line-numbers \
+        --table filter \
+        --list INPUT
+
+--START--
+Chain INPUT (policy DROP 0 packets, 0 bytes)
+num   pkts bytes target     prot opt in     out     source               destination
+1        0     0 ACCEPT     udp  --  virbr0 any     anywhere             anywhere             udp dpt:bootps
+2        0     0 ACCEPT     tcp  --  virbr0 any     anywhere             anywhere             tcp dpt:bootps
+3        0     0 ACCEPT     udp  --  br1    any     anywhere             anywhere             udp dpt:bootps
+4        0     0 ACCEPT     tcp  --  br1    any     anywhere             anywhere             tcp dpt:bootps
+5     269K  176M override   all  --  any    any     anywhere             anywhere
+6       52  3885 ACCEPT     all  --  lo     any     anywhere             anywhere
+7      186 62386 ACCEPT     udp  --  any    any     172.16.0.0/16        anywhere
+8        0     0 ACCEPT     tcp  --  any    any     172.16.0.0/16        anywhere
+9        0     0 ACCEPT     tcp  --  any    any     195.194.120.0/22     anywhere             tcp dpt:ssh
+10       0     0 ACCEPT     tcp  --  any    any     195.194.121.0/24     anywhere             tcp dpt:ssh
+11       0     0 ACCEPT     tcp  --  any    any     192.108.120.0/24     anywhere             tcp dpt:ssh
+12       0     0 ACCEPT     tcp  --  any    any     192.41.108.0/24      anywhere             tcp dpt:ssh
+13       0     0 ACCEPT     tcp  --  any    any     EdLAN.net.ed.ac.uk/16  anywhere             tcp dpt:ssh
+14       5   300 ACCEPT     tcp  --  any    any     polymer.andrews.metagrid.co.uk  anywhere             tcp dpt:ssh
+15       0     0 ACCEPT     tcp  --  any    any     monomer.andrews.metagrid.co.uk  anywhere             tcp dpt:ssh
+16       0     0 ACCEPT     all  --  enp4s4f0 any     anywhere             anywhere             ctstate RELATED,ESTABLISHED
+17    244K  118M DROP       udp  --  enp4s4f0 any     anywhere             anywhere             udp dpt:bootps
+18       0     0 DROP       tcp  --  enp4s4f0 any     anywhere             anywhere             tcp dpt:bootps
+19    6499  447K LOG        all  --  any    any     anywhere             anywhere             LOG level warning prefix "drop "
+20    6499  447K DROP       all  --  any    any     anywhere             anywhere
+--END--
+
+
+# -----------------------------------------------------
+# Drop the virbr0 rules, because we don't have libvirt installed.
+#[user@headnode]
+
+    sudo iptables \
+        --table filter \
+        --delete INPUT 2
+
+    sudo iptables \
+        --table filter \
+        --delete INPUT 1
+
+
+# -----------------------------------------------------
+# List the iptables OUTPUT chain.
+#[user@headnode]
+
+    sudo iptables \
+        --verbose \
+        --line-numbers \
+        --table filter \
+        --list OUTPUT
+
+--START--
+Chain OUTPUT (policy DROP 0 packets, 0 bytes)
+num   pkts bytes target     prot opt in     out     source               destination
+1        0     0 ACCEPT     udp  --  any    virbr0  anywhere             anywhere             udp dpt:bootpc
+2        0     0 ACCEPT     udp  --  any    br1     anywhere             anywhere             udp dpt:bootpc
+3     8800  761K override   all  --  any    any     anywhere             anywhere
+4       71  5443 ACCEPT     all  --  any    lo      anywhere             anywhere
+5       74  5560 ACCEPT     udp  --  any    any     anywhere             anywhere             udp spts:1024:65535 dpt:domain
+6        0     0 ACCEPT     tcp  --  any    any     anywhere             anywhere             tcp spts:1024:65535 dpt:domain
+7       95  7220 ACCEPT     udp  --  any    any     anywhere             anywhere             udp dpt:ntp
+8       15   900 ACCEPT     tcp  --  any    any     anywhere             anywhere
+9        0     0 LOG        all  --  any    any     anywhere             anywhere             LOG level warning prefix "drop "
+10       0     0 DROP       all  --  any    any     anywhere             anywhere
+--END--
+
+
+# -----------------------------------------------------
+# Drop the virbr0 rules, because we don't have libvirt installed.
+#[user@headnode]
+
+    sudo iptables \
+        --table filter \
+        --delete OUTPUT 1
+
+
+# -----------------------------------------------------
+# List the iptables INPUT filter.
+#[user@headnode]
+
+    sudo iptables \
+        --verbose \
+        --line-numbers \
+        --table filter \
+        --list INPUT
+
+--START--
+Chain INPUT (policy DROP 0 packets, 0 bytes)
+num   pkts bytes target     prot opt in     out     source               destination
+1        0     0 ACCEPT     udp  --  br1    any     anywhere             anywhere             udp dpt:bootps
+2        0     0 ACCEPT     tcp  --  br1    any     anywhere             anywhere             tcp dpt:bootps
+3     270K  177M override   all  --  any    any     anywhere             anywhere
+4       71  5443 ACCEPT     all  --  lo     any     anywhere             anywhere
+5      186 62386 ACCEPT     udp  --  any    any     172.16.0.0/16        anywhere
+6        0     0 ACCEPT     tcp  --  any    any     172.16.0.0/16        anywhere
+7        0     0 ACCEPT     tcp  --  any    any     195.194.120.0/22     anywhere             tcp dpt:ssh
+8        0     0 ACCEPT     tcp  --  any    any     195.194.121.0/24     anywhere             tcp dpt:ssh
+9        0     0 ACCEPT     tcp  --  any    any     192.108.120.0/24     anywhere             tcp dpt:ssh
+10       0     0 ACCEPT     tcp  --  any    any     192.41.108.0/24      anywhere             tcp dpt:ssh
+11       0     0 ACCEPT     tcp  --  any    any     EdLAN.net.ed.ac.uk/16  anywhere             tcp dpt:ssh
+12       5   300 ACCEPT     tcp  --  any    any     polymer.andrews.metagrid.co.uk  anywhere             tcp dpt:ssh
+13       0     0 ACCEPT     tcp  --  any    any     monomer.andrews.metagrid.co.uk  anywhere             tcp dpt:ssh
+14       0     0 ACCEPT     all  --  enp4s4f0 any     anywhere             anywhere             ctstate RELATED,ESTABLISHED
+15    245K  118M DROP       udp  --  enp4s4f0 any     anywhere             anywhere             udp dpt:bootps
+16       0     0 DROP       tcp  --  enp4s4f0 any     anywhere             anywhere             tcp dpt:bootps
+17    6515  448K LOG        all  --  any    any     anywhere             anywhere             LOG level warning prefix "drop "
+18    6515  448K DROP       all  --  any    any     anywhere             anywhere
+--END--
+
+
+# -----------------------------------------------------
+# List the iptables OUTPUT chain.
+#[user@headnode]
+
+    sudo iptables \
+        --verbose \
+        --line-numbers \
+        --table filter \
+        --list OUTPUT
+
+
+--START--
+Chain OUTPUT (policy DROP 0 packets, 0 bytes)
+num   pkts bytes target     prot opt in     out     source               destination
+1        0     0 ACCEPT     udp  --  any    br1     anywhere             anywhere             udp dpt:bootpc
+2     8890  771K override   all  --  any    any     anywhere             anywhere
+3       80  6181 ACCEPT     all  --  any    lo      anywhere             anywhere
+4       80  6051 ACCEPT     udp  --  any    any     anywhere             anywhere             udp spts:1024:65535 dpt:domain
+5        0     0 ACCEPT     tcp  --  any    any     anywhere             anywhere             tcp spts:1024:65535 dpt:domain
+6       95  7220 ACCEPT     udp  --  any    any     anywhere             anywhere             udp dpt:ntp
+7       15   900 ACCEPT     tcp  --  any    any     anywhere             anywhere
+8        0     0 LOG        all  --  any    any     anywhere             anywhere             LOG level warning prefix "drop "
+9        0     0 DROP       all  --  any    any     anywhere             anywhere
+--END--
+
+
+# -----------------------------------------------------
+# Update the iptables config to match.
+# https://www.digitalocean.com/community/tutorials/how-to-implement-a-basic-firewall-template-with-iptables-on-ubuntu-14-04
+#[root@work01]
+
+    sudo vi /etc/iptables/rules.v4
+
+        #
+        # The INPUT chain.
+        # Allow libvirt DHCP requests
+    -   [0:0] -A INPUT -i virbr0 -p udp --dport 67 -j ACCEPT
+    -   [0:0] -A INPUT -i virbr0 -p tcp --dport 67 -j ACCEPT
+
+        ....
+        ....
+
+        #
+        # The OUTPUT chain.
+        # Allow libvirt DHCP offers.
+    -   [0:0] -A OUTPUT -o virbr0 -p udp -m udp --dport 68 -j ACCEPT
+
+
+
+# -----------------------------------------------------
+# Install docker.
+#[user@headnode]
+
+    sudo apt-get install docker.io
+
+# -----------------------------------------------------
+# Add our admin users to the docker group.
+#[user@headnode]
+
+    sudo usermod --append --groups docker dmr
+    sudo usermod --append --groups docker msh
+
+# -----------------------------------------------------
+# Logout and back in to update our groups.
+#[user@headnode]
+
+    exit
+
+    ssh esperia
+
+# -----------------------------------------------------
+# Check our account groups.
+#[user@headnode]
+
+    id --groups --name
+
+--START--
+dmr sudo docker esperia
+--END--
+
+
+# -----------------------------------------------------
+# Run the dnsmasq container.
+#[user@headnode]
+
+    source "${HOME}/esperia.settings"
+
+    docker ps -a
+
+--START--
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+--END--
+
+    docker stop $(docker ps -aq)
+    docker rm   $(docker ps -aq)
+
+    docker run \
+        --detach \
+        --name dnsmasq \
+        --network host \
+        --restart always \
+        --volume ${ESPERIA_CODE}/src/dnsmasq:/etc/dnsmasq \
+        storytel/dnsmasq
+
+
+    docker run \
+        --rm \
+        --tty \
+        --interactive \
+        --name dnsmasq \
+        --network host \
+        --volume ${ESPERIA_CODE}/src/dnsmasq:/etc/dnsmasq \
+        storytel/dnsmasq \
+            sh
+
+
+
+
+--START--
+Unable to find image 'storytel/dnsmasq:latest' locally
+latest: Pulling from storytel/dnsmasq
+ff3a5c916c92: Pull complete
+be8a008d89ab: Pull complete
+Digest: sha256:73f265e405ac8e94c43913e1b3e10b759df2b6508b6922a635d5b68b48f907ec
+Status: Downloaded newer image for storytel/dnsmasq:latest
+2ca2e37a496eb489bf0e83a2e6ed95f554fb4c32ea5912ec5ece11cb6d457374
+--END--
+
+
+    docker ps -a
+
+--START--
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS                        PORTS               NAMES
+2ca2e37a496e        storytel/dnsmasq    "dnsmasq"           8 seconds ago       Restarting (2) 1 second ago                       dnsmasq
+--END--
+
+
+# -----------------------------------------------------
+# Follow the dnsmasq logs.
+#[user@headnode]
+
+    docker logs --since 5m --follow dnsmasq
+
+--START--
+--END--
+
+
+
 
 # TODO
-# Install docker
-# Install config files
-# Run container (autostart)
 
 # Update clients
 # Remove work01 external IP

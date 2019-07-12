@@ -63,7 +63,7 @@
 
 
 # -----------------------------------------------------
-# Create the esperia group and add our users.
+# Create the esperia group and add our admin users.
 #[user@headnode]
 
     sudo groupadd --system esperia
