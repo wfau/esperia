@@ -400,7 +400,6 @@ dnsmasq[1]: cleared cache
     +           - "172.16.1.11"
 
 
-
     sudo netplan generate
 
     sudo netplan apply
@@ -409,12 +408,6 @@ dnsmasq[1]: cleared cache
 # -----------------------------------------------------
 # Run the dnsmasq container as a daemon.
 #[user@headnode]
-
-    docker ps -a
-
---START--
---END--
-
 
     docker stop $(docker ps -aq)
     docker rm   $(docker ps -aq)
@@ -430,6 +423,8 @@ dnsmasq[1]: cleared cache
     docker ps -a
 
 --START--
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS                  PORTS               NAMES
+5110550b502d        storytel/dnsmasq    "dnsmasq"           1 second ago        Up Less than a second                       dnsmasq
 --END--
 
 

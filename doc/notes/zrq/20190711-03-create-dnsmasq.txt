@@ -102,7 +102,7 @@
                             printf("\n");
                             }
                         printf("\n");
-                        printf("host-record=%s,%s", $5, $4);
+                        printf("host-record=%s,%s.esperia,%s", $5, $5, $4);
                         }
                     }
                 END {
