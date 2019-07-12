@@ -72,7 +72,7 @@
                             {
                             printf("# DHCP range for %s", $1);
                             printf("\n");
-                            printf("dhcp-range=set:%s,%s,255.255.0.0,static,6h", $1, $4);
+                            printf("dhcp-range=set:%s,%s,static,255.255.0.0,6h", $1, $4);
                             printf("\n");
                             printf("\n");
                             printf("# DHCP hosts for %s", $1);

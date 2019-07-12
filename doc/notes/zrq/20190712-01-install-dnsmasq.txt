@@ -336,7 +336,7 @@ CONTAINER ID        IMAGE               COMMAND             CREATED             
         --name dnsmasq \
         --network host \
         --volume ${ESPERIA_CODE}/src/dnsmasq:/etc/dnsmasq \
-        storytel/dnsmasq \
+        storytel/dnsmasq
             sh
 
 
