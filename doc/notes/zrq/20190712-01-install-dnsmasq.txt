@@ -107,7 +107,7 @@ network:
 
 
 # -----------------------------------------------------
-# List the iptables INPUT chain.
+# List the filter/INPUT chain.
 #[user@headnode]
 
     sudo iptables \
@@ -144,11 +144,12 @@ num   pkts bytes target     prot opt in     out     source               destina
 
 # -----------------------------------------------------
 # Drop the virbr0 rules, because we don't have libvirt installed.
+# We will need to restore this if we decide to run virtual machines on this host.
 #[user@headnode]
 
     sudo iptables \
         --table filter \
-        --delete INPUT 2
+        --delete INPUT 1
 
     sudo iptables \
         --table filter \
@@ -156,8 +157,16 @@ num   pkts bytes target     prot opt in     out     source               destina
 
 
 # -----------------------------------------------------
-# Add a rule to allow dns queries.
+# Add rules to allow dns queries on the internal VLAN interface.
 #[user@headnode]
+
+    sudo iptables \
+        --table filter \
+        --insert INPUT 3 \
+            -i br1 \
+            -p tcp \
+            --dport 53 \
+            -j ACCEPT
 
     sudo iptables \
         --table filter \
@@ -167,17 +176,9 @@ num   pkts bytes target     prot opt in     out     source               destina
             --dport 53 \
             -j ACCEPT
 
-    sudo iptables \
-        --table filter \
-        --insert INPUT 4 \
-            -i br1 \
-            -p tcp \
-            --dport 53 \
-            -j ACCEPT
-
 
 # -----------------------------------------------------
-# List the iptables INPUT filter.
+# List the filter/INPUT chain.
 #[user@headnode]
 
     sudo iptables \
@@ -213,7 +214,7 @@ num   pkts bytes target     prot opt in     out     source               destina
 
 
 # -----------------------------------------------------
-# List the iptables OUTPUT chain.
+# List the filter/OUTPUT chain.
 #[user@headnode]
 
     sudo iptables \
@@ -239,7 +240,8 @@ num   pkts bytes target     prot opt in     out     source               destina
 
 
 # -----------------------------------------------------
-# Drop the virbr0 rules, because we don't have libvirt installed.
+# Drop the virbr0 rule, because we don't have libvirt installed.
+# We will need to restore this if we decide to run virtual machines on this host.
 #[user@headnode]
 
     sudo iptables \
@@ -247,9 +249,8 @@ num   pkts bytes target     prot opt in     out     source               destina
         --delete OUTPUT 1
 
 
-
 # -----------------------------------------------------
-# List the iptables OUTPUT chain.
+# List the filter/OUTPUT chain.
 #[user@headnode]
 
     sudo iptables \
@@ -273,28 +274,9 @@ num   pkts bytes target     prot opt in     out     source               destina
 9        0     0 DROP       all  --  any    any     anywhere             anywhere
 --END--
 
-
-# -----------------------------------------------------
-# Update the iptables config to match.
-# https://www.digitalocean.com/community/tutorials/how-to-implement-a-basic-firewall-template-with-iptables-on-ubuntu-14-04
-#[root@work01]
-
-    sudo vi /etc/iptables/rules.v4
-
-        #
-        # The INPUT chain.
-        # Allow libvirt DHCP requests
-    -   [0:0] -A INPUT -i virbr0 -p udp --dport 67 -j ACCEPT
-    -   [0:0] -A INPUT -i virbr0 -p tcp --dport 67 -j ACCEPT
-
-        ....
-        ....
-
-        #
-        # The OUTPUT chain.
-        # Allow libvirt DHCP offers.
-    -   [0:0] -A OUTPUT -o virbr0 -p udp -m udp --dport 68 -j ACCEPT
-
+# Rule 8 accepts tcp to anywhere, but we don't have the same for udp.
+# Does that mean that we block upd connections to other hosts ?
+# Might cause side effects for Docker swarm networks ?
 
 
 # -----------------------------------------------------
@@ -379,11 +361,11 @@ dnsmasq[1]: cleared cache
 
     sudo vi /etc/netplan/01-netcfg.yaml
 
-
         bridges:
           br1:
             addresses: [ 172.16.1.1/16 ]
             interfaces: [ eno1 ]
+            gateway4: 172.16.1.1
             dhcp4: false
             optional: true
             nameservers:
@@ -422,7 +404,6 @@ dnsmasq[1]: cleared cache
 #[user@gaia02]
 #[user@trop03]
 #[user@trop04]
-
 
     host gaia01
 
@@ -525,10 +506,505 @@ dnsmasq-dhcp[1]: DHCPACK(br1) 172.16.5.14 06:00:ac:10:05:0e Fosauri
 
 
 
+# -----------------------------------------------------
+# List the filer/INPUT chain.
+#[user@headnode]
+
+    sudo iptables \
+        --verbose \
+        --line-numbers \
+        --table filter \
+        --list INPUT
+
+--START--
+Chain INPUT (policy DROP 0 packets, 0 bytes)
+num   pkts bytes target     prot opt in     out     source               destination
+1        0     0 ACCEPT     udp  --  virbr0 any     anywhere             anywhere             udp dpt:bootps
+2        0     0 ACCEPT     tcp  --  virbr0 any     anywhere             anywhere             tcp dpt:bootps
+3     3449 1139K ACCEPT     udp  --  br1    any     anywhere             anywhere             udp dpt:bootps
+4        0     0 ACCEPT     tcp  --  br1    any     anywhere             anywhere             tcp dpt:bootps
+5     289K  181M override   all  --  any    any     anywhere             anywhere
+6     3288  209K ACCEPT     all  --  lo     any     anywhere             anywhere
+7     2375  158K ACCEPT     udp  --  any    any     172.16.0.0/16        anywhere
+8        0     0 ACCEPT     tcp  --  any    any     172.16.0.0/16        anywhere
+9        0     0 ACCEPT     tcp  --  any    any     195.194.120.0/22     anywhere             tcp dpt:ssh
+10       0     0 ACCEPT     tcp  --  any    any     195.194.121.0/24     anywhere             tcp dpt:ssh
+11       0     0 ACCEPT     tcp  --  any    any     192.108.120.0/24     anywhere             tcp dpt:ssh
+12       0     0 ACCEPT     tcp  --  any    any     192.41.108.0/24      anywhere             tcp dpt:ssh
+13       0     0 ACCEPT     tcp  --  any    any     EdLAN.net.ed.ac.uk/16  anywhere             tcp dpt:ssh
+14      18  1040 ACCEPT     tcp  --  any    any     polymer.andrews.metagrid.co.uk  anywhere             tcp dpt:ssh
+15       0     0 ACCEPT     tcp  --  any    any     monomer.andrews.metagrid.co.uk  anywhere             tcp dpt:ssh
+16       0     0 ACCEPT     all  --  enp4s4f0 any     anywhere             anywhere             ctstate RELATED,ESTABLISHED
+17    245K  118M DROP       udp  --  enp4s4f0 any     anywhere             anywhere             udp dpt:bootps
+18       0     0 DROP       tcp  --  enp4s4f0 any     anywhere             anywhere             tcp dpt:bootps
+19    7206  448K LOG        all  --  any    any     anywhere             anywhere             LOG level warning prefix "drop "
+20    7206  448K DROP       all  --  any    any     anywhere             anywhere
+--END--
+
+
+# -----------------------------------------------------
+# Add a rule to allow incoming packets from the external interface, IF the router initiated the connection.
+#[user@headnode]
+
+# Already in place (rule 16)
+#   sudo iptables \
+#       --table filter \
+#       --insert INPUT 14 \
+#           -i enp4s4f0 \
+#           -m conntrack \
+#           --ctstate ESTABLISHED,RELATED \
+#           -j ACCEPT
+#
+
+# -----------------------------------------------------
+# List the nat/POSTROUTING rules.
+#[user@headnode]
+
+    sudo iptables \
+        --verbose \
+        --line-numbers \
+        --table nat \
+        --list POSTROUTING
+
+--START--
+Chain POSTROUTING (policy ACCEPT 7839 packets, 582K bytes)
+num   pkts bytes target     prot opt in     out     source               destination
+1        0     0 MASQUERADE  all  --  any    !docker0  172.17.0.0/16        anywhere
+--END--
+
+
+# -----------------------------------------------------
+# Add a rule to masquerade packets leaving the external interface.
+#[user@headnode]
+
+    sudo iptables \
+        --table nat \
+        --insert POSTROUTING 2 \
+            -o enp4s4f0 \
+            -j MASQUERADE
+
+
+# -----------------------------------------------------
+# List the nat/POSTROUTING rules.
+#[user@headnode]
+
+    sudo iptables \
+        --verbose \
+        --line-numbers \
+        --table nat \
+        --list POSTROUTING
+
+--START--
+Chain POSTROUTING (policy ACCEPT 0 packets, 0 bytes)
+num   pkts bytes target     prot opt in     out     source               destination
+1       16  1146 MASQUERADE  all  --  any    enp4s4f0  anywhere             anywhere
+2        0     0 MASQUERADE  all  --  any    !docker0  172.17.0.0/16        anywhere
+--END--
+
+
+# -----------------------------------------------------
+# List the filter/FORWARD rules.
+#[user@headnode]
+
+    sudo iptables \
+        --verbose \
+        --line-numbers \
+        --table filter \
+        --list FORWARD
+
+--START--
+Chain FORWARD (policy DROP 0 packets, 0 bytes)
+num   pkts bytes target     prot opt in     out     source               destination
+1     5424  400K DOCKER-USER  all  --  any    any     anywhere             anywhere
+2     5424  400K DOCKER-ISOLATION-STAGE-1  all  --  any    any     anywhere             anywhere
+3        0     0 ACCEPT     all  --  any    docker0  anywhere             anywhere             ctstate RELATED,ESTABLISHED
+4        0     0 DOCKER     all  --  any    docker0  anywhere             anywhere
+5        0     0 ACCEPT     all  --  docker0 !docker0  anywhere             anywhere
+6        0     0 ACCEPT     all  --  docker0 docker0  anywhere             anywhere
+7     5411  399K ACCEPT     all  --  br1    enp4s4f0  anywhere             anywhere
+8       13   988 ACCEPT     all  --  enp4s4f0 br1     anywhere             anywhere             ctstate RELATED,ESTABLISHED
+9        0     0 ACCEPT     all  --  virbr0 virbr0  anywhere             anywhere
+10       0     0 REJECT     all  --  any    virbr0  anywhere             anywhere             reject-with icmp-port-unreachable
+11       0     0 REJECT     all  --  virbr0 any     anywhere             anywhere             reject-with icmp-port-unreachable
+12       0     0 LOG        all  --  any    any     anywhere             anywhere             LOG level warning prefix "drop "
+13       0     0 DROP       all  --  any    any     anywhere             anywhere
+--END--
+
+
+# -----------------------------------------------------
+# Drop the virbr0 rules, because we don't have libvirt installed.
+# We will need to restore these if we decide to run virtual machines on this host.
+#[user@headnode]
+
+    sudo iptables \
+        --table filter \
+        --delete FORWARD 9
+
+    sudo iptables \
+        --table filter \
+        --delete FORWARD 9
+
+    sudo iptables \
+        --table filter \
+        --delete FORWARD 9
+
+
+# -----------------------------------------------------
+# Add a rule to forward packets from the internal bridge to the external interface.
+#[user@headnode]
+
+# Already in place (rule 7)
+#   sudo iptables \
+#       --table filter \
+#       --insert FORWARD 1 \
+#           -i br1 \
+#           -o enp4s4f0 \
+#           -j ACCEPT
+#
+
+
+# -----------------------------------------------------
+# Add a rule to forward packets from the external interface to the internal bridge,
+# IF the LAN initiated the connection.
+#[user@headnode]
+
+# Already in place (rule 8)
+#   iptables \
+#       --table filter \
+#       --insert FORWARD 2 \
+#           -i enp4s4f0 \
+#           -o br1 \
+#           -m conntrack \
+#           --ctstate ESTABLISHED,RELATED \
+#           -j ACCEPT
+
+
+# -----------------------------------------------------
+# -----------------------------------------------------
+# Update the default route on the worker nodes.
+#[user@work02]
+
+    sudo vi /etc/netplan/01-netcfg.yaml
+
+        bridges:
+          br1:
+            addresses: [ 172.16.1.2/16 ]
+            interfaces: [ eno1 ]
+    -       gateway4: 172.16.1.1
+    +       gateway4: 172.16.1.11
+            dhcp4: false
+            optional: true
+            nameservers:
+              search:
+                - ""
+                - "esperia"
+                - "roe.ac.uk"
+              addresses:
+                - "172.16.1.11"
+
+    sudo netplan generate
+    sudo netplan apply
+
+# -----------------------------------------------------
+# Test that the worker can see an external address.
+#[user@work02]
+
+    curl --head 'http://data.metagrid.co.uk/temp/'
+
+--START--
+HTTP/1.1 200 OK
+Date: Sun, 14 Jul 2019 02:03:11 GMT
+Server: Apache/2.2.15 (CentOS)
+Connection: close
+Content-Type: text/html;charset=UTF-8
+--END--
+
+
+# -----------------------------------------------------
+# -----------------------------------------------------
+# List all the chains.
+#[user@headnode]
+
+    sudo iptables \
+        --verbose \
+        --line-numbers \
+        --list
+
+--START--
+Chain INPUT (policy DROP 0 packets, 0 bytes)
+num   pkts bytes target     prot opt in     out     source               destination
+1        8   542 ACCEPT     udp  --  br1    any     anywhere             anywhere             udp dpt:domain
+2        0     0 ACCEPT     tcp  --  br1    any     anywhere             anywhere             tcp dpt:domain
+3     3455 1141K ACCEPT     udp  --  br1    any     anywhere             anywhere             udp dpt:bootps
+4        0     0 ACCEPT     tcp  --  br1    any     anywhere             anywhere             tcp dpt:bootps
+5     300K  184M override   all  --  any    any     anywhere             anywhere
+6     3376  216K ACCEPT     all  --  lo     any     anywhere             anywhere
+7     2421  161K ACCEPT     udp  --  any    any     172.16.0.0/16        anywhere
+8        0     0 ACCEPT     tcp  --  any    any     172.16.0.0/16        anywhere
+9        0     0 ACCEPT     tcp  --  any    any     195.194.120.0/22     anywhere             tcp dpt:ssh
+10       0     0 ACCEPT     tcp  --  any    any     195.194.121.0/24     anywhere             tcp dpt:ssh
+11       0     0 ACCEPT     tcp  --  any    any     192.108.120.0/24     anywhere             tcp dpt:ssh
+12       0     0 ACCEPT     tcp  --  any    any     192.41.108.0/24      anywhere             tcp dpt:ssh
+13       0     0 ACCEPT     tcp  --  any    any     EdLAN.net.ed.ac.uk/16  anywhere             tcp dpt:ssh
+14      18  1040 ACCEPT     tcp  --  any    any     polymer.andrews.metagrid.co.uk  anywhere             tcp dpt:ssh
+15       0     0 ACCEPT     tcp  --  any    any     monomer.andrews.metagrid.co.uk  anywhere             tcp dpt:ssh
+16       0     0 ACCEPT     all  --  enp4s4f0 any     anywhere             anywhere             ctstate RELATED,ESTABLISHED
+17    250K  121M DROP       udp  --  enp4s4f0 any     anywhere             anywhere             udp dpt:bootps
+18       0     0 DROP       tcp  --  enp4s4f0 any     anywhere             anywhere             tcp dpt:bootps
+19    7352  456K LOG        all  --  any    any     anywhere             anywhere             LOG level warning prefix "drop "
+20    7352  456K DROP       all  --  any    any     anywhere             anywhere
+
+Chain FORWARD (policy DROP 0 packets, 0 bytes)
+num   pkts bytes target     prot opt in     out     source               destination
+1     5784  503K DOCKER-USER  all  --  any    any     anywhere             anywhere
+2     5784  503K DOCKER-ISOLATION-STAGE-1  all  --  any    any     anywhere             anywhere
+3        0     0 ACCEPT     all  --  any    docker0  anywhere             anywhere             ctstate RELATED,ESTABLISHED
+4        0     0 DOCKER     all  --  any    docker0  anywhere             anywhere
+5        0     0 ACCEPT     all  --  docker0 !docker0  anywhere             anywhere
+6        0     0 ACCEPT     all  --  docker0 docker0  anywhere             anywhere
+7     5595  415K ACCEPT     all  --  br1    enp4s4f0  anywhere             anywhere
+8      189 87271 ACCEPT     all  --  enp4s4f0 br1     anywhere             anywhere             ctstate RELATED,ESTABLISHED
+9        0     0 LOG        all  --  any    any     anywhere             anywhere             LOG level warning prefix "drop "
+10       0     0 DROP       all  --  any    any     anywhere             anywhere
+
+Chain OUTPUT (policy DROP 0 packets, 0 bytes)
+num   pkts bytes target     prot opt in     out     source               destination
+1      766  268K ACCEPT     udp  --  any    br1     anywhere             anywhere             udp dpt:bootpc
+2    35134 3544K override   all  --  any    any     anywhere             anywhere
+3     3376  216K ACCEPT     all  --  any    lo      anywhere             anywhere
+4     2779  189K ACCEPT     udp  --  any    any     anywhere             anywhere             udp spts:1024:65535 dpt:domain
+5        0     0 ACCEPT     tcp  --  any    any     anywhere             anywhere             tcp spts:1024:65535 dpt:domain
+6       92  6992 ACCEPT     udp  --  any    any     anywhere             anywhere             udp dpt:ntp
+7       22  1320 ACCEPT     tcp  --  any    any     anywhere             anywhere
+8       80  5136 LOG        all  --  any    any     anywhere             anywhere             LOG level warning prefix "drop "
+9       80  5136 DROP       all  --  any    any     anywhere             anywhere
+
+Chain DOCKER (1 references)
+num   pkts bytes target     prot opt in     out     source               destination
+
+Chain DOCKER-ISOLATION-STAGE-1 (1 references)
+num   pkts bytes target     prot opt in     out     source               destination
+1        0     0 DOCKER-ISOLATION-STAGE-2  all  --  docker0 !docker0  anywhere             anywhere
+2     5784  503K RETURN     all  --  any    any     anywhere             anywhere
+
+Chain DOCKER-ISOLATION-STAGE-2 (1 references)
+num   pkts bytes target     prot opt in     out     source               destination
+1        0     0 DROP       all  --  any    docker0  anywhere             anywhere
+2        0     0 RETURN     all  --  any    any     anywhere             anywhere
+
+Chain DOCKER-USER (1 references)
+num   pkts bytes target     prot opt in     out     source               destination
+1     5784  503K RETURN     all  --  any    any     anywhere             anywhere
+
+Chain frasynrel (1 references)
+num   pkts bytes target     prot opt in     out     source               destination
+1        0     0 ACCEPT     all  -f  any    any     anywhere             anywhere
+2    61324   65M ACCEPT     all  --  any    any     anywhere             anywhere             state ESTABLISHED
+3        0     0 ACCEPT     tcp  --  any    any     anywhere             anywhere             tcp flags:SYN,RST,ACK/SYN state RELATED
+
+Chain override (2 references)
+num   pkts bytes target     prot opt in     out     source               destination
+1     335K  188M frasynrel  all  --  any    any     anywhere             anywhere
+2     274K  123M vitalicmp  all  --  any    any     anywhere             anywhere
+
+Chain vitalicmp (1 references)
+num   pkts bytes target     prot opt in     out     source               destination
+1     4636  732K ACCEPT     icmp --  any    any     anywhere             anywhere             icmp destination-unreachable
+2        0     0 ACCEPT     icmp --  any    any     anywhere             anywhere             icmp parameter-problem
+3        0     0 ACCEPT     icmp --  any    any     anywhere             anywhere             icmp source-quench
+4        2   264 ACCEPT     icmp --  any    any     anywhere             anywhere             icmp time-exceeded
+--END--
+
+
+# -----------------------------------------------------
+# Update the iptables config to match.
+# https://www.digitalocean.com/community/tutorials/how-to-implement-a-basic-firewall-template-with-iptables-on-ubuntu-14-04
+#[user@headnode]
+
+    sudo vi /etc/iptables/rules.v4
+
+        ....
+        ....
+
+    cat /etc/iptables/rules.v4
+
+--START--
+# Note: no blank lines in this file!!
+*nat
+:PREROUTING ACCEPT [0:0]
+:INPUT ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+:POSTROUTING ACCEPT [0:0]
+[0:0] -A POSTROUTING -o enp4s4f0 -j MASQUERADE
+COMMIT
+#
+*filter
+:INPUT DROP [0:0]
+:FORWARD DROP [0:0]
+:OUTPUT DROP [0:0]
+:frasynrel - [0:0]
+:override - [0:0]
+:vitalicmp - [0:0]
+#
+# The INPUT chain.
+#
+# Include the frasynrel and vitalicmp chains.
+[0:0] -A INPUT -j override
+# Allow anything from localhost.
+[0:0] -A INPUT -i lo -j ACCEPT
+# Allow anything from the Esperia subnet.
+[0:0] -A INPUT -s 172.16.1.0/255.255.0.0 -p udp -j ACCEPT
+[0:0] -A INPUT -s 172.16.1.0/255.255.0.0 -p tcp -j ACCEPT
+# Allow DHCP requests via the bridge interface.
+[0:0] -A INPUT -i br1 -p udp --dport 53 -j ACCEPT
+[0:0] -A INPUT -i br1 -p tcp --dport 53 -j ACCEPT
+# Allow UDP and TCP DHCP requests via the bridge interface.
+[0:0] -A INPUT -i br1 -p udp --dport 67 -j ACCEPT
+[0:0] -A INPUT -i br1 -p tcp --dport 67 -j ACCEPT
+# Allow SSH access from ROE LAN (wired desktops etc.)
+[0:0] -A INPUT -s 195.194.120.0/255.255.252.0 -p tcp -m tcp --dport 22 -j ACCEPT
+# Allow SSH access from ROE VPN.
+[0:0] -A INPUT -s 195.194.121.0/255.255.255.0 -p tcp -m tcp --dport 22 -j ACCEPT
+# Allow SSH access from ROE servers (ULAN and ROEEduroam etc.)
+[0:0] -A INPUT -s 192.108.120.0/255.255.255.0 -p tcp -m tcp --dport 22 -j ACCEPT
+[0:0] -A INPUT -s 192.41.108.0/255.255.255.0 -p tcp -m tcp --dport 22 -j ACCEPT
+# Allow SSH access from Main uni network (Uni VPN, OpenStack, trop machines etc.)
+[0:0] -A INPUT -s 129.215.0.0/255.255.0.0 -p tcp -m tcp --dport 22 -j ACCEPT
+# Allow SSH acces for Dave Morris
+[0:0] -A INPUT -s 81.187.247.196 -p tcp -m tcp --dport 22 -j ACCEPT
+[0:0] -A INPUT -s 81.187.46.67   -p tcp -m tcp --dport 22 -j ACCEPT
+# Allow packets from the external interface IF we initiated the connection.
+[0:0] -A INPUT -i enp4s4f0 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+# Drop external DHCP requests.
+[0:0] -A INPUT -i enp4s4f0 -p udp --dport 67 -j DROP
+[0:0] -A INPUT -i enp4s4f0 -p tcp --dport 67 -j DROP
+# Log and drop everything else.
+[0:0] -A INPUT -j LOG --log-prefix "drop "
+[0:0] -A INPUT -j DROP
+#
+# The FORWARD chain.
+#
+# Forward packets from the bridge interface to the external interface.
+[0:0] -A FORWARD -i br1 -o enp4s4f0 -j ACCEPT
+# Forward packets from the external interface to the bridge interface IF we initiated the connection.
+[0:0] -A FORWARD -i enp4s4f0 -o br1 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+# Log and drop everything else.
+[0:0] -A FORWARD -j DROP
+#
+# The OUTPUT chain.
+#
+# Include the frasynrel and vitalicmp chains.
+[0:0] -A OUTPUT -j override
+# Allow anything to localhost.
+[0:0] -A OUTPUT -o lo -j ACCEPT
+# Allow DHCP offers via the bridge interface.
+[0:0] -A OUTPUT -o br1 -p udp -m udp --dport 68 -j ACCEPT
+[0:0] -A OUTPUT -o br1 -p tcp -m udp --dport 68 -j ACCEPT
+# Allow DNS by UDP and TCP.
+[0:0] -A OUTPUT -p udp -m udp --sport 1024:65535 --dport 53 -j ACCEPT
+[0:0] -A OUTPUT -p tcp -m tcp --sport 1024:65535 --dport 53 -j ACCEPT
+# Allow NTP by UDP.
+[0:0] -A OUTPUT -p udp -m udp --dport 123 -j ACCEPT
+# Allow TCP to anywhere.
+[0:0] -A OUTPUT -p tcp -j ACCEPT
+# Log and drop everything else.
+[0:0] -A OUTPUT -j LOG --log-prefix "drop "
+[0:0] -A OUTPUT -j DROP
+#
+# The frasynrel chain takes care of allowing fragments and
+# of allowing packets that belong to an established connection or
+# are related to an established connection.
+#
+[0:0] -A frasynrel -f -j ACCEPT
+[0:0] -A frasynrel -m state --state ESTABLISHED -j ACCEPT
+[0:0] -A frasynrel -p tcp -m tcp --tcp-flags SYN,RST,ACK SYN -m state --state RELATED -j ACCEPT
+#
+# The override chain combines the frasynrel and vitalicmp chains
+# and is the first element of the INPUT and OUTPUT chains.
+#
+[0:0] -A override -j frasynrel
+[0:0] -A override -j vitalicmp
+#
+# The vitalicmp chain takes care of allowing the really important
+# bits of ICMP traffic.  This does not include ping.
+#
+[0:0] -A vitalicmp -p icmp -m icmp --icmp-type 3 -j ACCEPT
+[0:0] -A vitalicmp -p icmp -m icmp --icmp-type 12 -j ACCEPT
+[0:0] -A vitalicmp -p icmp -m icmp --icmp-type 4 -j ACCEPT
+[0:0] -A vitalicmp -p icmp -m icmp --icmp-type 11 -j ACCEPT
+COMMIT
+--END--
+
+
+# -----------------------------------------------------
+# Reboot to check things are persistent.
+#[user@headnode]
+
+    sudo reboot
+
+
+# -----------------------------------------------------
+# -----------------------------------------------------
+# Update the default route on the worker nodes.
+#[user@work02]
+#[user@work03]
+
+    sudo vi /etc/netplan/01-netcfg.yaml
+
+        bridges:
+          br1:
+            addresses: [ 172.16.1.2/16 ]
+            interfaces: [ eno1 ]
+    -       gateway4: 172.16.1.1
+    +       gateway4: 172.16.1.11
+            dhcp4: false
+            optional: true
+            nameservers:
+              search:
+                - ""
+                - "esperia"
+                - "roe.ac.uk"
+              addresses:
+                - "172.16.1.11"
+
+    sudo netplan generate
+    sudo netplan apply
+
+# -----------------------------------------------------
+# Test that the worker can see an external address.
+#[user@work02]
+
+    curl --head 'http://data.metagrid.co.uk/temp/'
+
+--START--
+HTTP/1.1 200 OK
+Date: Sun, 14 Jul 2019 02:03:11 GMT
+Server: Apache/2.2.15 (CentOS)
+Connection: close
+Content-Type: text/html;charset=UTF-8
+--END--
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # TODO
 # Remove work01 public IP
 # Update headnode public IP
-
-
 
 
