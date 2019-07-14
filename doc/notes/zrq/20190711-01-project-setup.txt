@@ -40,22 +40,20 @@ EOF
 
     makeproject esperia
 
---START--
-Checking [/var/local/projects/esperia]
-Creating [/var/local/projects/esperia]
-Checking [/var/local/projects/esperia]
-Checking [/var/local/projects/esperia/github-zrq]
-Creating [/var/local/projects/esperia/github-zrq]
-/var/local/projects/esperia ~
-Cloning into 'github-zrq'...
-remote: Enumerating objects: 7, done.
-remote: Counting objects: 100% (7/7), done.
-remote: Compressing objects: 100% (7/7), done.
-remote: Total 7 (delta 1), reused 0 (delta 0), pack-reused 0
-Receiving objects: 100% (7/7), 13.29 KiB | 3.32 MiB/s, done.
-Resolving deltas: 100% (1/1), done.
-~
---END--
+    >   Checking [/var/local/projects/esperia]
+    >   Creating [/var/local/projects/esperia]
+    >   Checking [/var/local/projects/esperia]
+    >   Checking [/var/local/projects/esperia/github-zrq]
+    >   Creating [/var/local/projects/esperia/github-zrq]
+    >   /var/local/projects/esperia ~
+    >   Cloning into 'github-zrq'...
+    >   remote: Enumerating objects: 7, done.
+    >   remote: Counting objects: 100% (7/7), done.
+    >   remote: Compressing objects: 100% (7/7), done.
+    >   remote: Total 7 (delta 1), reused 0 (delta 0), pack-reused 0
+    >   Receiving objects: 100% (7/7), 13.29 KiB | 3.32 MiB/s, done.
+    >   Resolving deltas: 100% (1/1), done.
+    >   ~
 
 # -----------------------------------------------------
 # Create our notes directory.

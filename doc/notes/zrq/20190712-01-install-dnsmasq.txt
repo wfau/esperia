@@ -26,26 +26,24 @@
 
     cat /etc/netplan/01-netcfg.yaml
 
---START--
-# This file describes the network interfaces available on your system
-# For more information, see netplan(5).
-network:
-  version: 2
-  renderer: networkd
-  ethernets:
-    enp4s4f0:
-      addresses: [ 192.41.108.47/24 ]
-      gateway4: 192.41.108.126
-      nameservers:
-          search: [ roe.ac.uk ]
-          addresses:
-              - "195.194.120.1"
-              - "195.194.120.2"
-              - "8.8.8.8"
-
-    enp5s0:
-      addresses: [ 172.16.1.11/16 ]
---END--
+    >   # This file describes the network interfaces available on your system
+    >   # For more information, see netplan(5).
+    >   network:
+    >     version: 2
+    >     renderer: networkd
+    >     ethernets:
+    >       enp4s4f0:
+    >         addresses: [ 192.41.108.47/24 ]
+    >         gateway4: 192.41.108.126
+    >         nameservers:
+    >             search: [ roe.ac.uk ]
+    >             addresses:
+    >                 - "195.194.120.1"
+    >                 - "195.194.120.2"
+    >                 - "8.8.8.8"
+    >   
+    >       enp5s0:
+    >         addresses: [ 172.16.1.11/16 ]
 
 
 # -----------------------------------------------------
@@ -116,30 +114,28 @@ network:
         --table filter \
         --list INPUT
 
---START--
-Chain INPUT (policy DROP 0 packets, 0 bytes)
-num   pkts bytes target     prot opt in     out     source               destination
-1        0     0 ACCEPT     udp  --  virbr0 any     anywhere             anywhere             udp dpt:bootps
-2        0     0 ACCEPT     tcp  --  virbr0 any     anywhere             anywhere             tcp dpt:bootps
-3        0     0 ACCEPT     udp  --  br1    any     anywhere             anywhere             udp dpt:bootps
-4        0     0 ACCEPT     tcp  --  br1    any     anywhere             anywhere             tcp dpt:bootps
-5     269K  176M override   all  --  any    any     anywhere             anywhere
-6       52  3885 ACCEPT     all  --  lo     any     anywhere             anywhere
-7      186 62386 ACCEPT     udp  --  any    any     172.16.0.0/16        anywhere
-8        0     0 ACCEPT     tcp  --  any    any     172.16.0.0/16        anywhere
-9        0     0 ACCEPT     tcp  --  any    any     195.194.120.0/22     anywhere             tcp dpt:ssh
-10       0     0 ACCEPT     tcp  --  any    any     195.194.121.0/24     anywhere             tcp dpt:ssh
-11       0     0 ACCEPT     tcp  --  any    any     192.108.120.0/24     anywhere             tcp dpt:ssh
-12       0     0 ACCEPT     tcp  --  any    any     192.41.108.0/24      anywhere             tcp dpt:ssh
-13       0     0 ACCEPT     tcp  --  any    any     EdLAN.net.ed.ac.uk/16  anywhere             tcp dpt:ssh
-14       5   300 ACCEPT     tcp  --  any    any     polymer.andrews.metagrid.co.uk  anywhere             tcp dpt:ssh
-15       0     0 ACCEPT     tcp  --  any    any     monomer.andrews.metagrid.co.uk  anywhere             tcp dpt:ssh
-16       0     0 ACCEPT     all  --  enp4s4f0 any     anywhere             anywhere             ctstate RELATED,ESTABLISHED
-17    244K  118M DROP       udp  --  enp4s4f0 any     anywhere             anywhere             udp dpt:bootps
-18       0     0 DROP       tcp  --  enp4s4f0 any     anywhere             anywhere             tcp dpt:bootps
-19    6499  447K LOG        all  --  any    any     anywhere             anywhere             LOG level warning prefix "drop "
-20    6499  447K DROP       all  --  any    any     anywhere             anywhere
---END--
+    >   Chain INPUT (policy DROP 0 packets, 0 bytes)
+    >   num   pkts bytes target     prot opt in     out     source               destination
+    >   1        0     0 ACCEPT     udp  --  virbr0 any     anywhere             anywhere             udp dpt:bootps
+    >   2        0     0 ACCEPT     tcp  --  virbr0 any     anywhere             anywhere             tcp dpt:bootps
+    >   3        0     0 ACCEPT     udp  --  br1    any     anywhere             anywhere             udp dpt:bootps
+    >   4        0     0 ACCEPT     tcp  --  br1    any     anywhere             anywhere             tcp dpt:bootps
+    >   5     269K  176M override   all  --  any    any     anywhere             anywhere
+    >   6       52  3885 ACCEPT     all  --  lo     any     anywhere             anywhere
+    >   7      186 62386 ACCEPT     udp  --  any    any     172.16.0.0/16        anywhere
+    >   8        0     0 ACCEPT     tcp  --  any    any     172.16.0.0/16        anywhere
+    >   9        0     0 ACCEPT     tcp  --  any    any     195.194.120.0/22     anywhere             tcp dpt:ssh
+    >   10       0     0 ACCEPT     tcp  --  any    any     195.194.121.0/24     anywhere             tcp dpt:ssh
+    >   11       0     0 ACCEPT     tcp  --  any    any     192.108.120.0/24     anywhere             tcp dpt:ssh
+    >   12       0     0 ACCEPT     tcp  --  any    any     192.41.108.0/24      anywhere             tcp dpt:ssh
+    >   13       0     0 ACCEPT     tcp  --  any    any     EdLAN.net.ed.ac.uk/16  anywhere             tcp dpt:ssh
+    >   14       5   300 ACCEPT     tcp  --  any    any     polymer.andrews.metagrid.co.uk  anywhere             tcp dpt:ssh
+    >   15       0     0 ACCEPT     tcp  --  any    any     monomer.andrews.metagrid.co.uk  anywhere             tcp dpt:ssh
+    >   16       0     0 ACCEPT     all  --  enp4s4f0 any     anywhere             anywhere             ctstate RELATED,ESTABLISHED
+    >   17    244K  118M DROP       udp  --  enp4s4f0 any     anywhere             anywhere             udp dpt:bootps
+    >   18       0     0 DROP       tcp  --  enp4s4f0 any     anywhere             anywhere             tcp dpt:bootps
+    >   19    6499  447K LOG        all  --  any    any     anywhere             anywhere             LOG level warning prefix "drop "
+    >   20    6499  447K DROP       all  --  any    any     anywhere             anywhere
 
 
 # -----------------------------------------------------
@@ -187,30 +183,28 @@ num   pkts bytes target     prot opt in     out     source               destina
         --table filter \
         --list INPUT
 
---START--
-Chain INPUT (policy DROP 0 packets, 0 bytes)
-num   pkts bytes target     prot opt in     out     source               destination
-1        0     0 ACCEPT     udp  --  br1    any     anywhere             anywhere             udp dpt:bootps
-2        0     0 ACCEPT     tcp  --  br1    any     anywhere             anywhere             tcp dpt:bootps
-3        0     0 ACCEPT     udp  --  br1    any     anywhere             anywhere             udp dpt:domain
-4        0     0 ACCEPT     tcp  --  br1    any     anywhere             anywhere             tcp dpt:domain
-5     279K  182M override   all  --  any    any     anywhere             anywhere
-6      121  9371 ACCEPT     all  --  lo     any     anywhere             anywhere
-7      186 62386 ACCEPT     udp  --  any    any     172.16.0.0/16        anywhere
-8        0     0 ACCEPT     tcp  --  any    any     172.16.0.0/16        anywhere
-9        0     0 ACCEPT     tcp  --  any    any     195.194.120.0/22     anywhere             tcp dpt:ssh
-10       0     0 ACCEPT     tcp  --  any    any     195.194.121.0/24     anywhere             tcp dpt:ssh
-11       0     0 ACCEPT     tcp  --  any    any     192.108.120.0/24     anywhere             tcp dpt:ssh
-12       0     0 ACCEPT     tcp  --  any    any     192.41.108.0/24      anywhere             tcp dpt:ssh
-13       0     0 ACCEPT     tcp  --  any    any     EdLAN.net.ed.ac.uk/16  anywhere             tcp dpt:ssh
-14       7   420 ACCEPT     tcp  --  any    any     polymer.andrews.metagrid.co.uk  anywhere             tcp dpt:ssh
-15       0     0 ACCEPT     tcp  --  any    any     monomer.andrews.metagrid.co.uk  anywhere             tcp dpt:ssh
-16       0     0 ACCEPT     all  --  enp4s4f0 any     anywhere             anywhere             ctstate RELATED,ESTABLISHED
-17    251K  122M DROP       udp  --  enp4s4f0 any     anywhere             anywhere             udp dpt:bootps
-18       0     0 DROP       tcp  --  enp4s4f0 any     anywhere             anywhere             tcp dpt:bootps
-19    6684  458K LOG        all  --  any    any     anywhere             anywhere             LOG level warning prefix "drop "
-20    6684  458K DROP       all  --  any    any     anywhere             anywhere
---END--
+    >   Chain INPUT (policy DROP 0 packets, 0 bytes)
+    >   num   pkts bytes target     prot opt in     out     source               destination
+    >   1        0     0 ACCEPT     udp  --  br1    any     anywhere             anywhere             udp dpt:bootps
+    >   2        0     0 ACCEPT     tcp  --  br1    any     anywhere             anywhere             tcp dpt:bootps
+    >   3        0     0 ACCEPT     udp  --  br1    any     anywhere             anywhere             udp dpt:domain
+    >   4        0     0 ACCEPT     tcp  --  br1    any     anywhere             anywhere             tcp dpt:domain
+    >   5     279K  182M override   all  --  any    any     anywhere             anywhere
+    >   6      121  9371 ACCEPT     all  --  lo     any     anywhere             anywhere
+    >   7      186 62386 ACCEPT     udp  --  any    any     172.16.0.0/16        anywhere
+    >   8        0     0 ACCEPT     tcp  --  any    any     172.16.0.0/16        anywhere
+    >   9        0     0 ACCEPT     tcp  --  any    any     195.194.120.0/22     anywhere             tcp dpt:ssh
+    >   10       0     0 ACCEPT     tcp  --  any    any     195.194.121.0/24     anywhere             tcp dpt:ssh
+    >   11       0     0 ACCEPT     tcp  --  any    any     192.108.120.0/24     anywhere             tcp dpt:ssh
+    >   12       0     0 ACCEPT     tcp  --  any    any     192.41.108.0/24      anywhere             tcp dpt:ssh
+    >   13       0     0 ACCEPT     tcp  --  any    any     EdLAN.net.ed.ac.uk/16  anywhere             tcp dpt:ssh
+    >   14       7   420 ACCEPT     tcp  --  any    any     polymer.andrews.metagrid.co.uk  anywhere             tcp dpt:ssh
+    >   15       0     0 ACCEPT     tcp  --  any    any     monomer.andrews.metagrid.co.uk  anywhere             tcp dpt:ssh
+    >   16       0     0 ACCEPT     all  --  enp4s4f0 any     anywhere             anywhere             ctstate RELATED,ESTABLISHED
+    >   17    251K  122M DROP       udp  --  enp4s4f0 any     anywhere             anywhere             udp dpt:bootps
+    >   18       0     0 DROP       tcp  --  enp4s4f0 any     anywhere             anywhere             tcp dpt:bootps
+    >   19    6684  458K LOG        all  --  any    any     anywhere             anywhere             LOG level warning prefix "drop "
+    >   20    6684  458K DROP       all  --  any    any     anywhere             anywhere
 
 
 # -----------------------------------------------------
@@ -223,20 +217,18 @@ num   pkts bytes target     prot opt in     out     source               destina
         --table filter \
         --list OUTPUT
 
---START--
-Chain OUTPUT (policy DROP 0 packets, 0 bytes)
-num   pkts bytes target     prot opt in     out     source               destination
-1        0     0 ACCEPT     udp  --  any    virbr0  anywhere             anywhere             udp dpt:bootpc
-2        0     0 ACCEPT     udp  --  any    br1     anywhere             anywhere             udp dpt:bootpc
-3     8800  761K override   all  --  any    any     anywhere             anywhere
-4       71  5443 ACCEPT     all  --  any    lo      anywhere             anywhere
-5       74  5560 ACCEPT     udp  --  any    any     anywhere             anywhere             udp spts:1024:65535 dpt:domain
-6        0     0 ACCEPT     tcp  --  any    any     anywhere             anywhere             tcp spts:1024:65535 dpt:domain
-7       95  7220 ACCEPT     udp  --  any    any     anywhere             anywhere             udp dpt:ntp
-8       15   900 ACCEPT     tcp  --  any    any     anywhere             anywhere
-9        0     0 LOG        all  --  any    any     anywhere             anywhere             LOG level warning prefix "drop "
-10       0     0 DROP       all  --  any    any     anywhere             anywhere
---END--
+    >   Chain OUTPUT (policy DROP 0 packets, 0 bytes)
+    >   num   pkts bytes target     prot opt in     out     source               destination
+    >   1        0     0 ACCEPT     udp  --  any    virbr0  anywhere             anywhere             udp dpt:bootpc
+    >   2        0     0 ACCEPT     udp  --  any    br1     anywhere             anywhere             udp dpt:bootpc
+    >   3     8800  761K override   all  --  any    any     anywhere             anywhere
+    >   4       71  5443 ACCEPT     all  --  any    lo      anywhere             anywhere
+    >   5       74  5560 ACCEPT     udp  --  any    any     anywhere             anywhere             udp spts:1024:65535 dpt:domain
+    >   6        0     0 ACCEPT     tcp  --  any    any     anywhere             anywhere             tcp spts:1024:65535 dpt:domain
+    >   7       95  7220 ACCEPT     udp  --  any    any     anywhere             anywhere             udp dpt:ntp
+    >   8       15   900 ACCEPT     tcp  --  any    any     anywhere             anywhere
+    >   9        0     0 LOG        all  --  any    any     anywhere             anywhere             LOG level warning prefix "drop "
+    >   10       0     0 DROP       all  --  any    any     anywhere             anywhere
 
 
 # -----------------------------------------------------
@@ -260,19 +252,17 @@ num   pkts bytes target     prot opt in     out     source               destina
         --list OUTPUT
 
 
---START--
-Chain OUTPUT (policy DROP 0 packets, 0 bytes)
-num   pkts bytes target     prot opt in     out     source               destination
-1        0     0 ACCEPT     udp  --  any    br1     anywhere             anywhere             udp dpt:bootpc
-2     8890  771K override   all  --  any    any     anywhere             anywhere
-3       80  6181 ACCEPT     all  --  any    lo      anywhere             anywhere
-4       80  6051 ACCEPT     udp  --  any    any     anywhere             anywhere             udp spts:1024:65535 dpt:domain
-5        0     0 ACCEPT     tcp  --  any    any     anywhere             anywhere             tcp spts:1024:65535 dpt:domain
-6       95  7220 ACCEPT     udp  --  any    any     anywhere             anywhere             udp dpt:ntp
-7       15   900 ACCEPT     tcp  --  any    any     anywhere             anywhere
-8        0     0 LOG        all  --  any    any     anywhere             anywhere             LOG level warning prefix "drop "
-9        0     0 DROP       all  --  any    any     anywhere             anywhere
---END--
+    >   Chain OUTPUT (policy DROP 0 packets, 0 bytes)
+    >   num   pkts bytes target     prot opt in     out     source               destination
+    >   1        0     0 ACCEPT     udp  --  any    br1     anywhere             anywhere             udp dpt:bootpc
+    >   2     8890  771K override   all  --  any    any     anywhere             anywhere
+    >   3       80  6181 ACCEPT     all  --  any    lo      anywhere             anywhere
+    >   4       80  6051 ACCEPT     udp  --  any    any     anywhere             anywhere             udp spts:1024:65535 dpt:domain
+    >   5        0     0 ACCEPT     tcp  --  any    any     anywhere             anywhere             tcp spts:1024:65535 dpt:domain
+    >   6       95  7220 ACCEPT     udp  --  any    any     anywhere             anywhere             udp dpt:ntp
+    >   7       15   900 ACCEPT     tcp  --  any    any     anywhere             anywhere
+    >   8        0     0 LOG        all  --  any    any     anywhere             anywhere             LOG level warning prefix "drop "
+    >   9        0     0 DROP       all  --  any    any     anywhere             anywhere
 
 # Rule 8 accepts tcp to anywhere, but we don't have the same for udp.
 # Does that mean that we block upd connections to other hosts ?
@@ -306,9 +296,7 @@ num   pkts bytes target     prot opt in     out     source               destina
 
     id --groups --name
 
---START--
-dmr sudo docker esperia
---END--
+    >   dmr sudo docker esperia
 
 
 # -----------------------------------------------------
@@ -327,26 +315,24 @@ dmr sudo docker esperia
         --volume ${ESPERIA_CODE}/src/dnsmasq:/etc/dnsmasq \
         storytel/dnsmasq
 
---START--
-dnsmasq[1]: started, version 2.78 cachesize 150
-dnsmasq[1]: compile time options: IPv6 GNU-getopt no-DBus no-i18n no-IDN DHCP DHCPv6 no-Lua TFTP no-conntrack ipset auth no-DNSSEC loop-detect inotify
-dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.10.1, lease time 6h
-dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.3.1, lease time 6h
-dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.6.1, lease time 6h
-dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.4.1, lease time 6h
-dnsmasq-dhcp[1]: DHCP, IP range 172.16.252.1 -- 172.16.252.252, lease time 6h
-dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.2.1, lease time 6h
-dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.9.1, lease time 6h
-dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.0.1, lease time 6h
-dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.5.1, lease time 6h
-dnsmasq-dhcp[1]: DHCP, sockets bound exclusively to interface br1
-dnsmasq[1]: using local addresses only for domain esperia
-dnsmasq[1]: using local addresses only for domain 16.172.in-addr.arpa
-dnsmasq[1]: using nameserver 8.8.8.8#53
-dnsmasq[1]: using nameserver 195.194.120.2#53
-dnsmasq[1]: using nameserver 195.194.120.1#53
-dnsmasq[1]: cleared cache
---END--
+    >   dnsmasq[1]: started, version 2.78 cachesize 150
+    >   dnsmasq[1]: compile time options: IPv6 GNU-getopt no-DBus no-i18n no-IDN DHCP DHCPv6 no-Lua TFTP no-conntrack ipset auth no-DNSSEC loop-detect inotify
+    >   dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.10.1, lease time 6h
+    >   dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.3.1, lease time 6h
+    >   dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.6.1, lease time 6h
+    >   dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.4.1, lease time 6h
+    >   dnsmasq-dhcp[1]: DHCP, IP range 172.16.252.1 -- 172.16.252.252, lease time 6h
+    >   dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.2.1, lease time 6h
+    >   dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.9.1, lease time 6h
+    >   dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.0.1, lease time 6h
+    >   dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.5.1, lease time 6h
+    >   dnsmasq-dhcp[1]: DHCP, sockets bound exclusively to interface br1
+    >   dnsmasq[1]: using local addresses only for domain esperia
+    >   dnsmasq[1]: using local addresses only for domain 16.172.in-addr.arpa
+    >   dnsmasq[1]: using nameserver 8.8.8.8#53
+    >   dnsmasq[1]: using nameserver 195.194.120.2#53
+    >   dnsmasq[1]: using nameserver 195.194.120.1#53
+    >   dnsmasq[1]: cleared cache
 
 
 # -----------------------------------------------------
@@ -407,37 +393,27 @@ dnsmasq[1]: cleared cache
 
     host gaia01
 
---START--
-gaia01.esperia has address 172.16.1.9
---END--
+    >   gaia01.esperia has address 172.16.1.9
 
 
     host Falidon
 
---START--
-Falidon.esperia has address 172.16.0.29
---END--
+    >   Falidon.esperia has address 172.16.0.29
 
 
     host trop01
 
---START--
-trop01.roe.ac.uk has address 129.215.175.96
---END--
+    >   trop01.roe.ac.uk has address 129.215.175.96
 
 
     host trop03
 
---START--
-trop03.esperia has address 172.16.1.5
---END--
+    >   trop03.esperia has address 172.16.1.5
 
 
     host trop03.roe.ac.uk
 
---START--
-trop03.roe.ac.uk has address 129.215.175.98
---END--
+    >   trop03.roe.ac.uk has address 129.215.175.98
 
 
 # -----------------------------------------------------
@@ -456,17 +432,13 @@ trop03.roe.ac.uk has address 129.215.175.98
         --volume ${ESPERIA_CODE}/src/dnsmasq:/etc/dnsmasq \
         storytel/dnsmasq
 
---START--
-dc8a000f00086059b70c489e527bbcad83df094703560e5208351e981916c0f8
---END--
+    >   dc8a000f00086059b70c489e527bbcad83df094703560e5208351e981916c0f8
 
 
     docker ps -a
 
---START--
-CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS                  PORTS               NAMES
-dc8a000f0008        storytel/dnsmasq    "dnsmasq"           1 second ago        Up Less than a second                       dnsmasq
---END--
+    >   CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS                  PORTS               NAMES
+    >   dc8a000f0008        storytel/dnsmasq    "dnsmasq"           1 second ago        Up Less than a second                       dnsmasq
 
 
 # -----------------------------------------------------
@@ -475,33 +447,29 @@ dc8a000f0008        storytel/dnsmasq    "dnsmasq"           1 second ago        
 
     docker logs --since 5m --follow dnsmasq
 
---START--
-dnsmasq[1]: started, version 2.78 cachesize 150
-dnsmasq[1]: compile time options: IPv6 GNU-getopt no-DBus no-i18n no-IDN DHCP DHCPv6 no-Lua TFTP no-conntrack ipset auth no-DNSSEC loop-detect inotify
-dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.10.1, lease time 6h
-dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.3.1, lease time 6h
-dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.6.1, lease time 6h
-dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.4.1, lease time 6h
-dnsmasq-dhcp[1]: DHCP, IP range 172.16.252.1 -- 172.16.252.252, lease time 6h
-dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.2.1, lease time 6h
-dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.9.1, lease time 6h
-dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.0.1, lease time 6h
-dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.5.1, lease time 6h
-dnsmasq-dhcp[1]: DHCP, sockets bound exclusively to interface br1
-dnsmasq[1]: using local addresses only for domain esperia
-dnsmasq[1]: using local addresses only for domain 16.172.in-addr.arpa
-dnsmasq[1]: using nameserver 8.8.8.8#53
-dnsmasq[1]: using nameserver 195.194.120.2#53
-dnsmasq[1]: using nameserver 195.194.120.1#53
-dnsmasq[1]: cleared cache
---END--
+    >   dnsmasq[1]: started, version 2.78 cachesize 150
+    >   dnsmasq[1]: compile time options: IPv6 GNU-getopt no-DBus no-i18n no-IDN DHCP DHCPv6 no-Lua TFTP no-conntrack ipset auth no-DNSSEC loop-detect inotify
+    >   dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.10.1, lease time 6h
+    >   dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.3.1, lease time 6h
+    >   dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.6.1, lease time 6h
+    >   dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.4.1, lease time 6h
+    >   dnsmasq-dhcp[1]: DHCP, IP range 172.16.252.1 -- 172.16.252.252, lease time 6h
+    >   dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.2.1, lease time 6h
+    >   dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.9.1, lease time 6h
+    >   dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.0.1, lease time 6h
+    >   dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.5.1, lease time 6h
+    >   dnsmasq-dhcp[1]: DHCP, sockets bound exclusively to interface br1
+    >   dnsmasq[1]: using local addresses only for domain esperia
+    >   dnsmasq[1]: using local addresses only for domain 16.172.in-addr.arpa
+    >   dnsmasq[1]: using nameserver 8.8.8.8#53
+    >   dnsmasq[1]: using nameserver 195.194.120.2#53
+    >   dnsmasq[1]: using nameserver 195.194.120.1#53
+    >   dnsmasq[1]: cleared cache
 
---START--
-dnsmasq-dhcp[1]: DHCPDISCOVER(br1) 172.16.5.14 06:00:ac:10:05:0e
-dnsmasq-dhcp[1]: DHCPOFFER(br1) 172.16.5.14 06:00:ac:10:05:0e
-dnsmasq-dhcp[1]: DHCPREQUEST(br1) 172.16.5.14 06:00:ac:10:05:0e
-dnsmasq-dhcp[1]: DHCPACK(br1) 172.16.5.14 06:00:ac:10:05:0e Fosauri
---END--
+    >   dnsmasq-dhcp[1]: DHCPDISCOVER(br1) 172.16.5.14 06:00:ac:10:05:0e
+    >   dnsmasq-dhcp[1]: DHCPOFFER(br1) 172.16.5.14 06:00:ac:10:05:0e
+    >   dnsmasq-dhcp[1]: DHCPREQUEST(br1) 172.16.5.14 06:00:ac:10:05:0e
+    >   dnsmasq-dhcp[1]: DHCPACK(br1) 172.16.5.14 06:00:ac:10:05:0e Fosauri
 
 
 
@@ -516,30 +484,28 @@ dnsmasq-dhcp[1]: DHCPACK(br1) 172.16.5.14 06:00:ac:10:05:0e Fosauri
         --table filter \
         --list INPUT
 
---START--
-Chain INPUT (policy DROP 0 packets, 0 bytes)
-num   pkts bytes target     prot opt in     out     source               destination
-1        0     0 ACCEPT     udp  --  virbr0 any     anywhere             anywhere             udp dpt:bootps
-2        0     0 ACCEPT     tcp  --  virbr0 any     anywhere             anywhere             tcp dpt:bootps
-3     3449 1139K ACCEPT     udp  --  br1    any     anywhere             anywhere             udp dpt:bootps
-4        0     0 ACCEPT     tcp  --  br1    any     anywhere             anywhere             tcp dpt:bootps
-5     289K  181M override   all  --  any    any     anywhere             anywhere
-6     3288  209K ACCEPT     all  --  lo     any     anywhere             anywhere
-7     2375  158K ACCEPT     udp  --  any    any     172.16.0.0/16        anywhere
-8        0     0 ACCEPT     tcp  --  any    any     172.16.0.0/16        anywhere
-9        0     0 ACCEPT     tcp  --  any    any     195.194.120.0/22     anywhere             tcp dpt:ssh
-10       0     0 ACCEPT     tcp  --  any    any     195.194.121.0/24     anywhere             tcp dpt:ssh
-11       0     0 ACCEPT     tcp  --  any    any     192.108.120.0/24     anywhere             tcp dpt:ssh
-12       0     0 ACCEPT     tcp  --  any    any     192.41.108.0/24      anywhere             tcp dpt:ssh
-13       0     0 ACCEPT     tcp  --  any    any     EdLAN.net.ed.ac.uk/16  anywhere             tcp dpt:ssh
-14      18  1040 ACCEPT     tcp  --  any    any     polymer.andrews.metagrid.co.uk  anywhere             tcp dpt:ssh
-15       0     0 ACCEPT     tcp  --  any    any     monomer.andrews.metagrid.co.uk  anywhere             tcp dpt:ssh
-16       0     0 ACCEPT     all  --  enp4s4f0 any     anywhere             anywhere             ctstate RELATED,ESTABLISHED
-17    245K  118M DROP       udp  --  enp4s4f0 any     anywhere             anywhere             udp dpt:bootps
-18       0     0 DROP       tcp  --  enp4s4f0 any     anywhere             anywhere             tcp dpt:bootps
-19    7206  448K LOG        all  --  any    any     anywhere             anywhere             LOG level warning prefix "drop "
-20    7206  448K DROP       all  --  any    any     anywhere             anywhere
---END--
+    >   Chain INPUT (policy DROP 0 packets, 0 bytes)
+    >   num   pkts bytes target     prot opt in     out     source               destination
+    >   1        0     0 ACCEPT     udp  --  virbr0 any     anywhere             anywhere             udp dpt:bootps
+    >   2        0     0 ACCEPT     tcp  --  virbr0 any     anywhere             anywhere             tcp dpt:bootps
+    >   3     3449 1139K ACCEPT     udp  --  br1    any     anywhere             anywhere             udp dpt:bootps
+    >   4        0     0 ACCEPT     tcp  --  br1    any     anywhere             anywhere             tcp dpt:bootps
+    >   5     289K  181M override   all  --  any    any     anywhere             anywhere
+    >   6     3288  209K ACCEPT     all  --  lo     any     anywhere             anywhere
+    >   7     2375  158K ACCEPT     udp  --  any    any     172.16.0.0/16        anywhere
+    >   8        0     0 ACCEPT     tcp  --  any    any     172.16.0.0/16        anywhere
+    >   9        0     0 ACCEPT     tcp  --  any    any     195.194.120.0/22     anywhere             tcp dpt:ssh
+    >   10       0     0 ACCEPT     tcp  --  any    any     195.194.121.0/24     anywhere             tcp dpt:ssh
+    >   11       0     0 ACCEPT     tcp  --  any    any     192.108.120.0/24     anywhere             tcp dpt:ssh
+    >   12       0     0 ACCEPT     tcp  --  any    any     192.41.108.0/24      anywhere             tcp dpt:ssh
+    >   13       0     0 ACCEPT     tcp  --  any    any     EdLAN.net.ed.ac.uk/16  anywhere             tcp dpt:ssh
+    >   14      18  1040 ACCEPT     tcp  --  any    any     polymer.andrews.metagrid.co.uk  anywhere             tcp dpt:ssh
+    >   15       0     0 ACCEPT     tcp  --  any    any     monomer.andrews.metagrid.co.uk  anywhere             tcp dpt:ssh
+    >   16       0     0 ACCEPT     all  --  enp4s4f0 any     anywhere             anywhere             ctstate RELATED,ESTABLISHED
+    >   17    245K  118M DROP       udp  --  enp4s4f0 any     anywhere             anywhere             udp dpt:bootps
+    >   18       0     0 DROP       tcp  --  enp4s4f0 any     anywhere             anywhere             tcp dpt:bootps
+    >   19    7206  448K LOG        all  --  any    any     anywhere             anywhere             LOG level warning prefix "drop "
+    >   20    7206  448K DROP       all  --  any    any     anywhere             anywhere
 
 
 # -----------------------------------------------------
@@ -566,11 +532,9 @@ num   pkts bytes target     prot opt in     out     source               destina
         --table nat \
         --list POSTROUTING
 
---START--
-Chain POSTROUTING (policy ACCEPT 7839 packets, 582K bytes)
-num   pkts bytes target     prot opt in     out     source               destination
-1        0     0 MASQUERADE  all  --  any    !docker0  172.17.0.0/16        anywhere
---END--
+    >   Chain POSTROUTING (policy ACCEPT 7839 packets, 582K bytes)
+    >   num   pkts bytes target     prot opt in     out     source               destination
+    >   1        0     0 MASQUERADE  all  --  any    !docker0  172.17.0.0/16        anywhere
 
 
 # -----------------------------------------------------
@@ -594,12 +558,10 @@ num   pkts bytes target     prot opt in     out     source               destina
         --table nat \
         --list POSTROUTING
 
---START--
-Chain POSTROUTING (policy ACCEPT 0 packets, 0 bytes)
-num   pkts bytes target     prot opt in     out     source               destination
-1       16  1146 MASQUERADE  all  --  any    enp4s4f0  anywhere             anywhere
-2        0     0 MASQUERADE  all  --  any    !docker0  172.17.0.0/16        anywhere
---END--
+    >   Chain POSTROUTING (policy ACCEPT 0 packets, 0 bytes)
+    >   num   pkts bytes target     prot opt in     out     source               destination
+    >   1       16  1146 MASQUERADE  all  --  any    enp4s4f0  anywhere             anywhere
+    >   2        0     0 MASQUERADE  all  --  any    !docker0  172.17.0.0/16        anywhere
 
 
 # -----------------------------------------------------
@@ -612,23 +574,21 @@ num   pkts bytes target     prot opt in     out     source               destina
         --table filter \
         --list FORWARD
 
---START--
-Chain FORWARD (policy DROP 0 packets, 0 bytes)
-num   pkts bytes target     prot opt in     out     source               destination
-1     5424  400K DOCKER-USER  all  --  any    any     anywhere             anywhere
-2     5424  400K DOCKER-ISOLATION-STAGE-1  all  --  any    any     anywhere             anywhere
-3        0     0 ACCEPT     all  --  any    docker0  anywhere             anywhere             ctstate RELATED,ESTABLISHED
-4        0     0 DOCKER     all  --  any    docker0  anywhere             anywhere
-5        0     0 ACCEPT     all  --  docker0 !docker0  anywhere             anywhere
-6        0     0 ACCEPT     all  --  docker0 docker0  anywhere             anywhere
-7     5411  399K ACCEPT     all  --  br1    enp4s4f0  anywhere             anywhere
-8       13   988 ACCEPT     all  --  enp4s4f0 br1     anywhere             anywhere             ctstate RELATED,ESTABLISHED
-9        0     0 ACCEPT     all  --  virbr0 virbr0  anywhere             anywhere
-10       0     0 REJECT     all  --  any    virbr0  anywhere             anywhere             reject-with icmp-port-unreachable
-11       0     0 REJECT     all  --  virbr0 any     anywhere             anywhere             reject-with icmp-port-unreachable
-12       0     0 LOG        all  --  any    any     anywhere             anywhere             LOG level warning prefix "drop "
-13       0     0 DROP       all  --  any    any     anywhere             anywhere
---END--
+    >   Chain FORWARD (policy DROP 0 packets, 0 bytes)
+    >   num   pkts bytes target     prot opt in     out     source               destination
+    >   1     5424  400K DOCKER-USER  all  --  any    any     anywhere             anywhere
+    >   2     5424  400K DOCKER-ISOLATION-STAGE-1  all  --  any    any     anywhere             anywhere
+    >   3        0     0 ACCEPT     all  --  any    docker0  anywhere             anywhere             ctstate RELATED,ESTABLISHED
+    >   4        0     0 DOCKER     all  --  any    docker0  anywhere             anywhere
+    >   5        0     0 ACCEPT     all  --  docker0 !docker0  anywhere             anywhere
+    >   6        0     0 ACCEPT     all  --  docker0 docker0  anywhere             anywhere
+    >   7     5411  399K ACCEPT     all  --  br1    enp4s4f0  anywhere             anywhere
+    >   8       13   988 ACCEPT     all  --  enp4s4f0 br1     anywhere             anywhere             ctstate RELATED,ESTABLISHED
+    >   9        0     0 ACCEPT     all  --  virbr0 virbr0  anywhere             anywhere
+    >   10       0     0 REJECT     all  --  any    virbr0  anywhere             anywhere             reject-with icmp-port-unreachable
+    >   11       0     0 REJECT     all  --  virbr0 any     anywhere             anywhere             reject-with icmp-port-unreachable
+    >   12       0     0 LOG        all  --  any    any     anywhere             anywhere             LOG level warning prefix "drop "
+    >   13       0     0 DROP       all  --  any    any     anywhere             anywhere
 
 
 # -----------------------------------------------------
@@ -711,13 +671,11 @@ num   pkts bytes target     prot opt in     out     source               destina
 
     curl --head 'http://data.metagrid.co.uk/temp/'
 
---START--
-HTTP/1.1 200 OK
-Date: Sun, 14 Jul 2019 02:03:11 GMT
-Server: Apache/2.2.15 (CentOS)
-Connection: close
-Content-Type: text/html;charset=UTF-8
---END--
+    >   HTTP/1.1 200 OK
+    >   Date: Sun, 14 Jul 2019 02:03:11 GMT
+    >   Server: Apache/2.2.15 (CentOS)
+    >   Connection: close
+    >   Content-Type: text/html;charset=UTF-8
 
 
 # -----------------------------------------------------
@@ -730,90 +688,88 @@ Content-Type: text/html;charset=UTF-8
         --line-numbers \
         --list
 
---START--
-Chain INPUT (policy DROP 0 packets, 0 bytes)
-num   pkts bytes target     prot opt in     out     source               destination
-1        8   542 ACCEPT     udp  --  br1    any     anywhere             anywhere             udp dpt:domain
-2        0     0 ACCEPT     tcp  --  br1    any     anywhere             anywhere             tcp dpt:domain
-3     3455 1141K ACCEPT     udp  --  br1    any     anywhere             anywhere             udp dpt:bootps
-4        0     0 ACCEPT     tcp  --  br1    any     anywhere             anywhere             tcp dpt:bootps
-5     300K  184M override   all  --  any    any     anywhere             anywhere
-6     3376  216K ACCEPT     all  --  lo     any     anywhere             anywhere
-7     2421  161K ACCEPT     udp  --  any    any     172.16.0.0/16        anywhere
-8        0     0 ACCEPT     tcp  --  any    any     172.16.0.0/16        anywhere
-9        0     0 ACCEPT     tcp  --  any    any     195.194.120.0/22     anywhere             tcp dpt:ssh
-10       0     0 ACCEPT     tcp  --  any    any     195.194.121.0/24     anywhere             tcp dpt:ssh
-11       0     0 ACCEPT     tcp  --  any    any     192.108.120.0/24     anywhere             tcp dpt:ssh
-12       0     0 ACCEPT     tcp  --  any    any     192.41.108.0/24      anywhere             tcp dpt:ssh
-13       0     0 ACCEPT     tcp  --  any    any     EdLAN.net.ed.ac.uk/16  anywhere             tcp dpt:ssh
-14      18  1040 ACCEPT     tcp  --  any    any     polymer.andrews.metagrid.co.uk  anywhere             tcp dpt:ssh
-15       0     0 ACCEPT     tcp  --  any    any     monomer.andrews.metagrid.co.uk  anywhere             tcp dpt:ssh
-16       0     0 ACCEPT     all  --  enp4s4f0 any     anywhere             anywhere             ctstate RELATED,ESTABLISHED
-17    250K  121M DROP       udp  --  enp4s4f0 any     anywhere             anywhere             udp dpt:bootps
-18       0     0 DROP       tcp  --  enp4s4f0 any     anywhere             anywhere             tcp dpt:bootps
-19    7352  456K LOG        all  --  any    any     anywhere             anywhere             LOG level warning prefix "drop "
-20    7352  456K DROP       all  --  any    any     anywhere             anywhere
-
-Chain FORWARD (policy DROP 0 packets, 0 bytes)
-num   pkts bytes target     prot opt in     out     source               destination
-1     5784  503K DOCKER-USER  all  --  any    any     anywhere             anywhere
-2     5784  503K DOCKER-ISOLATION-STAGE-1  all  --  any    any     anywhere             anywhere
-3        0     0 ACCEPT     all  --  any    docker0  anywhere             anywhere             ctstate RELATED,ESTABLISHED
-4        0     0 DOCKER     all  --  any    docker0  anywhere             anywhere
-5        0     0 ACCEPT     all  --  docker0 !docker0  anywhere             anywhere
-6        0     0 ACCEPT     all  --  docker0 docker0  anywhere             anywhere
-7     5595  415K ACCEPT     all  --  br1    enp4s4f0  anywhere             anywhere
-8      189 87271 ACCEPT     all  --  enp4s4f0 br1     anywhere             anywhere             ctstate RELATED,ESTABLISHED
-9        0     0 LOG        all  --  any    any     anywhere             anywhere             LOG level warning prefix "drop "
-10       0     0 DROP       all  --  any    any     anywhere             anywhere
-
-Chain OUTPUT (policy DROP 0 packets, 0 bytes)
-num   pkts bytes target     prot opt in     out     source               destination
-1      766  268K ACCEPT     udp  --  any    br1     anywhere             anywhere             udp dpt:bootpc
-2    35134 3544K override   all  --  any    any     anywhere             anywhere
-3     3376  216K ACCEPT     all  --  any    lo      anywhere             anywhere
-4     2779  189K ACCEPT     udp  --  any    any     anywhere             anywhere             udp spts:1024:65535 dpt:domain
-5        0     0 ACCEPT     tcp  --  any    any     anywhere             anywhere             tcp spts:1024:65535 dpt:domain
-6       92  6992 ACCEPT     udp  --  any    any     anywhere             anywhere             udp dpt:ntp
-7       22  1320 ACCEPT     tcp  --  any    any     anywhere             anywhere
-8       80  5136 LOG        all  --  any    any     anywhere             anywhere             LOG level warning prefix "drop "
-9       80  5136 DROP       all  --  any    any     anywhere             anywhere
-
-Chain DOCKER (1 references)
-num   pkts bytes target     prot opt in     out     source               destination
-
-Chain DOCKER-ISOLATION-STAGE-1 (1 references)
-num   pkts bytes target     prot opt in     out     source               destination
-1        0     0 DOCKER-ISOLATION-STAGE-2  all  --  docker0 !docker0  anywhere             anywhere
-2     5784  503K RETURN     all  --  any    any     anywhere             anywhere
-
-Chain DOCKER-ISOLATION-STAGE-2 (1 references)
-num   pkts bytes target     prot opt in     out     source               destination
-1        0     0 DROP       all  --  any    docker0  anywhere             anywhere
-2        0     0 RETURN     all  --  any    any     anywhere             anywhere
-
-Chain DOCKER-USER (1 references)
-num   pkts bytes target     prot opt in     out     source               destination
-1     5784  503K RETURN     all  --  any    any     anywhere             anywhere
-
-Chain frasynrel (1 references)
-num   pkts bytes target     prot opt in     out     source               destination
-1        0     0 ACCEPT     all  -f  any    any     anywhere             anywhere
-2    61324   65M ACCEPT     all  --  any    any     anywhere             anywhere             state ESTABLISHED
-3        0     0 ACCEPT     tcp  --  any    any     anywhere             anywhere             tcp flags:SYN,RST,ACK/SYN state RELATED
-
-Chain override (2 references)
-num   pkts bytes target     prot opt in     out     source               destination
-1     335K  188M frasynrel  all  --  any    any     anywhere             anywhere
-2     274K  123M vitalicmp  all  --  any    any     anywhere             anywhere
-
-Chain vitalicmp (1 references)
-num   pkts bytes target     prot opt in     out     source               destination
-1     4636  732K ACCEPT     icmp --  any    any     anywhere             anywhere             icmp destination-unreachable
-2        0     0 ACCEPT     icmp --  any    any     anywhere             anywhere             icmp parameter-problem
-3        0     0 ACCEPT     icmp --  any    any     anywhere             anywhere             icmp source-quench
-4        2   264 ACCEPT     icmp --  any    any     anywhere             anywhere             icmp time-exceeded
---END--
+    >   Chain INPUT (policy DROP 0 packets, 0 bytes)
+    >   num   pkts bytes target     prot opt in     out     source               destination
+    >   1        8   542 ACCEPT     udp  --  br1    any     anywhere             anywhere             udp dpt:domain
+    >   2        0     0 ACCEPT     tcp  --  br1    any     anywhere             anywhere             tcp dpt:domain
+    >   3     3455 1141K ACCEPT     udp  --  br1    any     anywhere             anywhere             udp dpt:bootps
+    >   4        0     0 ACCEPT     tcp  --  br1    any     anywhere             anywhere             tcp dpt:bootps
+    >   5     300K  184M override   all  --  any    any     anywhere             anywhere
+    >   6     3376  216K ACCEPT     all  --  lo     any     anywhere             anywhere
+    >   7     2421  161K ACCEPT     udp  --  any    any     172.16.0.0/16        anywhere
+    >   8        0     0 ACCEPT     tcp  --  any    any     172.16.0.0/16        anywhere
+    >   9        0     0 ACCEPT     tcp  --  any    any     195.194.120.0/22     anywhere             tcp dpt:ssh
+    >   10       0     0 ACCEPT     tcp  --  any    any     195.194.121.0/24     anywhere             tcp dpt:ssh
+    >   11       0     0 ACCEPT     tcp  --  any    any     192.108.120.0/24     anywhere             tcp dpt:ssh
+    >   12       0     0 ACCEPT     tcp  --  any    any     192.41.108.0/24      anywhere             tcp dpt:ssh
+    >   13       0     0 ACCEPT     tcp  --  any    any     EdLAN.net.ed.ac.uk/16  anywhere             tcp dpt:ssh
+    >   14      18  1040 ACCEPT     tcp  --  any    any     polymer.andrews.metagrid.co.uk  anywhere             tcp dpt:ssh
+    >   15       0     0 ACCEPT     tcp  --  any    any     monomer.andrews.metagrid.co.uk  anywhere             tcp dpt:ssh
+    >   16       0     0 ACCEPT     all  --  enp4s4f0 any     anywhere             anywhere             ctstate RELATED,ESTABLISHED
+    >   17    250K  121M DROP       udp  --  enp4s4f0 any     anywhere             anywhere             udp dpt:bootps
+    >   18       0     0 DROP       tcp  --  enp4s4f0 any     anywhere             anywhere             tcp dpt:bootps
+    >   19    7352  456K LOG        all  --  any    any     anywhere             anywhere             LOG level warning prefix "drop "
+    >   20    7352  456K DROP       all  --  any    any     anywhere             anywhere
+    >   
+    >   Chain FORWARD (policy DROP 0 packets, 0 bytes)
+    >   num   pkts bytes target     prot opt in     out     source               destination
+    >   1     5784  503K DOCKER-USER  all  --  any    any     anywhere             anywhere
+    >   2     5784  503K DOCKER-ISOLATION-STAGE-1  all  --  any    any     anywhere             anywhere
+    >   3        0     0 ACCEPT     all  --  any    docker0  anywhere             anywhere             ctstate RELATED,ESTABLISHED
+    >   4        0     0 DOCKER     all  --  any    docker0  anywhere             anywhere
+    >   5        0     0 ACCEPT     all  --  docker0 !docker0  anywhere             anywhere
+    >   6        0     0 ACCEPT     all  --  docker0 docker0  anywhere             anywhere
+    >   7     5595  415K ACCEPT     all  --  br1    enp4s4f0  anywhere             anywhere
+    >   8      189 87271 ACCEPT     all  --  enp4s4f0 br1     anywhere             anywhere             ctstate RELATED,ESTABLISHED
+    >   9        0     0 LOG        all  --  any    any     anywhere             anywhere             LOG level warning prefix "drop "
+    >   10       0     0 DROP       all  --  any    any     anywhere             anywhere
+    >   
+    >   Chain OUTPUT (policy DROP 0 packets, 0 bytes)
+    >   num   pkts bytes target     prot opt in     out     source               destination
+    >   1      766  268K ACCEPT     udp  --  any    br1     anywhere             anywhere             udp dpt:bootpc
+    >   2    35134 3544K override   all  --  any    any     anywhere             anywhere
+    >   3     3376  216K ACCEPT     all  --  any    lo      anywhere             anywhere
+    >   4     2779  189K ACCEPT     udp  --  any    any     anywhere             anywhere             udp spts:1024:65535 dpt:domain
+    >   5        0     0 ACCEPT     tcp  --  any    any     anywhere             anywhere             tcp spts:1024:65535 dpt:domain
+    >   6       92  6992 ACCEPT     udp  --  any    any     anywhere             anywhere             udp dpt:ntp
+    >   7       22  1320 ACCEPT     tcp  --  any    any     anywhere             anywhere
+    >   8       80  5136 LOG        all  --  any    any     anywhere             anywhere             LOG level warning prefix "drop "
+    >   9       80  5136 DROP       all  --  any    any     anywhere             anywhere
+    >   
+    >   Chain DOCKER (1 references)
+    >   num   pkts bytes target     prot opt in     out     source               destination
+    >   
+    >   Chain DOCKER-ISOLATION-STAGE-1 (1 references)
+    >   num   pkts bytes target     prot opt in     out     source               destination
+    >   1        0     0 DOCKER-ISOLATION-STAGE-2  all  --  docker0 !docker0  anywhere             anywhere
+    >   2     5784  503K RETURN     all  --  any    any     anywhere             anywhere
+    >   
+    >   Chain DOCKER-ISOLATION-STAGE-2 (1 references)
+    >   num   pkts bytes target     prot opt in     out     source               destination
+    >   1        0     0 DROP       all  --  any    docker0  anywhere             anywhere
+    >   2        0     0 RETURN     all  --  any    any     anywhere             anywhere
+    >   
+    >   Chain DOCKER-USER (1 references)
+    >   num   pkts bytes target     prot opt in     out     source               destination
+    >   1     5784  503K RETURN     all  --  any    any     anywhere             anywhere
+    >   
+    >   Chain frasynrel (1 references)
+    >   num   pkts bytes target     prot opt in     out     source               destination
+    >   1        0     0 ACCEPT     all  -f  any    any     anywhere             anywhere
+    >   2    61324   65M ACCEPT     all  --  any    any     anywhere             anywhere             state ESTABLISHED
+    >   3        0     0 ACCEPT     tcp  --  any    any     anywhere             anywhere             tcp flags:SYN,RST,ACK/SYN state RELATED
+    >   
+    >   Chain override (2 references)
+    >   num   pkts bytes target     prot opt in     out     source               destination
+    >   1     335K  188M frasynrel  all  --  any    any     anywhere             anywhere
+    >   2     274K  123M vitalicmp  all  --  any    any     anywhere             anywhere
+    >   
+    >   Chain vitalicmp (1 references)
+    >   num   pkts bytes target     prot opt in     out     source               destination
+    >   1     4636  732K ACCEPT     icmp --  any    any     anywhere             anywhere             icmp destination-unreachable
+    >   2        0     0 ACCEPT     icmp --  any    any     anywhere             anywhere             icmp parameter-problem
+    >   3        0     0 ACCEPT     icmp --  any    any     anywhere             anywhere             icmp source-quench
+    >   4        2   264 ACCEPT     icmp --  any    any     anywhere             anywhere             icmp time-exceeded
 
 
 # -----------------------------------------------------
@@ -828,112 +784,110 @@ num   pkts bytes target     prot opt in     out     source               destina
 
     cat /etc/iptables/rules.v4
 
---START--
-# Note: no blank lines in this file!!
-*nat
-:PREROUTING ACCEPT [0:0]
-:INPUT ACCEPT [0:0]
-:OUTPUT ACCEPT [0:0]
-:POSTROUTING ACCEPT [0:0]
-[0:0] -A POSTROUTING -o enp4s4f0 -j MASQUERADE
-COMMIT
-#
-*filter
-:INPUT DROP [0:0]
-:FORWARD DROP [0:0]
-:OUTPUT DROP [0:0]
-:frasynrel - [0:0]
-:override - [0:0]
-:vitalicmp - [0:0]
-#
-# The INPUT chain.
-#
-# Include the frasynrel and vitalicmp chains.
-[0:0] -A INPUT -j override
-# Allow anything from localhost.
-[0:0] -A INPUT -i lo -j ACCEPT
-# Allow anything from the Esperia subnet.
-[0:0] -A INPUT -s 172.16.1.0/255.255.0.0 -p udp -j ACCEPT
-[0:0] -A INPUT -s 172.16.1.0/255.255.0.0 -p tcp -j ACCEPT
-# Allow DHCP requests via the bridge interface.
-[0:0] -A INPUT -i br1 -p udp --dport 53 -j ACCEPT
-[0:0] -A INPUT -i br1 -p tcp --dport 53 -j ACCEPT
-# Allow UDP and TCP DHCP requests via the bridge interface.
-[0:0] -A INPUT -i br1 -p udp --dport 67 -j ACCEPT
-[0:0] -A INPUT -i br1 -p tcp --dport 67 -j ACCEPT
-# Allow SSH access from ROE LAN (wired desktops etc.)
-[0:0] -A INPUT -s 195.194.120.0/255.255.252.0 -p tcp -m tcp --dport 22 -j ACCEPT
-# Allow SSH access from ROE VPN.
-[0:0] -A INPUT -s 195.194.121.0/255.255.255.0 -p tcp -m tcp --dport 22 -j ACCEPT
-# Allow SSH access from ROE servers (ULAN and ROEEduroam etc.)
-[0:0] -A INPUT -s 192.108.120.0/255.255.255.0 -p tcp -m tcp --dport 22 -j ACCEPT
-[0:0] -A INPUT -s 192.41.108.0/255.255.255.0 -p tcp -m tcp --dport 22 -j ACCEPT
-# Allow SSH access from Main uni network (Uni VPN, OpenStack, trop machines etc.)
-[0:0] -A INPUT -s 129.215.0.0/255.255.0.0 -p tcp -m tcp --dport 22 -j ACCEPT
-# Allow SSH acces for Dave Morris
-[0:0] -A INPUT -s 81.187.247.196 -p tcp -m tcp --dport 22 -j ACCEPT
-[0:0] -A INPUT -s 81.187.46.67   -p tcp -m tcp --dport 22 -j ACCEPT
-# Allow packets from the external interface IF we initiated the connection.
-[0:0] -A INPUT -i enp4s4f0 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
-# Drop external DHCP requests.
-[0:0] -A INPUT -i enp4s4f0 -p udp --dport 67 -j DROP
-[0:0] -A INPUT -i enp4s4f0 -p tcp --dport 67 -j DROP
-# Log and drop everything else.
-[0:0] -A INPUT -j LOG --log-prefix "drop "
-[0:0] -A INPUT -j DROP
-#
-# The FORWARD chain.
-#
-# Forward packets from the bridge interface to the external interface.
-[0:0] -A FORWARD -i br1 -o enp4s4f0 -j ACCEPT
-# Forward packets from the external interface to the bridge interface IF we initiated the connection.
-[0:0] -A FORWARD -i enp4s4f0 -o br1 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
-# Log and drop everything else.
-[0:0] -A FORWARD -j DROP
-#
-# The OUTPUT chain.
-#
-# Include the frasynrel and vitalicmp chains.
-[0:0] -A OUTPUT -j override
-# Allow anything to localhost.
-[0:0] -A OUTPUT -o lo -j ACCEPT
-# Allow DHCP offers via the bridge interface.
-[0:0] -A OUTPUT -o br1 -p udp -m udp --dport 68 -j ACCEPT
-[0:0] -A OUTPUT -o br1 -p tcp -m tcp --dport 68 -j ACCEPT
-# Allow DNS by UDP and TCP.
-[0:0] -A OUTPUT -p udp -m udp --sport 1024:65535 --dport 53 -j ACCEPT
-[0:0] -A OUTPUT -p tcp -m tcp --sport 1024:65535 --dport 53 -j ACCEPT
-# Allow NTP by UDP.
-[0:0] -A OUTPUT -p udp -m udp --dport 123 -j ACCEPT
-# Allow TCP to anywhere.
-[0:0] -A OUTPUT -p tcp -j ACCEPT
-# Log and drop everything else.
-[0:0] -A OUTPUT -j LOG --log-prefix "drop "
-[0:0] -A OUTPUT -j DROP
-#
-# The frasynrel chain takes care of allowing fragments and
-# of allowing packets that belong to an established connection or
-# are related to an established connection.
-#
-[0:0] -A frasynrel -f -j ACCEPT
-[0:0] -A frasynrel -m state --state ESTABLISHED -j ACCEPT
-[0:0] -A frasynrel -p tcp -m tcp --tcp-flags SYN,RST,ACK SYN -m state --state RELATED -j ACCEPT
-#
-# The override chain combines the frasynrel and vitalicmp chains
-# and is the first element of the INPUT and OUTPUT chains.
-#
-[0:0] -A override -j frasynrel
-[0:0] -A override -j vitalicmp
-#
-# The vitalicmp chain takes care of allowing the really important
-# bits of ICMP traffic.  This does not include ping.
-#
-[0:0] -A vitalicmp -p icmp -m icmp --icmp-type 3 -j ACCEPT
-[0:0] -A vitalicmp -p icmp -m icmp --icmp-type 12 -j ACCEPT
-[0:0] -A vitalicmp -p icmp -m icmp --icmp-type 4 -j ACCEPT
-[0:0] -A vitalicmp -p icmp -m icmp --icmp-type 11 -j ACCEPT
-COMMIT
---END--
+    >   # Note: no blank lines in this file!!
+    >   *nat
+    >   :PREROUTING ACCEPT [0:0]
+    >   :INPUT ACCEPT [0:0]
+    >   :OUTPUT ACCEPT [0:0]
+    >   :POSTROUTING ACCEPT [0:0]
+    >   [0:0] -A POSTROUTING -o enp4s4f0 -j MASQUERADE
+    >   COMMIT
+    >   #
+    >   *filter
+    >   :INPUT DROP [0:0]
+    >   :FORWARD DROP [0:0]
+    >   :OUTPUT DROP [0:0]
+    >   :frasynrel - [0:0]
+    >   :override - [0:0]
+    >   :vitalicmp - [0:0]
+    >   #
+    >   # The INPUT chain.
+    >   #
+    >   # Include the frasynrel and vitalicmp chains.
+    >   [0:0] -A INPUT -j override
+    >   # Allow anything from localhost.
+    >   [0:0] -A INPUT -i lo -j ACCEPT
+    >   # Allow anything from the Esperia subnet.
+    >   [0:0] -A INPUT -s 172.16.1.0/255.255.0.0 -p udp -j ACCEPT
+    >   [0:0] -A INPUT -s 172.16.1.0/255.255.0.0 -p tcp -j ACCEPT
+    >   # Allow DHCP requests via the bridge interface.
+    >   [0:0] -A INPUT -i br1 -p udp --dport 53 -j ACCEPT
+    >   [0:0] -A INPUT -i br1 -p tcp --dport 53 -j ACCEPT
+    >   # Allow UDP and TCP DHCP requests via the bridge interface.
+    >   [0:0] -A INPUT -i br1 -p udp --dport 67 -j ACCEPT
+    >   [0:0] -A INPUT -i br1 -p tcp --dport 67 -j ACCEPT
+    >   # Allow SSH access from ROE LAN (wired desktops etc.)
+    >   [0:0] -A INPUT -s 195.194.120.0/255.255.252.0 -p tcp -m tcp --dport 22 -j ACCEPT
+    >   # Allow SSH access from ROE VPN.
+    >   [0:0] -A INPUT -s 195.194.121.0/255.255.255.0 -p tcp -m tcp --dport 22 -j ACCEPT
+    >   # Allow SSH access from ROE servers (ULAN and ROEEduroam etc.)
+    >   [0:0] -A INPUT -s 192.108.120.0/255.255.255.0 -p tcp -m tcp --dport 22 -j ACCEPT
+    >   [0:0] -A INPUT -s 192.41.108.0/255.255.255.0 -p tcp -m tcp --dport 22 -j ACCEPT
+    >   # Allow SSH access from Main uni network (Uni VPN, OpenStack, trop machines etc.)
+    >   [0:0] -A INPUT -s 129.215.0.0/255.255.0.0 -p tcp -m tcp --dport 22 -j ACCEPT
+    >   # Allow SSH acces for Dave Morris
+    >   [0:0] -A INPUT -s 81.187.247.196 -p tcp -m tcp --dport 22 -j ACCEPT
+    >   [0:0] -A INPUT -s 81.187.46.67   -p tcp -m tcp --dport 22 -j ACCEPT
+    >   # Allow packets from the external interface IF we initiated the connection.
+    >   [0:0] -A INPUT -i enp4s4f0 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+    >   # Drop external DHCP requests.
+    >   [0:0] -A INPUT -i enp4s4f0 -p udp --dport 67 -j DROP
+    >   [0:0] -A INPUT -i enp4s4f0 -p tcp --dport 67 -j DROP
+    >   # Log and drop everything else.
+    >   [0:0] -A INPUT -j LOG --log-prefix "drop "
+    >   [0:0] -A INPUT -j DROP
+    >   #
+    >   # The FORWARD chain.
+    >   #
+    >   # Forward packets from the bridge interface to the external interface.
+    >   [0:0] -A FORWARD -i br1 -o enp4s4f0 -j ACCEPT
+    >   # Forward packets from the external interface to the bridge interface IF we initiated the connection.
+    >   [0:0] -A FORWARD -i enp4s4f0 -o br1 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+    >   # Log and drop everything else.
+    >   [0:0] -A FORWARD -j DROP
+    >   #
+    >   # The OUTPUT chain.
+    >   #
+    >   # Include the frasynrel and vitalicmp chains.
+    >   [0:0] -A OUTPUT -j override
+    >   # Allow anything to localhost.
+    >   [0:0] -A OUTPUT -o lo -j ACCEPT
+    >   # Allow DHCP offers via the bridge interface.
+    >   [0:0] -A OUTPUT -o br1 -p udp -m udp --dport 68 -j ACCEPT
+    >   [0:0] -A OUTPUT -o br1 -p tcp -m tcp --dport 68 -j ACCEPT
+    >   # Allow DNS by UDP and TCP.
+    >   [0:0] -A OUTPUT -p udp -m udp --sport 1024:65535 --dport 53 -j ACCEPT
+    >   [0:0] -A OUTPUT -p tcp -m tcp --sport 1024:65535 --dport 53 -j ACCEPT
+    >   # Allow NTP by UDP.
+    >   [0:0] -A OUTPUT -p udp -m udp --dport 123 -j ACCEPT
+    >   # Allow TCP to anywhere.
+    >   [0:0] -A OUTPUT -p tcp -j ACCEPT
+    >   # Log and drop everything else.
+    >   [0:0] -A OUTPUT -j LOG --log-prefix "drop "
+    >   [0:0] -A OUTPUT -j DROP
+    >   #
+    >   # The frasynrel chain takes care of allowing fragments and
+    >   # of allowing packets that belong to an established connection or
+    >   # are related to an established connection.
+    >   #
+    >   [0:0] -A frasynrel -f -j ACCEPT
+    >   [0:0] -A frasynrel -m state --state ESTABLISHED -j ACCEPT
+    >   [0:0] -A frasynrel -p tcp -m tcp --tcp-flags SYN,RST,ACK SYN -m state --state RELATED -j ACCEPT
+    >   #
+    >   # The override chain combines the frasynrel and vitalicmp chains
+    >   # and is the first element of the INPUT and OUTPUT chains.
+    >   #
+    >   [0:0] -A override -j frasynrel
+    >   [0:0] -A override -j vitalicmp
+    >   #
+    >   # The vitalicmp chain takes care of allowing the really important
+    >   # bits of ICMP traffic.  This does not include ping.
+    >   #
+    >   [0:0] -A vitalicmp -p icmp -m icmp --icmp-type 3 -j ACCEPT
+    >   [0:0] -A vitalicmp -p icmp -m icmp --icmp-type 12 -j ACCEPT
+    >   [0:0] -A vitalicmp -p icmp -m icmp --icmp-type 4 -j ACCEPT
+    >   [0:0] -A vitalicmp -p icmp -m icmp --icmp-type 11 -j ACCEPT
+    >   COMMIT
 
 
 # -----------------------------------------------------
@@ -983,13 +937,11 @@ COMMIT
 
     curl --head 'http://data.metagrid.co.uk/temp/'
 
---START--
-HTTP/1.1 200 OK
-Date: Sun, 14 Jul 2019 02:03:11 GMT
-Server: Apache/2.2.15 (CentOS)
-Connection: close
-Content-Type: text/html;charset=UTF-8
---END--
+    >   HTTP/1.1 200 OK
+    >   Date: Sun, 14 Jul 2019 02:03:11 GMT
+    >   Server: Apache/2.2.15 (CentOS)
+    >   Connection: close
+    >   Content-Type: text/html;charset=UTF-8
 
 
 # -----------------------------------------------------
@@ -1039,86 +991,84 @@ Content-Type: text/html;charset=UTF-8
 
     diff -c rules.v4.bak /etc/iptables/rules.v4
 
---START--
-*** rules.v4.bak	2019-07-14 05:07:41.403798361 +0100
---- /etc/iptables/rules.v4	2019-07-14 05:43:20.547988972 +0100
-***************
-*** 13,19 ****
-  :INPUT ACCEPT [0:0]
-  :OUTPUT ACCEPT [4:289]
-  :POSTROUTING ACCEPT [3:213]
-- -A POSTROUTING -o eno2 -j MASQUERADE
-  COMMIT
-  # Completed on Wed Jul 10 06:17:23 2019
-  # Generated by iptables-save v1.6.1 on Wed Jul 10 06:17:23 2019
---- 13,18 ----
-***************
-*** 24,62 ****
-  :frasynrel - [0:0]
-  :override - [0:0]
-  :vitalicmp - [0:0]
-! -A INPUT -i virbr0 -p udp -m udp --dport 67 -j ACCEPT
-! -A INPUT -i virbr0 -p tcp -m tcp --dport 67 -j ACCEPT
-! -A INPUT -i br1 -p udp -m udp --dport 67 -j ACCEPT
-! -A INPUT -i br1 -p tcp -m tcp --dport 67 -j ACCEPT
-  -A INPUT -j override
-  -A INPUT -i lo -j ACCEPT
-  -A INPUT -s 172.16.0.0/16 -p udp -j ACCEPT
-  -A INPUT -s 172.16.0.0/16 -p tcp -j ACCEPT
-- -A INPUT -s 195.194.120.0/22 -p tcp -m tcp --dport 22 -j ACCEPT
-- -A INPUT -s 195.194.121.0/24 -p tcp -m tcp --dport 22 -j ACCEPT
-- -A INPUT -s 192.108.120.0/24 -p tcp -m tcp --dport 22 -j ACCEPT
-- -A INPUT -s 192.41.108.0/24 -p tcp -m tcp --dport 22 -j ACCEPT
-- -A INPUT -s 129.215.0.0/16 -p tcp -m tcp --dport 22 -j ACCEPT
-- -A INPUT -s 81.187.247.196/32 -p tcp -m tcp --dport 22 -j ACCEPT
-- -A INPUT -s 81.187.46.67/32 -p tcp -m tcp --dport 22 -j ACCEPT
-- -A INPUT -i eno2 -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
-- -A INPUT -i eno2 -p udp -m udp --dport 67 -j DROP
-- -A INPUT -i eno2 -p tcp -m tcp --dport 67 -j DROP
-  -A INPUT -j LOG --log-prefix "drop "
-  -A INPUT -j DROP
-- -A FORWARD -i br1 -o eno2 -j ACCEPT
-- -A FORWARD -i eno2 -o br1 -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
-  -A FORWARD -i virbr0 -o virbr0 -j ACCEPT
-  -A FORWARD -o virbr0 -j REJECT --reject-with icmp-port-unreachable
-  -A FORWARD -i virbr0 -j REJECT --reject-with icmp-port-unreachable
-  -A FORWARD -j LOG --log-prefix "drop "
-  -A FORWARD -j DROP
-  -A OUTPUT -o virbr0 -p udp -m udp --dport 68 -j ACCEPT
-- -A OUTPUT -o br1 -p udp -m udp --dport 68 -j ACCEPT
-  -A OUTPUT -j override
-  -A OUTPUT -o lo -j ACCEPT
-- -A OUTPUT -p udp -m udp --sport 1024:65535 --dport 53 -j ACCEPT
-- -A OUTPUT -p tcp -m tcp --sport 1024:65535 --dport 53 -j ACCEPT
-  -A OUTPUT -p udp -m udp --dport 123 -j ACCEPT
-  -A OUTPUT -p tcp -j ACCEPT
-  -A OUTPUT -j LOG --log-prefix "drop "
---- 23,46 ----
-  :frasynrel - [0:0]
-  :override - [0:0]
-  :vitalicmp - [0:0]
-! #-A INPUT -i virbr0 -p udp -m udp --dport 67 -j ACCEPT
-! #-A INPUT -i virbr0 -p tcp -m tcp --dport 67 -j ACCEPT
-  -A INPUT -j override
-  -A INPUT -i lo -j ACCEPT
-  -A INPUT -s 172.16.0.0/16 -p udp -j ACCEPT
-  -A INPUT -s 172.16.0.0/16 -p tcp -j ACCEPT
-  -A INPUT -j LOG --log-prefix "drop "
-  -A INPUT -j DROP
-  -A FORWARD -i virbr0 -o virbr0 -j ACCEPT
-  -A FORWARD -o virbr0 -j REJECT --reject-with icmp-port-unreachable
-  -A FORWARD -i virbr0 -j REJECT --reject-with icmp-port-unreachable
-  -A FORWARD -j LOG --log-prefix "drop "
-  -A FORWARD -j DROP
-+ -A OUTPUT -p udp -m udp --sport 1024:65535 --dport 53 -j ACCEPT
-+ -A OUTPUT -p tcp -m tcp --sport 1024:65535 --dport 53 -j ACCEPT
-  -A OUTPUT -o virbr0 -p udp -m udp --dport 68 -j ACCEPT
-  -A OUTPUT -j override
-  -A OUTPUT -o lo -j ACCEPT
-  -A OUTPUT -p udp -m udp --dport 123 -j ACCEPT
-  -A OUTPUT -p tcp -j ACCEPT
-  -A OUTPUT -j LOG --log-prefix "drop "
---END--
+    >   *** rules.v4.bak	2019-07-14 05:07:41.403798361 +0100
+    >   --- /etc/iptables/rules.v4	2019-07-14 05:43:20.547988972 +0100
+    >   ***************
+    >   *** 13,19 ****
+    >     :INPUT ACCEPT [0:0]
+    >     :OUTPUT ACCEPT [4:289]
+    >     :POSTROUTING ACCEPT [3:213]
+    >   - -A POSTROUTING -o eno2 -j MASQUERADE
+    >     COMMIT
+    >     # Completed on Wed Jul 10 06:17:23 2019
+    >     # Generated by iptables-save v1.6.1 on Wed Jul 10 06:17:23 2019
+    >   --- 13,18 ----
+    >   ***************
+    >   *** 24,62 ****
+    >     :frasynrel - [0:0]
+    >     :override - [0:0]
+    >     :vitalicmp - [0:0]
+    >   ! -A INPUT -i virbr0 -p udp -m udp --dport 67 -j ACCEPT
+    >   ! -A INPUT -i virbr0 -p tcp -m tcp --dport 67 -j ACCEPT
+    >   ! -A INPUT -i br1 -p udp -m udp --dport 67 -j ACCEPT
+    >   ! -A INPUT -i br1 -p tcp -m tcp --dport 67 -j ACCEPT
+    >     -A INPUT -j override
+    >     -A INPUT -i lo -j ACCEPT
+    >     -A INPUT -s 172.16.0.0/16 -p udp -j ACCEPT
+    >     -A INPUT -s 172.16.0.0/16 -p tcp -j ACCEPT
+    >   - -A INPUT -s 195.194.120.0/22 -p tcp -m tcp --dport 22 -j ACCEPT
+    >   - -A INPUT -s 195.194.121.0/24 -p tcp -m tcp --dport 22 -j ACCEPT
+    >   - -A INPUT -s 192.108.120.0/24 -p tcp -m tcp --dport 22 -j ACCEPT
+    >   - -A INPUT -s 192.41.108.0/24 -p tcp -m tcp --dport 22 -j ACCEPT
+    >   - -A INPUT -s 129.215.0.0/16 -p tcp -m tcp --dport 22 -j ACCEPT
+    >   - -A INPUT -s 81.187.247.196/32 -p tcp -m tcp --dport 22 -j ACCEPT
+    >   - -A INPUT -s 81.187.46.67/32 -p tcp -m tcp --dport 22 -j ACCEPT
+    >   - -A INPUT -i eno2 -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+    >   - -A INPUT -i eno2 -p udp -m udp --dport 67 -j DROP
+    >   - -A INPUT -i eno2 -p tcp -m tcp --dport 67 -j DROP
+    >     -A INPUT -j LOG --log-prefix "drop "
+    >     -A INPUT -j DROP
+    >   - -A FORWARD -i br1 -o eno2 -j ACCEPT
+    >   - -A FORWARD -i eno2 -o br1 -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+    >     -A FORWARD -i virbr0 -o virbr0 -j ACCEPT
+    >     -A FORWARD -o virbr0 -j REJECT --reject-with icmp-port-unreachable
+    >     -A FORWARD -i virbr0 -j REJECT --reject-with icmp-port-unreachable
+    >     -A FORWARD -j LOG --log-prefix "drop "
+    >     -A FORWARD -j DROP
+    >     -A OUTPUT -o virbr0 -p udp -m udp --dport 68 -j ACCEPT
+    >   - -A OUTPUT -o br1 -p udp -m udp --dport 68 -j ACCEPT
+    >     -A OUTPUT -j override
+    >     -A OUTPUT -o lo -j ACCEPT
+    >   - -A OUTPUT -p udp -m udp --sport 1024:65535 --dport 53 -j ACCEPT
+    >   - -A OUTPUT -p tcp -m tcp --sport 1024:65535 --dport 53 -j ACCEPT
+    >     -A OUTPUT -p udp -m udp --dport 123 -j ACCEPT
+    >     -A OUTPUT -p tcp -j ACCEPT
+    >     -A OUTPUT -j LOG --log-prefix "drop "
+    >   --- 23,46 ----
+    >     :frasynrel - [0:0]
+    >     :override - [0:0]
+    >     :vitalicmp - [0:0]
+    >   ! #-A INPUT -i virbr0 -p udp -m udp --dport 67 -j ACCEPT
+    >   ! #-A INPUT -i virbr0 -p tcp -m tcp --dport 67 -j ACCEPT
+    >     -A INPUT -j override
+    >     -A INPUT -i lo -j ACCEPT
+    >     -A INPUT -s 172.16.0.0/16 -p udp -j ACCEPT
+    >     -A INPUT -s 172.16.0.0/16 -p tcp -j ACCEPT
+    >     -A INPUT -j LOG --log-prefix "drop "
+    >     -A INPUT -j DROP
+    >     -A FORWARD -i virbr0 -o virbr0 -j ACCEPT
+    >     -A FORWARD -o virbr0 -j REJECT --reject-with icmp-port-unreachable
+    >     -A FORWARD -i virbr0 -j REJECT --reject-with icmp-port-unreachable
+    >     -A FORWARD -j LOG --log-prefix "drop "
+    >     -A FORWARD -j DROP
+    >   + -A OUTPUT -p udp -m udp --sport 1024:65535 --dport 53 -j ACCEPT
+    >   + -A OUTPUT -p tcp -m tcp --sport 1024:65535 --dport 53 -j ACCEPT
+    >     -A OUTPUT -o virbr0 -p udp -m udp --dport 68 -j ACCEPT
+    >     -A OUTPUT -j override
+    >     -A OUTPUT -o lo -j ACCEPT
+    >     -A OUTPUT -p udp -m udp --dport 123 -j ACCEPT
+    >     -A OUTPUT -p tcp -j ACCEPT
+    >     -A OUTPUT -j LOG --log-prefix "drop "
 
 
 # -----------------------------------------------------
@@ -1140,13 +1090,11 @@ Content-Type: text/html;charset=UTF-8
         curl --head 'http://data.metagrid.co.uk/temp'
         '
 
---START--
-Sun 14 Jul 14:56:04 BST 2019
-lssthead
-[sudo] password for dmr:
-Connection to 192.41.108.47 closed by remote host.
-Connection to 192.41.108.47 closed.
---END--
+    >   Sun 14 Jul 14:56:04 BST 2019
+    >   lssthead
+    >   [sudo] password for dmr:
+    >   Connection to 192.41.108.47 closed by remote host.
+    >   Connection to 192.41.108.47 closed.
 
 
 # -----------------------------------------------------
@@ -1207,26 +1155,24 @@ Connection to 192.41.108.47 closed.
         echo "----"
         '
 
---START--
-Sun 14 Jul 15:36:05 BST 2019
-lssthead
-----
-User-agent: *
-Crawl-delay: 10
-# Robots
-# http://www.last.fm/robots.txt
-# http://www.wired.com/epicenter/2010/08/robot-laws/
-Disallow: /human//harm
-Disallow: /human/ignore
-Disallow: /self/harm
-# Directories
-Disallow: /
-Disallow: /temp/
-Disallow: /donkeys/
-Disallow: /private/
-Disallow: /sshkeys/
-----
---END--
+    >   Sun 14 Jul 15:36:05 BST 2019
+    >   lssthead
+    >   ----
+    >   User-agent: *
+    >   Crawl-delay: 10
+    >   # Robots
+    >   # http://www.last.fm/robots.txt
+    >   # http://www.wired.com/epicenter/2010/08/robot-laws/
+    >   Disallow: /human//harm
+    >   Disallow: /human/ignore
+    >   Disallow: /self/harm
+    >   # Directories
+    >   Disallow: /
+    >   Disallow: /temp/
+    >   Disallow: /donkeys/
+    >   Disallow: /private/
+    >   Disallow: /sshkeys/
+    >   ----
 
 
 # -----------------------------------------------------
@@ -1257,64 +1203,62 @@ Disallow: /sshkeys/
     done
 
 
---START--
-Machine [work01]
-Sun 14 Jul 15:43:03 BST 2019
-lsstukwork1
-[sudo] password for dmr:
-Connection to work01 closed by remote host.
-Connection to work01 closed.
----- ---- ---- ----
-Machine [work02]
-Sun 14 Jul 15:43:10 BST 2019
-lsstukwork2
-[sudo] password for dmr:
-Connection to work02 closed by remote host.
-Connection to work02 closed.
----- ---- ---- ----
-Machine [work03]
-Sun 14 Jul 15:43:17 BST 2019
-lsstukwork3
-[sudo] password for dmr:
-Connection to work03 closed by remote host.
-Connection to work03 closed.
----- ---- ---- ----
-Machine [work04]
-Sun 14 Jul 15:43:23 BST 2019
-lsstukwork4
-[sudo] password for dmr:
-Connection to work04 closed by remote host.
-Connection to work04 closed.
----- ---- ---- ----
-Machine [trop03]
-Sun 14 Jul 15:43:27 BST 2019
-trop03
-[sudo] password for dmr:
-Connection to trop03.roe.ac.uk closed by remote host.
-Connection to trop03.roe.ac.uk closed.
----- ---- ---- ----
-Machine [trop04]
-Sun 14 Jul 15:43:32 BST 2019
-trop04
-[sudo] password for dmr:
-Connection to trop04.roe.ac.uk closed by remote host.
-Connection to trop04.roe.ac.uk closed.
----- ---- ---- ----
-Machine [gaia01]
-Sun 14 Jul 15:43:40 BST 2019
-gaia1
-[sudo] password for dmr:
-Connection to gaia01 closed by remote host.
-Connection to gaia01 closed.
----- ---- ---- ----
-Machine [gaia02]
-Sun 14 Jul 15:43:51 BST 2019
-gaia2
-[sudo] password for dmr:
-Connection to gaia02 closed by remote host.
-Connection to gaia02 closed.
-[Zarquan@methionine ~]$
---END--
+    >   Machine [work01]
+    >   Sun 14 Jul 15:43:03 BST 2019
+    >   lsstukwork1
+    >   [sudo] password for dmr:
+    >   Connection to work01 closed by remote host.
+    >   Connection to work01 closed.
+    >   ---- ---- ---- ----
+    >   Machine [work02]
+    >   Sun 14 Jul 15:43:10 BST 2019
+    >   lsstukwork2
+    >   [sudo] password for dmr:
+    >   Connection to work02 closed by remote host.
+    >   Connection to work02 closed.
+    >   ---- ---- ---- ----
+    >   Machine [work03]
+    >   Sun 14 Jul 15:43:17 BST 2019
+    >   lsstukwork3
+    >   [sudo] password for dmr:
+    >   Connection to work03 closed by remote host.
+    >   Connection to work03 closed.
+    >   ---- ---- ---- ----
+    >   Machine [work04]
+    >   Sun 14 Jul 15:43:23 BST 2019
+    >   lsstukwork4
+    >   [sudo] password for dmr:
+    >   Connection to work04 closed by remote host.
+    >   Connection to work04 closed.
+    >   ---- ---- ---- ----
+    >   Machine [trop03]
+    >   Sun 14 Jul 15:43:27 BST 2019
+    >   trop03
+    >   [sudo] password for dmr:
+    >   Connection to trop03.roe.ac.uk closed by remote host.
+    >   Connection to trop03.roe.ac.uk closed.
+    >   ---- ---- ---- ----
+    >   Machine [trop04]
+    >   Sun 14 Jul 15:43:32 BST 2019
+    >   trop04
+    >   [sudo] password for dmr:
+    >   Connection to trop04.roe.ac.uk closed by remote host.
+    >   Connection to trop04.roe.ac.uk closed.
+    >   ---- ---- ---- ----
+    >   Machine [gaia01]
+    >   Sun 14 Jul 15:43:40 BST 2019
+    >   gaia1
+    >   [sudo] password for dmr:
+    >   Connection to gaia01 closed by remote host.
+    >   Connection to gaia01 closed.
+    >   ---- ---- ---- ----
+    >   Machine [gaia02]
+    >   Sun 14 Jul 15:43:51 BST 2019
+    >   gaia2
+    >   [sudo] password for dmr:
+    >   Connection to gaia02 closed by remote host.
+    >   Connection to gaia02 closed.
+    >   [Zarquan@methionine ~]$
 
     # Need to wait for the machines to restart
     sleep 120
@@ -1333,70 +1277,68 @@ Connection to gaia02 closed.
             '
     done
 
---START--
-Machine [work01]
-Sun 14 Jul 15:47:32 BST 2019
-lsstukwork1
-----
-HTTP/1.1 200 OK
-Date: Sun, 14 Jul 2019 14:47:32 GMT
-----
-Connection to work01 closed.
----- ---- ---- ----
-Machine [work02]
-Sun 14 Jul 15:47:35 BST 2019
-lsstukwork2
-----
-HTTP/1.1 200 OK
-Date: Sun, 14 Jul 2019 14:47:35 GMT
-----
-Connection to work02 closed.
----- ---- ---- ----
-Machine [work03]
-Sun 14 Jul 15:47:38 BST 2019
-lsstukwork3
-----
-HTTP/1.1 200 OK
-Date: Sun, 14 Jul 2019 14:47:38 GMT
-----
-Connection to work03 closed.
----- ---- ---- ----
-Machine [work04]
-Sun 14 Jul 15:47:41 BST 2019
-lsstukwork4
-----
-HTTP/1.1 200 OK
-Date: Sun, 14 Jul 2019 14:47:41 GMT
-----
-Connection to work04 closed.
----- ---- ---- ----
-Machine [trop03]
----- ---- ---- ----
-Machine [trop04]
-Sun 14 Jul 15:47:41 BST 2019
-trop04
-----
-----
-Connection to trop04.roe.ac.uk closed.
----- ---- ---- ----
-Machine [gaia01]
-Sun 14 Jul 15:47:54 BST 2019
-gaia1
-----
-HTTP/1.1 200 OK
-Date: Sun, 14 Jul 2019 14:47:54 GMT
-----
-Connection to gaia01 closed.
----- ---- ---- ----
-Machine [gaia02]
-Sun 14 Jul 15:47:57 BST 2019
-gaia2
-----
-HTTP/1.1 200 OK
-Date: Sun, 14 Jul 2019 14:47:57 GMT
-----
-Connection to gaia02 closed.
---END--
+    >   Machine [work01]
+    >   Sun 14 Jul 15:47:32 BST 2019
+    >   lsstukwork1
+    >   ----
+    >   HTTP/1.1 200 OK
+    >   Date: Sun, 14 Jul 2019 14:47:32 GMT
+    >   ----
+    >   Connection to work01 closed.
+    >   ---- ---- ---- ----
+    >   Machine [work02]
+    >   Sun 14 Jul 15:47:35 BST 2019
+    >   lsstukwork2
+    >   ----
+    >   HTTP/1.1 200 OK
+    >   Date: Sun, 14 Jul 2019 14:47:35 GMT
+    >   ----
+    >   Connection to work02 closed.
+    >   ---- ---- ---- ----
+    >   Machine [work03]
+    >   Sun 14 Jul 15:47:38 BST 2019
+    >   lsstukwork3
+    >   ----
+    >   HTTP/1.1 200 OK
+    >   Date: Sun, 14 Jul 2019 14:47:38 GMT
+    >   ----
+    >   Connection to work03 closed.
+    >   ---- ---- ---- ----
+    >   Machine [work04]
+    >   Sun 14 Jul 15:47:41 BST 2019
+    >   lsstukwork4
+    >   ----
+    >   HTTP/1.1 200 OK
+    >   Date: Sun, 14 Jul 2019 14:47:41 GMT
+    >   ----
+    >   Connection to work04 closed.
+    >   ---- ---- ---- ----
+    >   Machine [trop03]
+    >   ---- ---- ---- ----
+    >   Machine [trop04]
+    >   Sun 14 Jul 15:47:41 BST 2019
+    >   trop04
+    >   ----
+    >   ----
+    >   Connection to trop04.roe.ac.uk closed.
+    >   ---- ---- ---- ----
+    >   Machine [gaia01]
+    >   Sun 14 Jul 15:47:54 BST 2019
+    >   gaia1
+    >   ----
+    >   HTTP/1.1 200 OK
+    >   Date: Sun, 14 Jul 2019 14:47:54 GMT
+    >   ----
+    >   Connection to gaia01 closed.
+    >   ---- ---- ---- ----
+    >   Machine [gaia02]
+    >   Sun 14 Jul 15:47:57 BST 2019
+    >   gaia2
+    >   ----
+    >   HTTP/1.1 200 OK
+    >   Date: Sun, 14 Jul 2019 14:47:57 GMT
+    >   ----
+    >   Connection to gaia02 closed.
 
 
 
