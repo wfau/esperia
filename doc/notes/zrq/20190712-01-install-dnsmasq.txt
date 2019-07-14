@@ -994,7 +994,7 @@ Content-Type: text/html;charset=UTF-8
 
 # -----------------------------------------------------
 # -----------------------------------------------------
-# Remove the external interface on work01.
+# Remove the external interface from work01.
 #[user@work01]
 
     sudo vi /etc/netplan/01-netcfg.yaml
@@ -1032,7 +1032,7 @@ Content-Type: text/html;charset=UTF-8
 
 
 # -----------------------------------------------------
-# Remove the iptables rules for DHCP and NAT.
+# Remove the iptables rules for DHCP and NAT from work01.
 #[user@work01]
 
     sudo vi /etc/iptables/rules.v4
@@ -1121,18 +1121,282 @@ Content-Type: text/html;charset=UTF-8
 --END--
 
 
+# -----------------------------------------------------
+# -----------------------------------------------------
+# Reboot the head node and check everything works.
+#[user@desktop]
+
+    ssh esperia -tty '
+        date
+        hostname
+        sudo reboot
+        '
+
+    sleep 120
+
+    ssh esperia '
+        date
+        hostname
+        curl --head 'http://data.metagrid.co.uk/temp'
+        '
+
+--START--
+Sun 14 Jul 14:56:04 BST 2019
+lssthead
+[sudo] password for dmr:
+Connection to 192.41.108.47 closed by remote host.
+Connection to 192.41.108.47 closed.
+--END--
 
 
+# -----------------------------------------------------
+# Update the external address for the head node.
+#[user@headnode]
+
+    sudo vi /etc/netplan/01-netcfg.yaml
+
+        ....
+          ....
+            enp4s4f0:
+              dhcp4: false
+              optional: true
+              addresses:
+    -           - "192.41.108.47/24"
+    +           - "192.41.108.44/24"
+              gateway4: 192.41.108.126
 
 
+# -----------------------------------------------------
+# -----------------------------------------------------
+# Update the local ssh config.
+#[user@desktop]
+
+    gedit "${HOME}/.ssh/config" &
+
+        ....
+
+        Host esperia-old
+            HostName 192.41.108.47
+            User ....
+            IdentityFile ~/.ssh/....
+
+    +   Host esperia-new
+    +       HostName 192.41.108.44
+    +       User ....
+    +       IdentityFile ~/.ssh/....
 
 
+# -----------------------------------------------------
+# Reboot the head node and check everything works.
+#[user@desktop]
+
+    ssh esperia-old -tty '
+        date
+        hostname
+        sudo reboot
+        '
+
+    # Need to wait for Docker to restart dnsmasq.
+    sleep 480
+
+    ssh esperia-new '
+        date
+        hostname
+        echo "----"
+        curl --silent 'http://data.metagrid.co.uk/robots.txt'
+        echo "----"
+        '
+
+--START--
+Sun 14 Jul 15:36:05 BST 2019
+lssthead
+----
+User-agent: *
+Crawl-delay: 10
+# Robots
+# http://www.last.fm/robots.txt
+# http://www.wired.com/epicenter/2010/08/robot-laws/
+Disallow: /human//harm
+Disallow: /human/ignore
+Disallow: /self/harm
+# Directories
+Disallow: /
+Disallow: /temp/
+Disallow: /donkeys/
+Disallow: /private/
+Disallow: /sshkeys/
+----
+--END--
 
 
+# -----------------------------------------------------
+# Reboot the worker nodes and check everything works as planned.
+#[user@desktop]
+
+    unset machines
+    machines=(
+        work01
+        work02
+        work03
+        work04
+        trop03
+        trop04
+        gaia01
+        gaia02
+        )
+
+    for machine in "${machines[@]}"
+    do
+        echo "---- ---- ---- ----"
+        echo "Machine [${machine}]"
+        ssh -tty "${machine:?}" '
+            date
+            hostname
+            sudo reboot
+            '
+    done
 
 
+--START--
+Machine [work01]
+Sun 14 Jul 15:43:03 BST 2019
+lsstukwork1
+[sudo] password for dmr:
+Connection to work01 closed by remote host.
+Connection to work01 closed.
+---- ---- ---- ----
+Machine [work02]
+Sun 14 Jul 15:43:10 BST 2019
+lsstukwork2
+[sudo] password for dmr:
+Connection to work02 closed by remote host.
+Connection to work02 closed.
+---- ---- ---- ----
+Machine [work03]
+Sun 14 Jul 15:43:17 BST 2019
+lsstukwork3
+[sudo] password for dmr:
+Connection to work03 closed by remote host.
+Connection to work03 closed.
+---- ---- ---- ----
+Machine [work04]
+Sun 14 Jul 15:43:23 BST 2019
+lsstukwork4
+[sudo] password for dmr:
+Connection to work04 closed by remote host.
+Connection to work04 closed.
+---- ---- ---- ----
+Machine [trop03]
+Sun 14 Jul 15:43:27 BST 2019
+trop03
+[sudo] password for dmr:
+Connection to trop03.roe.ac.uk closed by remote host.
+Connection to trop03.roe.ac.uk closed.
+---- ---- ---- ----
+Machine [trop04]
+Sun 14 Jul 15:43:32 BST 2019
+trop04
+[sudo] password for dmr:
+Connection to trop04.roe.ac.uk closed by remote host.
+Connection to trop04.roe.ac.uk closed.
+---- ---- ---- ----
+Machine [gaia01]
+Sun 14 Jul 15:43:40 BST 2019
+gaia1
+[sudo] password for dmr:
+Connection to gaia01 closed by remote host.
+Connection to gaia01 closed.
+---- ---- ---- ----
+Machine [gaia02]
+Sun 14 Jul 15:43:51 BST 2019
+gaia2
+[sudo] password for dmr:
+Connection to gaia02 closed by remote host.
+Connection to gaia02 closed.
+[Zarquan@methionine ~]$
+--END--
 
-# TODO
-# Update headnode public IP
+    # Need to wait for the machines to restart
+    sleep 120
+
+
+    for machine in "${machines[@]}"
+    do
+        echo "---- ---- ---- ----"
+        echo "Machine [${machine}]"
+        ssh -tty "${machine:?}" '
+            date
+            hostname
+            echo "----"
+            curl --silent --head 'http://data.metagrid.co.uk/robots.txt' | head -n 2
+            echo "----"
+            '
+    done
+
+--START--
+Machine [work01]
+Sun 14 Jul 15:47:32 BST 2019
+lsstukwork1
+----
+HTTP/1.1 200 OK
+Date: Sun, 14 Jul 2019 14:47:32 GMT
+----
+Connection to work01 closed.
+---- ---- ---- ----
+Machine [work02]
+Sun 14 Jul 15:47:35 BST 2019
+lsstukwork2
+----
+HTTP/1.1 200 OK
+Date: Sun, 14 Jul 2019 14:47:35 GMT
+----
+Connection to work02 closed.
+---- ---- ---- ----
+Machine [work03]
+Sun 14 Jul 15:47:38 BST 2019
+lsstukwork3
+----
+HTTP/1.1 200 OK
+Date: Sun, 14 Jul 2019 14:47:38 GMT
+----
+Connection to work03 closed.
+---- ---- ---- ----
+Machine [work04]
+Sun 14 Jul 15:47:41 BST 2019
+lsstukwork4
+----
+HTTP/1.1 200 OK
+Date: Sun, 14 Jul 2019 14:47:41 GMT
+----
+Connection to work04 closed.
+---- ---- ---- ----
+Machine [trop03]
+---- ---- ---- ----
+Machine [trop04]
+Sun 14 Jul 15:47:41 BST 2019
+trop04
+----
+----
+Connection to trop04.roe.ac.uk closed.
+---- ---- ---- ----
+Machine [gaia01]
+Sun 14 Jul 15:47:54 BST 2019
+gaia1
+----
+HTTP/1.1 200 OK
+Date: Sun, 14 Jul 2019 14:47:54 GMT
+----
+Connection to gaia01 closed.
+---- ---- ---- ----
+Machine [gaia02]
+Sun 14 Jul 15:47:57 BST 2019
+gaia2
+----
+HTTP/1.1 200 OK
+Date: Sun, 14 Jul 2019 14:47:57 GMT
+----
+Connection to gaia02 closed.
+--END--
+
 
 
