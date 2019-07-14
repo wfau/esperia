@@ -1032,7 +1032,7 @@ Content-Type: text/html;charset=UTF-8
 
 
 # -----------------------------------------------------
-# Remove the iptables rules for DNS, DHCP and NAT.
+# Remove the iptables rules for DHCP and NAT.
 #[user@work01]
 
     sudo vi /etc/iptables/rules.v4
@@ -1041,7 +1041,7 @@ Content-Type: text/html;charset=UTF-8
 
 --START--
 *** rules.v4.bak	2019-07-14 05:07:41.403798361 +0100
---- /etc/iptables/rules.v4	2019-07-14 05:26:38.099864895 +0100
+--- /etc/iptables/rules.v4	2019-07-14 05:43:20.547988972 +0100
 ***************
 *** 13,19 ****
   :INPUT ACCEPT [0:0]
@@ -1093,7 +1093,7 @@ Content-Type: text/html;charset=UTF-8
   -A OUTPUT -p udp -m udp --dport 123 -j ACCEPT
   -A OUTPUT -p tcp -j ACCEPT
   -A OUTPUT -j LOG --log-prefix "drop "
---- 23,44 ----
+--- 23,46 ----
   :frasynrel - [0:0]
   :override - [0:0]
   :vitalicmp - [0:0]
@@ -1110,6 +1110,8 @@ Content-Type: text/html;charset=UTF-8
   -A FORWARD -i virbr0 -j REJECT --reject-with icmp-port-unreachable
   -A FORWARD -j LOG --log-prefix "drop "
   -A FORWARD -j DROP
++ -A OUTPUT -p udp -m udp --sport 1024:65535 --dport 53 -j ACCEPT
++ -A OUTPUT -p tcp -m tcp --sport 1024:65535 --dport 53 -j ACCEPT
   -A OUTPUT -o virbr0 -p udp -m udp --dport 68 -j ACCEPT
   -A OUTPUT -j override
   -A OUTPUT -o lo -j ACCEPT
@@ -1131,7 +1133,6 @@ Content-Type: text/html;charset=UTF-8
 
 
 # TODO
-# Remove work01 public IP
 # Update headnode public IP
 
 
