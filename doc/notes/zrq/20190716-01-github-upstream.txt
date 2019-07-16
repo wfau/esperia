@@ -159,4 +159,50 @@ Your branch is up to date with 'origin/master'.
     "
 
 
+# -----------------------------------------------------
+# Add these notes.
+#[user@desktop]
+
+    git status
+
+--START--
+On branch master
+Your branch is up to date with 'origin/master'.
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+
+	doc/notes/zrq/20190716-01-github-upstream.txt
+--END--
+
+
+    git add .
+
+--START--
+--END--
+
+
+    git commit -m "Notes on keeping GitHub fork in sync with upstream repository"
+
+--START--
+[master df2baac] Notes on keeping GitHub fork in sync with upstream repository
+ 1 file changed, 162 insertions(+)
+ create mode 100644 doc/notes/zrq/20190716-01-github-upstream.txt
+--END--
+
+
+    git push
+
+--START--
+Enumerating objects: 10, done.
+Counting objects: 100% (10/10), done.
+Delta compression using up to 4 threads
+Compressing objects: 100% (4/4), done.
+Writing objects: 100% (6/6), 1.86 KiB | 1.86 MiB/s, done.
+Total 6 (delta 1), reused 0 (delta 0)
+remote: Resolving deltas: 100% (1/1), completed with 1 local object.
+To github.com:Zarquan/esperia.git
+   efe4c95..df2baac  master -> master
+--END--
+
 
