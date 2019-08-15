@@ -1,0 +1,189 @@
+#
+# <meta:header>
+#   <meta:licence>
+#     Copyright (c) 2018, ROE (http://www.roe.ac.uk/)
+#
+#     This information is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     This information is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#   </meta:licence>
+# </meta:header>
+#
+#
+
+    # Notes on what I did
+    # https://github.com/wfau/esperia/tree/master/doc/notes/zrq
+
+    # Dnsmasq config files.
+    # https://github.com/wfau/esperia/tree/master/src/dnsmasq
+
+    # Libvirt machine template
+    # https://github.com/wfau/esperia/blob/master/src/ischnura/esperia-template.xml
+
+# -----------------------------------------------------
+# OS network config.
+#[user@work02]
+
+    cat /etc/netplan/01-netcfg.yaml
+
+--START--
+# This file describes the network interfaces available on your system
+# For more information, see netplan(5).
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    eno1:
+      dhcp4: false
+      optional: true
+
+  bridges:
+    br1:
+      addresses: [ 172.16.1.2/16 ]
+      interfaces: [ eno1 ]
+      gateway4: 172.16.1.11
+      dhcp4: false
+      optional: true
+      nameservers:
+        search:
+          - ""
+          - "esperia"
+          - "roe.ac.uk"
+        addresses:
+          - "172.16.1.11"
+--END--
+
+# -----------------------------------------------------
+# Add the netfilter bridge config and udev rules.
+# https://bugzilla.redhat.com/show_bug.cgi?id=512206
+# http://wiki.libvirt.org/page/Net.bridge.bridge-nf-call_and_sysctl.conf
+# http://ebtables.netfilter.org/misc/brnf-faq.html
+# http://unix.stackexchange.com/questions/136918/why-does-my-firewall-iptables-interfere-in-my-bridge-brctl
+# http://manpages.ubuntu.com/manpages/zesty/man5/sysctl.d.5.html
+# https://wiki.libvirt.org/page/Networking#Debian.2FUbuntu_Bridging
+# https://wiki.debian.org/BridgeNetworkConnections
+#[user@work02]
+
+    cat /etc/sysctl.d/98-bridge.conf
+
+--START--
+###################################################################
+# Netfilter bridge settings.
+#
+# http://wiki.libvirt.org/page/Net.bridge.bridge-nf-call_and_sysctl.conf
+# http://ebtables.netfilter.org/misc/brnf-faq.html
+# http://unix.stackexchange.com/questions/136918/why-does-my-firewall-iptables-interfere-in-my-bridge-brctl
+net.bridge.bridge-nf-call-iptables  = 0
+net.bridge.bridge-nf-call-arptables = 0
+net.bridge.bridge-nf-call-ip6tables = 0
+
+# Enable packet forwarding for IPv4
+net.ipv4.ip_forward = 1
+
+# Enable packet forwarding for IPv6
+net.ipv6.conf.all.forwarding = 1
+--END--
+
+    cat /etc/udev/rules.d/98-bridge.rules
+
+--START--
+###################################################################
+# Load the net.bridge rules when the br_netfilter module is loaded.
+# http://manpages.ubuntu.com/manpages/zesty/man5/sysctl.d.5.html
+#
+
+ACTION=="add", SUBSYSTEM=="module", KERNEL=="ip_tables",    RUN+="/sbin/sysctl --load /etc/sysctl.d/98-bridge.conf"
+ACTION=="add", SUBSYSTEM=="module", KERNEL=="br_netfilter", RUN+="/sbin/sysctl --load /etc/sysctl.d/98-bridge.conf"
+--END--
+
+# -----------------------------------------------------
+# Check that forwarded packets are not filtered by iptables ..
+#[user@work02]
+
+    ** May need to reboot for this to take effect **
+
+    sudo modprobe br_netfilter
+
+    sudo sysctl 'net.bridge'
+
+--START--
+net.bridge.bridge-nf-call-arptables = 0
+net.bridge.bridge-nf-call-ip6tables = 0
+net.bridge.bridge-nf-call-iptables = 0
+net.bridge.bridge-nf-filter-pppoe-tagged = 0
+net.bridge.bridge-nf-filter-vlan-tagged = 0
+net.bridge.bridge-nf-pass-vlan-input-dev = 0
+--END--
+
+
+# -----------------------------------------------------
+# Libvirt bridged network.
+#[user@work02]
+
+    virsh \
+        --connect 'qemu:///system' \
+        net-dumpxml bridged
+
+--START--
+<network connections='4' ipv6='yes'>
+  <name>bridged</name>
+  <uuid>8fe92850-f636-4bc5-9422-0f467828c018</uuid>
+  <forward mode='bridge'/>
+  <bridge name='br1'/>
+</network>
+--END--
+
+
+# -----------------------------------------------------
+# VM network config.
+#[user@work02]
+
+    virsh \
+        --connect 'qemu:///system' \
+        dumpxml Dwerader \
+    | xmlstarlet \
+        select \
+            --root \
+            --indent \
+            --template \
+            --copy-of '//interface'
+
+--START--
+<xsl-select>
+  <interface type="bridge">
+      <mac address="06:00:ac:10:02:03"/>
+      <source network="bridged" bridge="br1"/>
+      <target dev="vnet2"/>
+      <model type="virtio"/>
+      <alias name="net0"/>
+      <address type="pci" domain="0x0000" bus="0x00" slot="0x03" function="0x0"/>
+    </interface>
+</xsl-select>
+--END--
+
+
+# -----------------------------------------------------
+# List of suggested MAC addresses to use.
+# These should already be in the dnsmasq config, so using these should get the same IP address each time.
+# MAC addresses starting with 06:00:AC are reserved.
+# Using an unknown MAC address will get a random IP address between 172.16.252.1 and 172.16.252.252.
+
+    06:00:AC:10:07:01 => 172.16.7.1
+    06:00:AC:10:07:02 => 172.16.7.2
+    06:00:AC:10:07:03 => 172.16.7.3
+    06:00:AC:10:07:04 => 172.16.7.4
+    06:00:AC:10:07:05 => 172.16.7.5
+    06:00:AC:10:07:06 => 172.16.7.6
+    06:00:AC:10:07:07 => 172.16.7.7
+    06:00:AC:10:07:08 => 172.16.7.8
+
+
