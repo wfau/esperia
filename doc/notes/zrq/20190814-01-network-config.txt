@@ -35,32 +35,30 @@
 
     cat /etc/netplan/01-netcfg.yaml
 
---START--
-# This file describes the network interfaces available on your system
-# For more information, see netplan(5).
-network:
-  version: 2
-  renderer: networkd
-  ethernets:
-    eno1:
-      dhcp4: false
-      optional: true
-
-  bridges:
-    br1:
-      addresses: [ 172.16.1.2/16 ]
-      interfaces: [ eno1 ]
-      gateway4: 172.16.1.11
-      dhcp4: false
-      optional: true
-      nameservers:
-        search:
-          - ""
-          - "esperia"
-          - "roe.ac.uk"
-        addresses:
-          - "172.16.1.11"
---END--
+    >   # This file describes the network interfaces available on your system
+    >   # For more information, see netplan(5).
+    >   network:
+    >     version: 2
+    >     renderer: networkd
+    >     ethernets:
+    >       eno1:
+    >         dhcp4: false
+    >         optional: true
+    >   
+    >     bridges:
+    >       br1:
+    >         addresses: [ 172.16.1.2/16 ]
+    >         interfaces: [ eno1 ]
+    >         gateway4: 172.16.1.11
+    >         dhcp4: false
+    >         optional: true
+    >         nameservers:
+    >           search:
+    >             - ""
+    >             - "esperia"
+    >             - "roe.ac.uk"
+    >           addresses:
+    >             - "172.16.1.11"
 
 # -----------------------------------------------------
 # Add the netfilter bridge config and udev rules.
@@ -75,35 +73,31 @@ network:
 
     cat /etc/sysctl.d/98-bridge.conf
 
---START--
-###################################################################
-# Netfilter bridge settings.
-#
-# http://wiki.libvirt.org/page/Net.bridge.bridge-nf-call_and_sysctl.conf
-# http://ebtables.netfilter.org/misc/brnf-faq.html
-# http://unix.stackexchange.com/questions/136918/why-does-my-firewall-iptables-interfere-in-my-bridge-brctl
-net.bridge.bridge-nf-call-iptables  = 0
-net.bridge.bridge-nf-call-arptables = 0
-net.bridge.bridge-nf-call-ip6tables = 0
-
-# Enable packet forwarding for IPv4
-net.ipv4.ip_forward = 1
-
-# Enable packet forwarding for IPv6
-net.ipv6.conf.all.forwarding = 1
---END--
+    >   ###################################################################
+    >   # Netfilter bridge settings.
+    >   #
+    >   # http://wiki.libvirt.org/page/Net.bridge.bridge-nf-call_and_sysctl.conf
+    >   # http://ebtables.netfilter.org/misc/brnf-faq.html
+    >   # http://unix.stackexchange.com/questions/136918/why-does-my-firewall-iptables-interfere-in-my-bridge-brctl
+    >   net.bridge.bridge-nf-call-iptables  = 0
+    >   net.bridge.bridge-nf-call-arptables = 0
+    >   net.bridge.bridge-nf-call-ip6tables = 0
+    >   
+    >   # Enable packet forwarding for IPv4
+    >   net.ipv4.ip_forward = 1
+    >   
+    >   # Enable packet forwarding for IPv6
+    >   net.ipv6.conf.all.forwarding = 1
 
     cat /etc/udev/rules.d/98-bridge.rules
 
---START--
-###################################################################
-# Load the net.bridge rules when the br_netfilter module is loaded.
-# http://manpages.ubuntu.com/manpages/zesty/man5/sysctl.d.5.html
-#
-
-ACTION=="add", SUBSYSTEM=="module", KERNEL=="ip_tables",    RUN+="/sbin/sysctl --load /etc/sysctl.d/98-bridge.conf"
-ACTION=="add", SUBSYSTEM=="module", KERNEL=="br_netfilter", RUN+="/sbin/sysctl --load /etc/sysctl.d/98-bridge.conf"
---END--
+    >   ###################################################################
+    >   # Load the net.bridge rules when the br_netfilter module is loaded.
+    >   # http://manpages.ubuntu.com/manpages/zesty/man5/sysctl.d.5.html
+    >   #
+    >   
+    >   ACTION=="add", SUBSYSTEM=="module", KERNEL=="ip_tables",    RUN+="/sbin/sysctl --load /etc/sysctl.d/98-bridge.conf"
+    >   ACTION=="add", SUBSYSTEM=="module", KERNEL=="br_netfilter", RUN+="/sbin/sysctl --load /etc/sysctl.d/98-bridge.conf"
 
 # -----------------------------------------------------
 # Check that forwarded packets are not filtered by iptables ..
@@ -115,14 +109,12 @@ ACTION=="add", SUBSYSTEM=="module", KERNEL=="br_netfilter", RUN+="/sbin/sysctl -
 
     sudo sysctl 'net.bridge'
 
---START--
-net.bridge.bridge-nf-call-arptables = 0
-net.bridge.bridge-nf-call-ip6tables = 0
-net.bridge.bridge-nf-call-iptables = 0
-net.bridge.bridge-nf-filter-pppoe-tagged = 0
-net.bridge.bridge-nf-filter-vlan-tagged = 0
-net.bridge.bridge-nf-pass-vlan-input-dev = 0
---END--
+    >   net.bridge.bridge-nf-call-arptables = 0
+    >   net.bridge.bridge-nf-call-ip6tables = 0
+    >   net.bridge.bridge-nf-call-iptables = 0
+    >   net.bridge.bridge-nf-filter-pppoe-tagged = 0
+    >   net.bridge.bridge-nf-filter-vlan-tagged = 0
+    >   net.bridge.bridge-nf-pass-vlan-input-dev = 0
 
 
 # -----------------------------------------------------
@@ -133,14 +125,12 @@ net.bridge.bridge-nf-pass-vlan-input-dev = 0
         --connect 'qemu:///system' \
         net-dumpxml bridged
 
---START--
-<network connections='4' ipv6='yes'>
-  <name>bridged</name>
-  <uuid>8fe92850-f636-4bc5-9422-0f467828c018</uuid>
-  <forward mode='bridge'/>
-  <bridge name='br1'/>
-</network>
---END--
+    >   <network connections='4' ipv6='yes'>
+    >     <name>bridged</name>
+    >     <uuid>8fe92850-f636-4bc5-9422-0f467828c018</uuid>
+    >     <forward mode='bridge'/>
+    >     <bridge name='br1'/>
+    >   </network>
 
 
 # -----------------------------------------------------
@@ -157,18 +147,16 @@ net.bridge.bridge-nf-pass-vlan-input-dev = 0
             --template \
             --copy-of '//interface'
 
---START--
-<xsl-select>
-  <interface type="bridge">
-      <mac address="06:00:ac:10:02:03"/>
-      <source network="bridged" bridge="br1"/>
-      <target dev="vnet2"/>
-      <model type="virtio"/>
-      <alias name="net0"/>
-      <address type="pci" domain="0x0000" bus="0x00" slot="0x03" function="0x0"/>
-    </interface>
-</xsl-select>
---END--
+    >   <xsl-select>
+    >     <interface type="bridge">
+    >         <mac address="06:00:ac:10:02:03"/>
+    >         <source network="bridged" bridge="br1"/>
+    >         <target dev="vnet2"/>
+    >         <model type="virtio"/>
+    >         <alias name="net0"/>
+    >         <address type="pci" domain="0x0000" bus="0x00" slot="0x03" function="0x0"/>
+    >       </interface>
+    >   </xsl-select>
 
 
 # -----------------------------------------------------
