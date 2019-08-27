@@ -21,70 +21,8 @@
 #
 
 # -----------------------------------------------------
-# Create our ssh config.
-#[user@desktop]
-
-    gedit "${HOME}/.ssh/config"
-
-        ....
-
-        Host esperia
-            HostName 192.41.108.47
-            User dmr
-            IdentityFile ~/.ssh/dmr.roe.ac.uk.rsa
-            ServerAliveInterval 60
-            ServerAliveCountMax 5
-
-
-# -----------------------------------------------------
-# Login to the head node.
-#[user@desktop]
-
-    ssh esperia
-
-
-# -----------------------------------------------------
-# Update the system.
-#[user@headnode]
-
-    sudo apt-get update
-
-    sudo apt-get upgrade
-
-
-# -----------------------------------------------------
-# Reboot to complete the update.
-#[user@headnode]
-
-    sudo reboot
-    ....
-
-    ssh esperia
-
-
-# -----------------------------------------------------
-# Create the esperia group and add our admin users.
-#[user@headnode]
-
-    sudo groupadd --system esperia
-
-    sudo usermod --append --groups esperia dmr
-    sudo usermod --append --groups esperia msh
-
-
-# -----------------------------------------------------
-# Logut to update our groups.
-#[user@headnode]
-
-    exit
-    ....
-
-    ssh esperia
-
-
-# -----------------------------------------------------
 # Create our projects settings.
-#[user@headnode]
+#[user@gaia01]
 
     if [ ! -e "${HOME:?}/projects.settings" ]
     then
@@ -95,7 +33,7 @@ EOF
 
 # -----------------------------------------------------
 # Create our projects directory.
-#[user@headnode]
+#[user@gaia01]
 
     source "${HOME:?}/projects.settings"
 
@@ -111,7 +49,7 @@ EOF
 
 # -----------------------------------------------------
 # Create our project settings.
-#[user@headnode]
+#[user@gaia01]
 
     if [ ! -e "${HOME:?}/esperia.settings" ]
     then
@@ -125,7 +63,7 @@ EOF
 
 # -----------------------------------------------------
 # Checkout our project source code.
-#[user@headnode]
+#[user@gaia01]
 
     source "${HOME:?}/esperia.settings"
 
@@ -158,6 +96,29 @@ EOF
     fi
 
 
+# -----------------------------------------------------
+# Update the ischnura config.
+#[user@gaia01]
 
+    source "${HOME:?}/esperia.settings"
+    source "${HOME:?}/ischnura.settings"
+
+    pushd "${ischcode:?}"
+        pushd 'src'
+            pushd 'dat'
+
+                ln -s "${ESPERIA_CODE:?}/src/ischnura/esperia-machines.txt" .
+                ln -s "${ESPERIA_CODE:?}/src/ischnura/esperia-template.xml" .
+
+            popd
+
+cat > config << 'EOF'
+thisname=gaia01
+machines=${datpath:?}/esperia-machines.txt
+template=${datpath:?}/esperia-template.xml
+EOF
+
+        popd
+    popd
 
 

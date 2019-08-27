@@ -178,10 +178,6 @@ Untracked files:
 
     git add .
 
---START--
---END--
-
-
     git commit -m "Notes on keeping GitHub fork in sync with upstream repository"
 
 --START--
@@ -204,5 +200,6 @@ remote: Resolving deltas: 100% (1/1), completed with 1 local object.
 To github.com:Zarquan/esperia.git
    efe4c95..df2baac  master -> master
 --END--
+
 
 
