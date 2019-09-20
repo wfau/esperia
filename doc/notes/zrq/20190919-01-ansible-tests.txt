@@ -1,0 +1,145 @@
+#
+# <meta:header>
+#   <meta:licence>
+#     Copyright (c) 2018, ROE (http://www.roe.ac.uk/)
+#
+#     This information is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     This information is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#   </meta:licence>
+# </meta:header>
+#
+#
+
+# -----------------------------------------------------
+# Run our Ansible client.
+#[user@laptop]
+
+    docker run \
+        --rm \
+        --tty \
+        --interactive \
+        --hostname ansible-client \
+        --env SSH_AUTH_SOCK=/tmp/ssh_auth_sock \
+        --volume ${SSH_AUTH_SOCK}:/tmp/ssh_auth_sock \
+        --volume ${ESPERIA_CODE:?}/src/ansible:/etc/ansible:ro \
+        korscheltellus/ansible-client:latest \
+            bash
+
+# -----------------------------------------------------
+# Run our 'ping' playbook to check we can login using the sudo password.
+#[user@ansible-client]
+
+    ansible-playbook \
+        --user dmr \
+        --ask-become-pass \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/workers-ping.yml
+
+--START--
+BECOME password:
+
+PLAY [esperia]
+
+TASK [Check we can connect.]
+ok: [esperia]
+
+PLAY [workers]
+
+TASK [Check we can connect.]
+ok: [work02]
+ok: [work01]
+
+TASK [Check we can use sudo.]
+ok: [work02]
+ok: [work01]
+
+PLAY RECAP
+esperia                    : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+work01                     : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+work02                     : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+--END--
+
+# -----------------------------------------------------
+# Configure the Ansible group.
+#[user@ansible-client]
+
+    ansible-playbook \
+        --user dmr \
+        --ask-become-pass \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/workers-ansible.yml
+
+--START--
+BECOME password:
+
+PLAY [workers]
+
+TASK [Check we can connect.]
+ok: [work02]
+ok: [work01]
+
+TASK [Check we can connect as root.]
+ok: [work01]
+ok: [work02]
+
+TASK [Install our sudoers config.]
+ok: [work01]
+changed: [work02]
+
+TASK [Create our ansible group.]
+changed: [work02]
+ok: [work01]
+
+TASK [Add our admin accounts to the ansible group.]
+changed: [work02] => (item=dmr)
+ok: [work01] => (item=dmr)
+changed: [work02] => (item=msh)
+ok: [work01] => (item=msh)
+
+PLAY RECAP
+work01                     : ok=5    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+work02                     : ok=5    changed=3    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+--END--
+
+
+# -----------------------------------------------------
+# Run our 'ping' playbook to check we can login without using the sudo password.
+#[user@ansible-client]
+
+    ansible-playbook \
+        --user dmr \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/workers-ping.yml
+
+--START--
+PLAY [esperia]
+
+TASK [Check we can connect.]
+ok: [esperia]
+
+PLAY [workers]
+
+TASK [Check we can connect.]
+ok: [work01]
+ok: [work02]
+
+TASK [Check we can use sudo.]
+ok: [work01]
+ok: [work02]
+
+PLAY RECAP **********************************************************************************************************
+esperia                    : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+work01                     : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+work02                     : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+--END--
+
