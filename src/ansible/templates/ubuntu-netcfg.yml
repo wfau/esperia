@@ -1,0 +1,26 @@
+# This file describes the network interfaces available on your system
+# For more information, see netplan(5).
+
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    eno1:
+      dhcp4: false
+      optional: true
+
+  bridges:
+    br1:
+      addresses:  [ {{ hostvars[inventory_hostname]['vlanipv4'] }}/16 ]
+      interfaces: [ {{ hostvars[inventory_hostname]['vlaneth']  }} ]
+      gateway4: 172.16.1.11
+      dhcp4: false
+      optional: true
+      nameservers:
+        search:
+          - ""
+          - "esperia"
+          - "roe.ac.uk"
+        addresses:
+          - "172.16.1.11"
+

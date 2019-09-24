@@ -26,24 +26,26 @@
 
     source "${HOME}/esperia.settings"
     pushd  "${ESPERIA_CODE:?}"
+        pushd src
 
-        buildtag=$(date '+%Y.%m.%d')
-        buildtime=$(date '+%Y-%m-%dT%H:%M:%S')
+            buildtag=$(date '+%Y.%m.%d')
+            buildtime=$(date '+%Y-%m-%dT%H:%M:%S')
 
-        docker build \
-            --build-arg "buildtag=${buildtag:?}" \
-            --build-arg "buildtime=${buildtime:?}" \
-            --tag esperia/fedora:latest \
-            --tag esperia/fedora:${buildtag:?} \
-            docker/fedora
+            docker build \
+                --build-arg "buildtag=${buildtag:?}" \
+                --build-arg "buildtime=${buildtime:?}" \
+                --tag esperia/fedora:latest \
+                --tag esperia/fedora:${buildtag:?} \
+                docker/fedora
 
-        docker build \
-            --build-arg "buildtag=${buildtag:?}" \
-            --build-arg "buildtime=${buildtime:?}" \
-            --tag esperia/ansible-client:latest \
-            --tag esperia/ansible-client:${buildtag:?} \
-            docker/ansible-client
+            docker build \
+                --build-arg "buildtag=${buildtag:?}" \
+                --build-arg "buildtime=${buildtime:?}" \
+                --tag esperia/ansible-client:latest \
+                --tag esperia/ansible-client:${buildtag:?} \
+                docker/ansible-client
 
+        popd
     popd
 
 # -----------------------------------------------------

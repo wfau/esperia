@@ -1,0 +1,81 @@
+#
+# <meta:header>
+#   <meta:licence>
+#     Copyright (c) 2018, ROE (http://www.roe.ac.uk/)
+#
+#     This information is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     This information is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#   </meta:licence>
+# </meta:header>
+#
+#
+
+---
+- hosts: work01
+  gather_facts: false
+  tasks:
+
+    - name: "Check we can connect"
+      ping:
+
+    - name: "Check we can use sudo"
+      become: true
+      ping:
+
+    - name: "Create our admin users"
+      become: true
+      user:
+        state: present
+        groups:
+            - sudo
+            - users
+            - libvirt
+            - ansible
+        append: true
+        create_home: true
+      loop:
+        - msh
+        - dmr
+
+    - name: "Install authorized keys for dmr"
+      become: true
+      authorized_key:
+        user: dmr
+        state: present
+        key: '{{ item }}'
+      loop:
+        - ssh-keys/dmr.roe.ac.uk.rsa.pub
+
+    - name: "Install authorized keys for msh"
+      become: true
+      authorized_key:
+        user: msh
+        state: present
+        key: '{{ item }}'
+      loop:
+        - ssh-keys/msh.roe.ac.uk.rsa.pub
+
+    - name: "Install authorized keys for root"
+      become: true
+      authorized_key:
+        user: root
+        state: present
+        key: '{{ item }}'
+      loop:
+        - ssh-keys/dmr.roe.ac.uk.rsa.pub
+        - ssh-keys/msh.roe.ac.uk.rsa.pub
+
+
+
+
+

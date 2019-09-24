@@ -1,0 +1,6 @@
+#
+# This file should be installed as /etc/sudoers.d/ansible-sudoers
+#
+# Allow members of the 'ansible' group to execute any command.
+%ansible ALL=(ALL:ALL) NOPASSWD:ALL
+

@@ -1,0 +1,84 @@
+#
+# <meta:header>
+#   <meta:licence>
+#     Copyright (c) 2018, ROE (http://www.roe.ac.uk/)
+#
+#     This information is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     This information is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#   </meta:licence>
+# </meta:header>
+#
+#
+
+---
+- hosts: work01
+  gather_facts: false
+  tasks:
+
+    - name: "Check we can connect"
+      ping:
+
+    - name: "Check we can use sudo"
+      become: true
+      ping:
+
+    - name: "Create our ansible group"
+      become: true
+      group:
+        name: 'ansible'
+        state: present
+        system: true
+
+    - name: "Create our ansible account"
+      become: true
+      user:
+        name: 'ansible'
+        state: present
+        system: true
+        group: ansible
+        groups:
+            - sudo
+            - users
+            - libvirt
+            - ansible
+        append: true
+        create_home: true
+        home: '/etc/ansible/home'
+
+    - name: "Add our admin accounts to the ansible group"
+      become: true
+      user:
+        name: "{{ item }}"
+        groups: ansible
+        append: yes
+      loop:
+        - dmr
+        - msh
+
+    - name: "Install our sudoers config"
+      become: true
+      copy:
+        src: ansible-sudoers
+        dest: /etc/sudoers.d/ansible-sudoers
+
+    - name: "Install authorized keys for ansible"
+      become: true
+      authorized_key:
+        user: ansible
+        state: present
+        key: '{{ item }}'
+      loop:
+        - "{{ lookup('file', 'ssh-keys/dmr.roe.ac.uk.rsa.pub') }}"
+        - "{{ lookup('file', 'ssh-keys/msh.roe.ac.uk.rsa.pub') }}"
+
+
