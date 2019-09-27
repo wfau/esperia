@@ -45,29 +45,27 @@
         --inventory /etc/ansible/hosts.yml \
         /etc/ansible/workers-ping.yml
 
---START--
-BECOME password:
-
-PLAY [esperia]
-
-TASK [Check we can connect.]
-ok: [esperia]
-
-PLAY [workers]
-
-TASK [Check we can connect.]
-ok: [work02]
-ok: [work01]
-
-TASK [Check we can use sudo.]
-ok: [work02]
-ok: [work01]
-
-PLAY RECAP
-esperia                    : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
-work01                     : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
-work02                     : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
---END--
+    >   BECOME password:
+    >
+    >   PLAY [esperia]
+    >
+    >   TASK [Check we can connect.]
+    >   ok: [esperia]
+    >
+    >   PLAY [workers]
+    >
+    >   TASK [Check we can connect.]
+    >   ok: [work02]
+    >   ok: [work01]
+    >
+    >   TASK [Check we can use sudo.]
+    >   ok: [work02]
+    >   ok: [work01]
+    >
+    >   PLAY RECAP
+    >   esperia                    : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+    >   work01                     : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+    >   work02                     : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 
 # -----------------------------------------------------
 # Configure the Ansible group.
@@ -79,37 +77,35 @@ work02                     : ok=2    changed=0    unreachable=0    failed=0    s
         --inventory /etc/ansible/hosts.yml \
         /etc/ansible/workers-ansible.yml
 
---START--
-BECOME password:
-
-PLAY [workers]
-
-TASK [Check we can connect.]
-ok: [work02]
-ok: [work01]
-
-TASK [Check we can connect as root.]
-ok: [work01]
-ok: [work02]
-
-TASK [Install our sudoers config.]
-ok: [work01]
-changed: [work02]
-
-TASK [Create our ansible group.]
-changed: [work02]
-ok: [work01]
-
-TASK [Add our admin accounts to the ansible group.]
-changed: [work02] => (item=dmr)
-ok: [work01] => (item=dmr)
-changed: [work02] => (item=msh)
-ok: [work01] => (item=msh)
-
-PLAY RECAP
-work01                     : ok=5    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
-work02                     : ok=5    changed=3    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
---END--
+    >   BECOME password:
+    >
+    >   PLAY [workers]
+    >
+    >   TASK [Check we can connect.]
+    >   ok: [work02]
+    >   ok: [work01]
+    >
+    >   TASK [Check we can connect as root.]
+    >   ok: [work01]
+    >   ok: [work02]
+    >
+    >   TASK [Install our sudoers config.]
+    >   ok: [work01]
+    >   changed: [work02]
+    >
+    >   TASK [Create our ansible group.]
+    >   changed: [work02]
+    >   ok: [work01]
+    >
+    >   TASK [Add our admin accounts to the ansible group.]
+    >   changed: [work02] => (item=dmr)
+    >   ok: [work01] => (item=dmr)
+    >   changed: [work02] => (item=msh)
+    >   ok: [work01] => (item=msh)
+    >
+    >   PLAY RECAP
+    >   work01                     : ok=5    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+    >   work02                     : ok=5    changed=3    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 
 
 # -----------------------------------------------------
@@ -121,25 +117,23 @@ work02                     : ok=5    changed=3    unreachable=0    failed=0    s
         --inventory /etc/ansible/hosts.yml \
         /etc/ansible/workers-ping.yml
 
---START--
-PLAY [esperia]
-
-TASK [Check we can connect.]
-ok: [esperia]
-
-PLAY [workers]
-
-TASK [Check we can connect.]
-ok: [work01]
-ok: [work02]
-
-TASK [Check we can use sudo.]
-ok: [work01]
-ok: [work02]
-
-PLAY RECAP **********************************************************************************************************
-esperia                    : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
-work01                     : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
-work02                     : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
---END--
+    >   PLAY [esperia]
+    >
+    >   TASK [Check we can connect.]
+    >   ok: [esperia]
+    >
+    >   PLAY [workers]
+    >
+    >   TASK [Check we can connect.]
+    >   ok: [work01]
+    >   ok: [work02]
+    >
+    >   TASK [Check we can use sudo.]
+    >   ok: [work01]
+    >   ok: [work02]
+    >
+    >   PLAY RECAP **********************************************************************************************************
+    >   esperia                    : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+    >   work01                     : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+    >   work02                     : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 
