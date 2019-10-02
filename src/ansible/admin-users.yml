@@ -1,7 +1,7 @@
 #
 # <meta:header>
 #   <meta:licence>
-#     Copyright (c) 2018, ROE (http://www.roe.ac.uk/)
+#     Copyright (c) 2019, ROE (http://www.roe.ac.uk/)
 #
 #     This information is free software: you can redistribute it and/or modify
 #     it under the terms of the GNU General Public License as published by
@@ -21,29 +21,23 @@
 #
 
 ---
-- hosts: work01
+# hosts: lsstnodes:gaianodes:tropnodes
+- hosts: work01:work02
   gather_facts: false
   tasks:
 
-    - name: "Check we can connect"
-      ping:
-
-    - name: "Check we can use sudo"
+    - name: "Create our admin users"
       become: true
-      ping:
-
-    - name: "Install authorized keys for root"
-      become: true
-      authorized_key:
-        user: root
+      user:
+        name: "{{item}}"
         state: present
-        key: '{{ item }}'
+        groups:
+            - sudo
+            - users
+            - ansible
+            - libvirt
+        append: true
+        create_home: true
       loop:
-        - "{{ lookup('file', 'ssh-keys/dmr.roe.ac.uk.rsa.pub') }}"
-        - "{{ lookup('file', 'ssh-keys/msh.roe.ac.uk.rsa.pub') }}"
-        - "{{ lookup('file', 'ssh-keys/khaba.roe.ac.uk.rsa.pub') }}"
-
-
-
-
+        "{{ hostvars[inventory_hostname].admins }}"
 

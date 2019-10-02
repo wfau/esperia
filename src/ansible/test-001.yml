@@ -21,7 +21,7 @@
 #
 
 ---
-- hosts: work01
+- hosts: lssthead:lsstnodes:tropnodes:gaianodes
   gather_facts: false
   tasks:
 
@@ -31,51 +31,5 @@
     - name: "Check we can use sudo"
       become: true
       ping:
-
-    - name: "Create our admin users"
-      become: true
-      user:
-        state: present
-        groups:
-            - sudo
-            - users
-            - libvirt
-            - ansible
-        append: true
-        create_home: true
-      loop:
-        - msh
-        - dmr
-
-    - name: "Install authorized keys for dmr"
-      become: true
-      authorized_key:
-        user: dmr
-        state: present
-        key: '{{ item }}'
-      loop:
-        - ssh-keys/dmr.roe.ac.uk.rsa.pub
-
-    - name: "Install authorized keys for msh"
-      become: true
-      authorized_key:
-        user: msh
-        state: present
-        key: '{{ item }}'
-      loop:
-        - ssh-keys/msh.roe.ac.uk.rsa.pub
-
-    - name: "Install authorized keys for root"
-      become: true
-      authorized_key:
-        user: root
-        state: present
-        key: '{{ item }}'
-      loop:
-        - ssh-keys/dmr.roe.ac.uk.rsa.pub
-        - ssh-keys/msh.roe.ac.uk.rsa.pub
-
-
-
 
 

@@ -21,21 +21,18 @@
 #
 
 ---
-- hosts: esperia
+# hosts: lsstnodes:gaianodes:tropnodes
+- hosts: work01:work02
   gather_facts: false
   tasks:
 
-    - name: "Check we can connect"
-      ping:
-
-- hosts: allworkers
-  gather_facts: false
-  tasks:
-
-    - name: "Check we can connect"
-      ping:
-
-    - name: "Check we can use sudo"
+    - name: "Install authorized keys for ansible"
       become: true
-      ping:
+      authorized_key:
+        user:  ansible
+        state: present
+        key: "{{ lookup('file', 'ssh-keys/' + users[item].sshkey) }}"
+      loop:
+        "{{ hostvars[inventory_hostname].admins }}"
+
 

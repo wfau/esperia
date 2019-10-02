@@ -1,7 +1,7 @@
 #
 # <meta:header>
 #   <meta:licence>
-#     Copyright (c) 2019, ROE (http://www.roe.ac.uk/)
+#     Copyright (c) 2018, ROE (http://www.roe.ac.uk/)
 #
 #     This information is free software: you can redistribute it and/or modify
 #     it under the terms of the GNU General Public License as published by
@@ -18,16 +18,23 @@
 #   </meta:licence>
 # </meta:header>
 #
+#
 
-[defaults]
+---
+- hosts: lssthead:lsstnodes:tropnodes:gaianodes
+  gather_facts: false
+  tasks:
 
-# https://docs.ansible.com/ansible/2.8/reference_appendices/interpreter_discovery.html
-interpreter_python = auto
+    - name: "Add our admin accounts to the ansible group"
+      debug:
+        msg: "Add user '{{ item }}' to 'ansible group'"
+      loop:
+        "{{ hostvars[inventory_hostname].admins }}"
 
-# https://docs.ansible.com/ansible/latest/user_guide/intro_getting_started.html#host-key-checking
-host_key_checking = False
+    - name: "Add our admin keys to the ansible user"
+      debug:
+        msg: "Add key '{{ users[item].sshkey }}' to 'ansible user'"
+      loop:
+        "{{ hostvars[inventory_hostname].admins }}"
 
-[ssh_connection]
-# https://blog.scottlowe.org/2015/12/24/running-ansible-through-ssh-bastion-host/
-# ssh_args = -F /etc/ansible/ssh.cfg
 

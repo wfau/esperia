@@ -1,0 +1,8 @@
+# DNS host records for VLAN nodes.
+{% for name in groups['vlannodes'] -%}
+    host-record=
+    {{- name }},
+    {{- name }}.esperia,
+    {{- hostvars[name].vlanip4 | ipaddr('address') }}
+{% endfor %}
+

@@ -1,0 +1,9 @@
+# DNS host records for public interfaces.
+{% for name in groups['vlannodes'] -%}
+    {%- if 'inetip4' in hostvars[name] -%}
+        host-record=
+        {{- name -}}.roe.ac.uk,
+        {{- hostvars[name].inetip4 | ipaddr('address') }}
+{% endif %}
+{% endfor %}
+
