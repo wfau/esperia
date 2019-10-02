@@ -21,8 +21,7 @@
 #
 
 ---
-# hosts: lsstnodes:gaianodes:tropnodes
-- hosts: work01:work02
+- hosts: lsstnodes:gaianodes:tropnodes
   gather_facts: false
   tasks:
 

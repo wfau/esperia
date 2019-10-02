@@ -74,6 +74,75 @@
         '
 
 --START--
+The authenticity of host '192.41.108.44 (192.41.108.44)' can't be established.
+ECDSA key fingerprint is SHA256:jCWHt7d/fVNH0VBOpuR+OZgxmPDaF4/9b9te7kPLo7E.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '192.41.108.44' (ECDSA) to the list of known hosts.
+Thu  3 Oct 00:17:40 BST 2019
+lssthead
+uid=1001(dmr) gid=1001(dmr) groups=1001(dmr),27(sudo),115(docker),999(esperia)
+--END--
+
+
+# -----------------------------------------------------
+# Create our ansible group.
+#[root@ansible-client]
+
+    ansible-playbook \
+        --ask-become-pass \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/ansible-group.yml
+
+--START--
+....
+TASK [Create our ansible group]
+ok: [work01]
+ok: [work04]
+ok: [work02]
+ok: [work03]
+changed: [gaia01]
+ [WARNING]: Platform linux on host trop03 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change this. See
+https://docs.ansible.com/ansible/2.8/reference_appendices/interpreter_discovery.html for more information.
+
+changed: [trop03]
+ [WARNING]: Platform linux on host trop04 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change this. See
+https://docs.ansible.com/ansible/2.8/reference_appendices/interpreter_discovery.html for more information.
+
+changed: [trop04]
+changed: [gaia02]
+
+TASK [Install our sudoers config]
+ok: [work01]
+ok: [work02]
+changed: [work04]
+changed: [work03]
+changed: [gaia01]
+changed: [gaia02]
+changed: [trop03]
+changed: [trop04]
+
+TASK [Add our admin accounts to the ansible group]
+ok: [work04] => (item=msh)
+ok: [work02] => (item=msh)
+ok: [work01] => (item=msh)
+ok: [work03] => (item=msh)
+changed: [gaia01] => (item=msh)
+ok: [work04] => (item=dmr)
+ok: [work01] => (item=dmr)
+ok: [work03] => (item=dmr)
+ok: [work02] => (item=dmr)
+changed: [gaia01] => (item=dmr)
+ok: [work01] => (item=gfrancis)
+ok: [work02] => (item=gfrancis)
+changed: [work04] => (item=gfrancis)
+changed: [gaia02] => (item=msh)
+changed: [work03] => (item=gfrancis)
+changed: [trop03] => (item=msh)
+changed: [trop04] => (item=msh)
+changed: [gaia02] => (item=dmr)
+changed: [trop03] => (item=dmr)
+changed: [trop04] => (item=dmr)
+....
 --END--
 
 
@@ -83,43 +152,27 @@
 #[root@ansible-client]
 
     ansible-playbook \
+        --ask-become-pass \
         --inventory /etc/ansible/hosts.yml \
         /etc/ansible/ansible-user.yml
 
 --START--
 ....
 TASK [Create our ansible user]
-changed: [work01]
-changed: [work02]
-....
---END--
-
-
-# -----------------------------------------------------
-# Create our ansible group.
-#[root@ansible-client]
-
-    ansible-playbook \
-        --inventory /etc/ansible/hosts.yml \
-        /etc/ansible/ansible-group.yml
-
---START--
-....
-TASK [Create our ansible group]
+ok: [work01]
 ok: [work02]
-ok: [work01]
+changed: [gaia01]
+ok: [work03]
+ok: [work04]
+ [WARNING]: Platform linux on host trop03 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change this. See
+https://docs.ansible.com/ansible/2.8/reference_appendices/interpreter_discovery.html for more information.
 
-TASK [Install our sudoers config]
-ok: [work01]
-changed: [work02]
+changed: [trop03]
+ [WARNING]: Platform linux on host trop04 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change this. See
+https://docs.ansible.com/ansible/2.8/reference_appendices/interpreter_discovery.html for more information.
 
-TASK [Add our admin accounts to the ansible group]
-ok: [work01] => (item=msh)
-ok: [work02] => (item=msh)
-ok: [work01] => (item=dmr)
-ok: [work02] => (item=dmr)
-ok: [work01] => (item=gfrancis)
-changed: [work02] => (item=gfrancis)
+changed: [trop04]
+changed: [gaia02]
 ....
 --END--
 
@@ -129,18 +182,38 @@ changed: [work02] => (item=gfrancis)
 #[root@ansible-client]
 
     ansible-playbook \
+        --ask-become-pass \
         --inventory /etc/ansible/hosts.yml \
         /etc/ansible/ansible-keys.yml
 
 --START--
 ....
 TASK [Install authorized keys for ansible]
-changed: [work01] => (item=msh)
-changed: [work02] => (item=msh)
-changed: [work01] => (item=dmr)
-changed: [work02] => (item=dmr)
-changed: [work01] => (item=gfrancis)
-changed: [work02] => (item=gfrancis)
+ok: [work01] => (item=msh)
+ok: [work02] => (item=msh)
+changed: [gaia01] => (item=msh)
+changed: [work03] => (item=msh)
+changed: [work04] => (item=msh)
+ok: [work02] => (item=dmr)
+ok: [work01] => (item=dmr)
+changed: [gaia01] => (item=dmr)
+changed: [work03] => (item=dmr)
+changed: [work04] => (item=dmr)
+ok: [work02] => (item=gfrancis)
+ok: [work01] => (item=gfrancis)
+changed: [work03] => (item=gfrancis)
+changed: [work04] => (item=gfrancis)
+changed: [gaia02] => (item=msh)
+changed: [gaia02] => (item=dmr)
+changed: [trop03] => (item=msh)
+changed: [trop04] => (item=msh)
+changed: [trop03] => (item=dmr)
+ [WARNING]: Platform linux on host trop03 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change this. See
+https://docs.ansible.com/ansible/2.8/reference_appendices/interpreter_discovery.html for more information.
+
+changed: [trop04] => (item=dmr)
+ [WARNING]: Platform linux on host trop04 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change this. See
+https://docs.ansible.com/ansible/2.8/reference_appendices/interpreter_discovery.html for more information.
 ....
 --END--
 
@@ -150,6 +223,7 @@ changed: [work02] => (item=gfrancis)
 #[root@ansible-client]
 
     ansible-playbook \
+        --ask-become-pass \
         --inventory /etc/ansible/hosts.yml \
         /etc/ansible/admin-users.yml
 
@@ -157,11 +231,30 @@ changed: [work02] => (item=gfrancis)
 ....
 TASK [Create our admin users]
 ok: [work01] => (item=msh)
-changed: [work02] => (item=msh)
-ok: [work01] => (item=dmr)
+changed: [gaia01] => (item=msh)
+ok: [work02] => (item=msh)
+changed: [work03] => (item=msh)
+changed: [work04] => (item=msh)
+ok: [gaia01] => (item=dmr)
 ok: [work02] => (item=dmr)
+ok: [work01] => (item=dmr)
+ok: [work03] => (item=dmr)
+ok: [work04] => (item=dmr)
+ok: [work02] => (item=gfrancis)
 ok: [work01] => (item=gfrancis)
-changed: [work02] => (item=gfrancis)
+changed: [work03] => (item=gfrancis)
+changed: [work04] => (item=gfrancis)
+changed: [gaia02] => (item=msh)
+changed: [trop04] => (item=msh)
+changed: [trop03] => (item=msh)
+ok: [gaia02] => (item=dmr)
+changed: [trop04] => (item=dmr)
+ [WARNING]: Platform linux on host trop04 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change this. See
+https://docs.ansible.com/ansible/2.8/reference_appendices/interpreter_discovery.html for more information.
+
+changed: [trop03] => (item=dmr)
+ [WARNING]: Platform linux on host trop03 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change this. See
+https://docs.ansible.com/ansible/2.8/reference_appendices/interpreter_discovery.html for more information.
 ....
 --END--
 
@@ -171,18 +264,38 @@ changed: [work02] => (item=gfrancis)
 #[root@ansible-client]
 
     ansible-playbook \
+        --ask-become-pass \
         --inventory /etc/ansible/hosts.yml \
         /etc/ansible/admin-keys.yml
 
 --START--
 ....
 TASK [Update authorized keys for admin users]
-changed: [work02] => (item=msh)
 ok: [work01] => (item=msh)
-ok: [work02] => (item=dmr)
+changed: [work04] => (item=msh)
+ok: [work02] => (item=msh)
+changed: [gaia01] => (item=msh)
+changed: [work03] => (item=msh)
 ok: [work01] => (item=dmr)
-changed: [work02] => (item=gfrancis)
-changed: [work01] => (item=gfrancis)
+ok: [gaia01] => (item=dmr)
+ok: [work04] => (item=dmr)
+ok: [work02] => (item=dmr)
+ok: [work03] => (item=dmr)
+ok: [work01] => (item=gfrancis)
+changed: [work04] => (item=gfrancis)
+ok: [work02] => (item=gfrancis)
+changed: [work03] => (item=gfrancis)
+changed: [gaia02] => (item=msh)
+changed: [trop04] => (item=msh)
+changed: [trop03] => (item=msh)
+ok: [gaia02] => (item=dmr)
+ok: [trop04] => (item=dmr)
+ [WARNING]: Platform linux on host trop04 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change this. See
+https://docs.ansible.com/ansible/2.8/reference_appendices/interpreter_discovery.html for more information.
+
+ok: [trop03] => (item=dmr)
+ [WARNING]: Platform linux on host trop03 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change this. See
+https://docs.ansible.com/ansible/2.8/reference_appendices/interpreter_discovery.html for more information.
 ....
 --END--
 
@@ -192,20 +305,51 @@ changed: [work01] => (item=gfrancis)
 #[root@ansible-client]
 
     ansible-playbook \
+        --ask-become-pass \
         --inventory /etc/ansible/hosts.yml \
         /etc/ansible/root-keys.yml
 
 --START--
 ....
 TASK [Update authorized keys for root]
+ok: [work03] => (item=lssthead)
+ok: [gaia01] => (item=lssthead)
+ok: [work04] => (item=lssthead)
 ok: [work02] => (item=lssthead)
-changed: [work01] => (item=lssthead)
+ok: [work01] => (item=lssthead)
+changed: [gaia01] => (item=khaba)
+changed: [work03] => (item=khaba)
+changed: [work04] => (item=khaba)
 ok: [work02] => (item=khaba)
 ok: [work01] => (item=khaba)
+changed: [gaia01] => (item=msh)
+changed: [work03] => (item=msh)
+changed: [work04] => (item=msh)
 ok: [work02] => (item=msh)
 ok: [work01] => (item=msh)
+changed: [gaia01] => (item=dmr)
+changed: [work04] => (item=dmr)
+changed: [work03] => (item=dmr)
 ok: [work02] => (item=dmr)
 ok: [work01] => (item=dmr)
+ok: [trop04] => (item=lssthead)
+ok: [gaia02] => (item=lssthead)
+ok: [trop03] => (item=lssthead)
+ok: [trop04] => (item=khaba)
+changed: [gaia02] => (item=khaba)
+ok: [trop03] => (item=khaba)
+ok: [trop04] => (item=msh)
+changed: [gaia02] => (item=msh)
+ok: [trop03] => (item=msh)
+ok: [trop04] => (item=dmr)
+ [WARNING]: Platform linux on host trop04 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change this. See
+https://docs.ansible.com/ansible/2.8/reference_appendices/interpreter_discovery.html for more information.
+
+ok: [trop03] => (item=dmr)
+ [WARNING]: Platform linux on host trop03 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change this. See
+https://docs.ansible.com/ansible/2.8/reference_appendices/interpreter_discovery.html for more information.
+
+changed: [gaia02] => (item=dmr)
 ....
 --END--
 
