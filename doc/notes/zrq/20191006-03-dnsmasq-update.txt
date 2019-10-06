@@ -48,6 +48,20 @@
         --inventory /etc/ansible/hosts.yml \
         /etc/ansible/ssh-config.yml
 
+--START--
+PLAY [localhost]
+
+TASK [Check our ssh directory]
+ok: [localhost]
+
+TASK [Generate our ssh config file]
+changed: [localhost]
+
+PLAY RECAP
+localhost                  : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+--END--
+
+
 # -----------------------------------------------------
 # Check we can connect.
 #[root@ansible-client]
@@ -56,6 +70,48 @@
         --inventory /etc/ansible/hosts.yml \
         /etc/ansible/test-001.yml
 
+--START--
+PLAY [lssthead:lsstnodes:tropnodes:gaianodes]
+
+TASK [Check we can connect]
+ok: [lssthead]
+ok: [work03]
+ok: [work04]
+ok: [work02]
+ [WARNING]: Platform linux on host trop04 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change
+this. See https://docs.ansible.com/ansible/2.8/reference_appendices/interpreter_discovery.html for more information.
+
+ok: [trop04]
+ [WARNING]: Platform linux on host trop03 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change
+this. See https://docs.ansible.com/ansible/2.8/reference_appendices/interpreter_discovery.html for more information.
+
+ok: [trop03]
+ok: [work01]
+ok: [gaia01]
+ok: [gaia02]
+
+TASK [Check we can use sudo]
+ok: [lssthead]
+ok: [work03]
+ok: [work02]
+ok: [work01]
+ok: [work04]
+ok: [trop03]
+ok: [trop04]
+ok: [gaia01]
+ok: [gaia02]
+
+PLAY RECAP
+gaia01                     : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+gaia02                     : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+lssthead                   : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+trop03                     : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+trop04                     : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+work01                     : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+work02                     : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+work03                     : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+work04                     : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+--END--
 
 
 
