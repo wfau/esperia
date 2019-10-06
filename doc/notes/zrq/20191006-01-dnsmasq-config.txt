@@ -1,0 +1,531 @@
+#
+# <meta:header>
+#   <meta:licence>
+#     Copyright (c) 2019, ROE (http://www.roe.ac.uk/)
+#
+#     This information is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     This information is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#   </meta:licence>
+# </meta:header>
+#
+#
+
+# -----------------------------------------------------
+# Run our Ansible client.
+#[user@desktop]
+
+    source "${HOME}/esperia.settings"
+    ESPERIA_USERNAME=dmr
+
+    docker run \
+        --rm \
+        --tty \
+        --interactive \
+        --hostname ansible-client \
+        --env ESPERIA_USERNAME=${ESPERIA_USERNAME:?} \
+        --env SSH_AUTH_SOCK=/tmp/ssh_auth_sock \
+        --volume ${SSH_AUTH_SOCK}:/tmp/ssh_auth_sock \
+        --volume ${ESPERIA_CODE:?}/src/ansible:/etc/ansible:ro \
+        atolmis/ansible-client:latest \
+            bash
+
+
+# -----------------------------------------------------
+# Create our ssh config.
+# TODO add this to the container startup.
+# TODO use Ansible to generate the ssh config file.
+#[root@ansible-client]
+
+    rm -f "${HOME}/.ssh/config"
+
+    if [ ! -e "${HOME}/.ssh" ]
+    then
+        mkdir "${HOME}/.ssh"
+    fi
+
+    if [ ! -e "${HOME}/.ssh/config" ]
+    then
+        cp /etc/ansible/ssh.cfg ${HOME}/.ssh/config
+    fi
+
+    sed -i "
+        s/ESPERIA_USERNAME/${ESPERIA_USERNAME:?}/
+        " "${HOME}/.ssh/config"
+
+# -----------------------------------------------------
+# Check we can login to the gateway machine.
+#[root@ansible-client]
+
+    ssh \
+        lssthead \
+        '
+        date
+        hostname
+        id
+        '
+
+--START--
+The authenticity of host '192.41.108.44 (192.41.108.44)' can't be established.
+ECDSA key fingerprint is SHA256:jCWHt7d/fVNH0VBOpuR+OZgxmPDaF4/9b9te7kPLo7E.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '192.41.108.44' (ECDSA) to the list of known hosts.
+Sun  6 Oct 14:51:35 BST 2019
+lssthead
+uid=1001(dmr) gid=1001(dmr) groups=1001(dmr),27(sudo),100(users),115(docker),998(ansible),999(esperia)
+--END--
+
+
+# -----------------------------------------------------
+# Check we can login via Ansible and use sudo.
+#[root@ansible-client]
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/test-001.yml
+
+
+# -----------------------------------------------------
+# Experiment with creating dnsmasq files.
+#[root@ansible-client]
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/test-002.yml
+
+
+# -----------------------------------------------------
+# -----------------------------------------------------
+# Compare the generated files.
+#[user@lssthead]
+
+    live=/var/local/projects/esperia/github-zrq/src/dnsmasq
+    test=test002
+
+    ls -1 "${live}"
+
+--START--
+esperia-config.conf
+gaia01-dhcp-hosts.conf
+gaia01-host-records.conf
+gaia02-dhcp-hosts.conf
+gaia02-host-records.conf
+trop03-dhcp-hosts.conf
+trop03-host-records.conf
+trop04-dhcp-hosts.conf
+trop04-host-records.conf
+work01-dhcp-hosts.conf
+work01-host-records.conf
+work02-dhcp-hosts.conf
+work02-host-records.conf
+work03-dhcp-hosts.conf
+work03-host-records.conf
+work04-dhcp-hosts.conf
+work04-host-records.conf
+--END--
+
+
+    ls -1 "${test}"
+
+--START--
+esperia.conf
+gaia01-dhcp.conf
+gaia01-host.conf
+gaia02-dhcp.conf
+gaia02-host.conf
+inet.conf
+trop03-dhcp.conf
+trop03-host.conf
+trop04-dhcp.conf
+trop04-host.conf
+vlan.conf
+work01-dhcp.conf
+work01-host.conf
+work02-dhcp.conf
+work02-host.conf
+work03-dhcp.conf
+work03-host.conf
+work04-dhcp.conf
+work04-host.conf
+--END--
+
+
+    diff "${live}/gaia01-dhcp-hosts.conf" "${test}/gaia01-dhcp.conf"
+
+    diff "${live}/gaia01-host-records.conf" "${test}/gaia01-host.conf"
+
+    diff "${live}/gaia02-dhcp-hosts.conf" "${test}/gaia02-dhcp.conf"
+
+    diff "${live}/gaia02-host-records.conf" "${test}/gaia02-host.conf"
+
+    diff "${live}/trop03-dhcp-hosts.conf" "${test}/trop03-dhcp.conf"
+
+    diff "${live}/trop03-host-records.conf" "${test}/trop03-host.conf"
+
+    diff "${live}/trop04-dhcp-hosts.conf" "${test}/trop04-dhcp.conf"
+
+    diff "${live}/trop04-host-records.conf" "${test}/trop04-host.conf"
+
+    diff "${live}/work01-dhcp-hosts.conf" "${test}/work01-dhcp.conf"
+
+    diff "${live}/work01-host-records.conf" "${test}/work01-host.conf"
+
+    diff "${live}/work02-dhcp-hosts.conf" "${test}/work02-dhcp.conf"
+
+    diff "${live}/work02-host-records.conf" "${test}/work02-host.conf"
+
+    diff "${live}/work03-dhcp-hosts.conf" "${test}/work03-dhcp.conf"
+
+    diff "${live}/work03-host-records.conf" "${test}/work03-host.conf"
+
+    diff "${live}/work04-dhcp-hosts.conf" "${test}/work04-dhcp.conf"
+
+    diff "${live}/work04-host-records.conf" "${test}/work04-host.conf"
+
+    diff "${live}/esperia-config.conf"        "${test}/esperia.conf"
+
+--START--
+56a57,58
+>
+> # Generate names for un-nammed blocks
+62,79d63
+<
+< # Host records for physical machines.
+< host-record=work01,work01.esperia,172.16.1.1
+< host-record=work02,work02.esperia,172.16.1.2
+< host-record=work03,work03.esperia,172.16.1.3
+< host-record=work04,work04.esperia,172.16.1.4
+< host-record=trop03,trop03.esperia,172.16.1.5
+< host-record=trop04,trop04.esperia,172.16.1.6
+< host-record=data01,data01.esperia,172.16.1.7
+< host-record=data02,data02.esperia,172.16.1.8
+< host-record=gaia01,gaia01.esperia,172.16.1.9
+< host-record=gaia02,gaia02.esperia,172.16.1.10
+<
+< # Host records for public interfaces.
+< host-record=trop01.roe.ac.uk,129.215.175.96
+< host-record=trop02.roe.ac.uk,129.215.175.97
+< host-record=trop03.roe.ac.uk,129.215.175.98
+< host-record=trop04.roe.ac.uk,129.215.175.99
+--END--
+
+
+    cat "${test}/vlan.conf"
+
+--START--
+# DNS host records for VLAN nodes.
+host-record=work01,work01.esperia,172.16.1.1
+host-record=work02,work02.esperia,172.16.1.2
+host-record=work03,work03.esperia,172.16.1.3
+host-record=work04,work04.esperia,172.16.1.4
+host-record=trop03,trop03.esperia,172.16.1.5
+host-record=trop04,trop04.esperia,172.16.1.6
+host-record=lsstukdata1,lsstukdata1.esperia,172.16.1.7
+host-record=lsstukdata2,lsstukdata2.esperia,172.16.1.8
+host-record=gaia01,gaia01.esperia,172.16.1.9
+host-record=gaia02,gaia02.esperia,172.16.1.10
+--END--
+
+
+    cat "${test}/inet.conf"
+
+--START--
+# DNS host records for public interfaces.
+host-record=trop03.roe.ac.uk,129.215.175.98
+host-record=trop04.roe.ac.uk,129.215.175.99
+host-record=lsstukdata1.roe.ac.uk,192.41.108.45
+--END--
+
+
+# -----------------------------------------------------
+# -----------------------------------------------------
+# Ansible script to deploy the dnsmasq config files.
+#[root@ansible-client]
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/dnsmasq-config.yml
+
+
+# -----------------------------------------------------
+# -----------------------------------------------------
+# Check the generated files arrived.
+#[user@lssthead]
+
+    ls -al /etc/esperia
+
+--START--
+total 12
+drwxr-xr-x  3 root root 4096 Oct  6 16:19 .
+drwxr-xr-x 95 root root 4096 Oct  6 16:19 ..
+drwxr-xr-x  2 root root 4096 Oct  6 16:22 dnsmasq
+--END--
+
+
+    ls -al /etc/esperia/dnsmasq
+
+--START--
+total 84
+drwxr-xr-x 2 root root 4096 Oct  6 16:22 .
+drwxr-xr-x 3 root root 4096 Oct  6 16:19 ..
+-rw-r--r-- 1 root root 1628 Oct  6 16:19 esperia.conf
+-rw-r--r-- 1 root root 1642 Oct  6 16:20 gaia01-dhcp.conf
+-rw-r--r-- 1 root root 1576 Oct  6 16:21 gaia01-host.conf
+-rw-r--r-- 1 root root 1684 Oct  6 16:20 gaia02-dhcp.conf
+-rw-r--r-- 1 root root 1626 Oct  6 16:21 gaia02-host.conf
+-rw-r--r-- 1 root root  179 Oct  6 16:21 inet.conf
+-rw-r--r-- 1 root root 1647 Oct  6 16:20 trop03-dhcp.conf
+-rw-r--r-- 1 root root 1586 Oct  6 16:21 trop03-host.conf
+-rw-r--r-- 1 root root 1644 Oct  6 16:20 trop04-dhcp.conf
+-rw-r--r-- 1 root root 1580 Oct  6 16:21 trop04-host.conf
+-rw-r--r-- 1 root root  507 Oct  6 16:21 vlan.conf
+-rw-r--r-- 1 root root 1644 Oct  6 16:20 work01-dhcp.conf
+-rw-r--r-- 1 root root 1580 Oct  6 16:20 work01-host.conf
+-rw-r--r-- 1 root root 1643 Oct  6 16:20 work02-dhcp.conf
+-rw-r--r-- 1 root root 1578 Oct  6 16:21 work02-host.conf
+-rw-r--r-- 1 root root 1636 Oct  6 16:20 work03-dhcp.conf
+-rw-r--r-- 1 root root 1564 Oct  6 16:21 work03-host.conf
+-rw-r--r-- 1 root root 1633 Oct  6 16:20 work04-dhcp.conf
+-rw-r--r-- 1 root root 1558 Oct  6 16:21 work04-host.conf
+--END--
+
+
+# -----------------------------------------------------
+# Check the corrent Docker deployment.
+#[user@lssthead]
+
+    docker inspect dnsmasq
+
+--START--
+[
+    {
+        "Id": "dc8a000f00086059b70c489e527bbcad83df094703560e5208351e981916c0f8",
+        "Created": "2019-07-12T05:13:53.707962333Z",
+        "Path": "dnsmasq",
+        "Args": [],
+        "State": {
+            "Status": "running",
+            "Running": true,
+            "Paused": false,
+            "Restarting": false,
+            "OOMKilled": false,
+            "Dead": false,
+            "Pid": 2286,
+            "ExitCode": 0,
+            "Error": "",
+            "StartedAt": "2019-07-14T14:33:54.077827368Z",
+            "FinishedAt": "2019-07-14T14:25:32.793215421Z"
+        },
+        "Image": "sha256:a12355af408b83950f803716de133c0440c54c5808125044d6b71898bfb5bdf3",
+        "ResolvConfPath": "/var/lib/docker/containers/dc8a000f00086059b70c489e527bbcad83df094703560e5208351e981916c0f8/resolv.conf",
+        "HostnamePath": "/var/lib/docker/containers/dc8a000f00086059b70c489e527bbcad83df094703560e5208351e981916c0f8/hostname",
+        "HostsPath": "/var/lib/docker/containers/dc8a000f00086059b70c489e527bbcad83df094703560e5208351e981916c0f8/hosts",
+        "LogPath": "/var/lib/docker/containers/dc8a000f00086059b70c489e527bbcad83df094703560e5208351e981916c0f8/dc8a000f00086059b70c489e527bbcad83df094703560e5208351e981916c0f8-json.log",
+        "Name": "/dnsmasq",
+        "RestartCount": 0,
+        "Driver": "overlay2",
+        "Platform": "linux",
+        "MountLabel": "",
+        "ProcessLabel": "",
+        "AppArmorProfile": "unconfined",
+        "ExecIDs": null,
+        "HostConfig": {
+            "Binds": [
+                "/var/local/projects/esperia/github-zrq/src/dnsmasq:/etc/dnsmasq"
+            ],
+            "ContainerIDFile": "",
+            "LogConfig": {
+                "Type": "json-file",
+                "Config": {}
+            },
+            "NetworkMode": "host",
+            "PortBindings": {},
+            "RestartPolicy": {
+                "Name": "always",
+                "MaximumRetryCount": 0
+            },
+            "AutoRemove": false,
+            "VolumeDriver": "",
+            "VolumesFrom": null,
+            "CapAdd": null,
+            "CapDrop": null,
+            "Dns": [],
+            "DnsOptions": [],
+            "DnsSearch": [],
+            "ExtraHosts": null,
+            "GroupAdd": null,
+            "IpcMode": "shareable",
+            "Cgroup": "",
+            "Links": null,
+            "OomScoreAdj": 0,
+            "PidMode": "",
+            "Privileged": true,
+            "PublishAllPorts": false,
+            "ReadonlyRootfs": false,
+            "SecurityOpt": [
+                "label=disable"
+            ],
+            "UTSMode": "",
+            "UsernsMode": "",
+            "ShmSize": 67108864,
+            "Runtime": "runc",
+            "ConsoleSize": [
+                0,
+                0
+            ],
+            "Isolation": "",
+            "CpuShares": 0,
+            "Memory": 0,
+            "NanoCpus": 0,
+            "CgroupParent": "",
+            "BlkioWeight": 0,
+            "BlkioWeightDevice": [],
+            "BlkioDeviceReadBps": null,
+            "BlkioDeviceWriteBps": null,
+            "BlkioDeviceReadIOps": null,
+            "BlkioDeviceWriteIOps": null,
+            "CpuPeriod": 0,
+            "CpuQuota": 0,
+            "CpuRealtimePeriod": 0,
+            "CpuRealtimeRuntime": 0,
+            "CpusetCpus": "",
+            "CpusetMems": "",
+            "Devices": [],
+            "DeviceCgroupRules": null,
+            "DiskQuota": 0,
+            "KernelMemory": 0,
+            "MemoryReservation": 0,
+            "MemorySwap": 0,
+            "MemorySwappiness": null,
+            "OomKillDisable": false,
+            "PidsLimit": 0,
+            "Ulimits": null,
+            "CpuCount": 0,
+            "CpuPercent": 0,
+            "IOMaximumIOps": 0,
+            "IOMaximumBandwidth": 0,
+            "MaskedPaths": null,
+            "ReadonlyPaths": null
+        },
+        "GraphDriver": {
+            "Data": {
+                "LowerDir": "/var/lib/docker/overlay2/36c28db662e07d5e1708298af70e4dbb7ceee4a15d64b26a36f8584f7600a328-init/diff:/var/lib/docker/overlay2/a4856194b2f3bde12cfea98b8686a3f3ab44a1941d22be3b1d9b967a14fe85ac/diff:/var/lib/docker/overlay2/4e46aa3147f1380a9cb5b13261e8ddaee03c765121d184cfa7480969327e65d2/diff",
+                "MergedDir": "/var/lib/docker/overlay2/36c28db662e07d5e1708298af70e4dbb7ceee4a15d64b26a36f8584f7600a328/merged",
+                "UpperDir": "/var/lib/docker/overlay2/36c28db662e07d5e1708298af70e4dbb7ceee4a15d64b26a36f8584f7600a328/diff",
+                "WorkDir": "/var/lib/docker/overlay2/36c28db662e07d5e1708298af70e4dbb7ceee4a15d64b26a36f8584f7600a328/work"
+            },
+            "Name": "overlay2"
+        },
+        "Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/var/local/projects/esperia/github-zrq/src/dnsmasq",
+                "Destination": "/etc/dnsmasq",
+                "Mode": "",
+                "RW": true,
+                "Propagation": "rprivate"
+            }
+        ],
+        "Config": {
+            "Hostname": "lssthead",
+            "Domainname": "",
+            "User": "",
+            "AttachStdin": false,
+            "AttachStdout": false,
+            "AttachStderr": false,
+            "ExposedPorts": {
+                "53/tcp": {},
+                "53/udp": {}
+            },
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+            ],
+            "Cmd": [
+                "dnsmasq"
+            ],
+            "ArgsEscaped": true,
+            "Image": "storytel/dnsmasq",
+            "Volumes": {
+                "/etc/dnsmasq": {}
+            },
+            "WorkingDir": "",
+            "Entrypoint": null,
+            "OnBuild": null,
+            "Labels": {}
+        },
+        "NetworkSettings": {
+            "Bridge": "",
+            "SandboxID": "07514b9d53d5dd9cfdcd952a6d062b81dbe778b7f0e17ca8127797a4ab23f775",
+            "HairpinMode": false,
+            "LinkLocalIPv6Address": "",
+            "LinkLocalIPv6PrefixLen": 0,
+            "Ports": {},
+            "SandboxKey": "/var/run/docker/netns/default",
+            "SecondaryIPAddresses": null,
+            "SecondaryIPv6Addresses": null,
+            "EndpointID": "",
+            "Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "IPAddress": "",
+            "IPPrefixLen": 0,
+            "IPv6Gateway": "",
+            "MacAddress": "",
+            "Networks": {
+                "host": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "NetworkID": "bbf6e23c88c892872778b194d25b88e9a038f6d313d154d1999fc95b0b6c87c3",
+                    "EndpointID": "71e5e5ffac33846c7291774a91160c62d1a088bddfbd63a9ac97ab0687e7292d",
+                    "Gateway": "",
+                    "IPAddress": "",
+                    "IPPrefixLen": 0,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "MacAddress": "",
+                    "DriverOpts": null
+                }
+            }
+        }
+    }
+]
+--END--
+
+
+# -----------------------------------------------------
+# -----------------------------------------------------
+# Ansible script to deploy the dnsmasq Docker container.
+#[root@ansible-client]
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/dnsmasq-deploy.yml
+
+
+
+
+    docker run \
+        --detach \
+        --privileged \
+        --name dnsmasq \
+        --network host \
+        --restart always \
+        --volume ${ESPERIA_CODE}/src/dnsmasq:/etc/dnsmasq \
+        storytel/dnsmasq
+
+
+

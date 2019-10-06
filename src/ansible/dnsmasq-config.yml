@@ -25,33 +25,56 @@
   gather_facts: false
   tasks:
 
+    - name: "Check the esperia config directory"
+      become: true
+      file:
+        path: '/etc/esperia'
+        mode: 'u=rwx,g=rx,o=rx'
+        state: directory
+        owner: root
+        group: root
+
+    - name: "Check the dnsmasq config directory"
+      become: true
+      file:
+        path: '/etc/esperia/dnsmasq'
+        mode: 'u=rwx,g=rx,o=rx'
+        state: directory
+        owner: root
+        group: root
+
     - name: "Deploy the dnsmasq config file"
+      become: true
       copy:
         src:  'dnsmasq/dnsmasq-esperia.conf'
-        dest: 'test002/esperia.conf'
+        dest: '/etc/esperia/dnsmasq/esperia.conf'
 
     - name: "Generate the dnsmasq DHCP config files"
+      become: true
       template:
         src:  'dnsmasq/dnsmasq-dhcp.j2'
-        dest: 'test002/{{ item }}-dhcp.conf'
+        dest: '/etc/esperia/dnsmasq/{{ item }}-dhcp.conf'
       loop:
         "{{ groups['dhcpnodes'] }}"
 
     - name: "Generate the dnsmasq DNS config files"
+      become: true
       template:
         src:  'dnsmasq/dnsmasq-host.j2'
-        dest: 'test002/{{ item }}-host.conf'
+        dest: '/etc/esperia/dnsmasq/{{ item }}-host.conf'
       loop:
         "{{ groups['dhcpnodes'] }}"
 
     - name: "Generate the dnsmasq VLAN config file"
+      become: true
       template:
         src:  'dnsmasq/dnsmasq-vlan.j2'
-        dest: 'test002/vlan.conf'
+        dest: '/etc/esperia/dnsmasq/vlan.conf'
 
     - name: "Generate the dnsmasq inet config file"
+      become: true
       template:
         src:  'dnsmasq/dnsmasq-inet.j2'
-        dest: 'test002/inet.conf'
+        dest: '/etc/esperia/dnsmasq/inet.conf'
 
 

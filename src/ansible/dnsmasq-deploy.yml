@@ -21,31 +21,22 @@
 #
 
 ---
-- hosts: lssthead:lsstnodes:gaianodes:tropnodes
+- hosts: lssthead
   gather_facts: false
   tasks:
 
-    - name: "Create our ansible group"
+    - name: "Deploy the dnsmasq service"
       become: true
-      group:
-        name: 'ansible'
-        state: present
-        system: true
-
-    - name: "Install our sudoers config"
-      become: true
-      copy:
-        src: ansible-sudoers
-        dest: /etc/sudoers.d/ansible-sudoers
-
-    - name: "Add our admin accounts to the ansible group"
-      become: true
-      user:
-        name: "{{ item }}"
-        groups: ansible
-        append: yes
-      loop:
-        "{{ hostvars[inventory_hostname].admins }}"
+      docker_container:
+        name:  'dnsmasq'
+        image: 'storytel/dnsmasq'
+        state: 'started'
+        detach: true
+        privileged: true
+        network_mode: 'host'
+        restart_policy: 'always'
+        volumes:
+            - "/etc/esperia/dnsmasq:/etc/dnsmasq:ro"
 
 
 

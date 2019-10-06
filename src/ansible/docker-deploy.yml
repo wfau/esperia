@@ -21,31 +21,33 @@
 #
 
 ---
-- hosts: lssthead:lsstnodes:gaianodes:tropnodes
+- hosts: lssthead
   gather_facts: false
   tasks:
 
-    - name: "Create our ansible group"
-      become: true
-      group:
-        name: 'ansible'
-        state: present
-        system: true
+  - name: "Check Docker service is installed"
+    become: true
+    apt:
+     name:  docker
+     state: latest
 
-    - name: "Install our sudoers config"
-      become: true
-      copy:
-        src: ansible-sudoers
-        dest: /etc/sudoers.d/ansible-sudoers
+  - name: "Check Docker service is started"
+    become: true
+    systemd:
+      enabled: true
+      name:  docker
+      state: started
 
-    - name: "Add our admin accounts to the ansible group"
-      become: true
-      user:
-        name: "{{ item }}"
-        groups: ansible
-        append: yes
-      loop:
-        "{{ hostvars[inventory_hostname].admins }}"
+  - name: "Check Python pip is installed"
+    become: true
+    apt:
+     name: python3-pip
 
-
+  - name: "Check Python Docker libraries for Ansible"
+    become: true
+    pip:
+      name: [
+          'docker',
+          'docker-compose'
+          ]
 
