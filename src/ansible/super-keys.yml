@@ -1,7 +1,7 @@
 #
 # <meta:header>
 #   <meta:licence>
-#     Copyright (c) 2019, ROE (http://www.roe.ac.uk/)
+#     Copyright (c) 2018, ROE (http://www.roe.ac.uk/)
 #
 #     This information is free software: you can redistribute it and/or modify
 #     it under the terms of the GNU General Public License as published by
@@ -25,18 +25,13 @@
   gather_facts: false
   tasks:
 
-    - name: "Create our admin users"
+    - name: "Update authorized keys for root"
       become: true
-      user:
-        name: "{{item}}"
+      authorized_key:
+        user:  root
         state: present
-        groups:
-            - sudo
-            - users
-            - ansible
-            - libvirt
-        append: true
-        create_home: true
+        key: "{{ lookup('file', 'ssh-keys/' + users[item].sshkey) }}"
       loop:
-        "{{ hostvars[inventory_hostname].admins }}"
+        "{{ hostvars[inventory_hostname].supers }}"
+
 

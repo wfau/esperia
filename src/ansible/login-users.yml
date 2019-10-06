@@ -1,7 +1,7 @@
 #
 # <meta:header>
 #   <meta:licence>
-#     Copyright (c) 2018, ROE (http://www.roe.ac.uk/)
+#     Copyright (c) 2019, ROE (http://www.roe.ac.uk/)
 #
 #     This information is free software: you can redistribute it and/or modify
 #     it under the terms of the GNU General Public License as published by
@@ -21,17 +21,19 @@
 #
 
 ---
-- hosts: lsstnodes:gaianodes:tropnodes
+- hosts: lssthead:lsstnodes:gaianodes:tropnodes
   gather_facts: false
   tasks:
 
-    - name: "Update authorized keys for root"
+    - name: "Create our login users"
       become: true
-      authorized_key:
-        user:  root
+      user:
+        name: "{{item}}"
         state: present
-        key: "{{ lookup('file', 'ssh-keys/' + users[item].sshkey) }}"
+        groups:
+            - users
+        append: true
+        create_home: true
       loop:
-        "{{ hostvars[inventory_hostname].supers }}"
-
+        "{{ hostvars[inventory_hostname].logins }}"
 

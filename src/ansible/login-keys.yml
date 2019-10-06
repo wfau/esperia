@@ -25,18 +25,14 @@
   gather_facts: false
   tasks:
 
-    - name: "Create our admin users"
+    - name: "Update authorized keys for login users"
       become: true
-      user:
-        name: "{{item}}"
+      authorized_key:
+        user:  "{{item}}"
         state: present
-        groups:
-            - sudo
-            - users
-            - ansible
-            - libvirt
-        append: true
-        create_home: true
+        key: "{{ lookup('file', 'ssh-keys/' + users[item].sshkey) }}"
       loop:
-        "{{ hostvars[inventory_hostname].admins }}"
+        "{{ hostvars[inventory_hostname].logins }}"
+
+
 
