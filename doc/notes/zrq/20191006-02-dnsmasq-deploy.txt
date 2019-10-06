@@ -818,8 +818,79 @@ Connection to 192.41.108.44 closed.
 --END--
 
 
+# -----------------------------------------------------
+# Testing ....
+#[user@laptop]
+
+    ssh esperia \
+        '
+        date
+        hostname
+        echo
+        host -a data.metagrid.co.uk
+        '
+
+--START--
+Sun  6 Oct 18:15:27 BST 2019
+lssthead
+
+Trying "data.metagrid.co.uk"
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 62923
+;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 0
+
+;; QUESTION SECTION:
+;data.metagrid.co.uk.		IN	ANY
+
+;; ANSWER SECTION:
+data.metagrid.co.uk.	6865	IN	CNAME	bullfinch.linode.metagrid.co.uk.
+
+Received 68 bytes from 127.0.0.53#53 in 13 ms
+--END--
 
 
 
+
+    ssh trop04 \
+        '
+        date
+        hostname
+        echo
+        host -a data.metagrid.co.uk
+        '
+
+--START--
+Sun  6 Oct 18:16:11 BST 2019
+trop04
+
+Trying "data.metagrid.co.uk"
+....
+;; ANSWER SECTION:
+data.metagrid.co.uk.	6821	IN	CNAME	bullfinch.linode.metagrid.co.uk.
+....
+....
+Received 245 bytes from 172.16.1.11#53 in 13 ms
+--END--
+
+
+    ssh Wumar \
+        '
+        date
+        hostname
+        echo
+        host -a data.metagrid.co.uk
+        '
+
+--START--
+Sun  6 Oct 18:18:24 BST 2019
+Wumar
+
+Trying "data.metagrid.co.uk"
+....
+;; ANSWER SECTION:
+data.metagrid.co.uk.	6688	IN	CNAME	bullfinch.linode.metagrid.co.uk.
+....
+....
+Received 245 bytes from 172.16.1.11#53 in 13 ms
+--END--
 
 
