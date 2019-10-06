@@ -1,0 +1,33 @@
+
+# Gateway host.
+Host lssthead
+    User {{ lookup('env','ESPERIA_USERNAME') }}
+    HostName {{ hostvars['lssthead'].inetip4 | ipaddr('address') }}
+    ServerAliveInterval 60
+    ServerAliveCountMax 5
+    ControlPath ~/.ssh/%r@%h:%p
+    ControlMaster auto
+    ControlPersist 5m
+
+# Physical hosts.
+Host {{ groups['vlannodes'] | join(' ') }}
+    User {{ lookup('env','ESPERIA_USERNAME') }}
+    ProxyCommand ssh -W %h:%p -l {{ lookup('env','ESPERIA_USERNAME') }} -F {{ lookup('env','HOME') }}/.ssh/esperia-config lssthead
+    ServerAliveInterval 60
+    ServerAliveCountMax 5
+    ControlPath ~/.ssh/%r@%h:%p
+    ControlMaster auto
+    ControlPersist 5m
+
+{% for hostname in groups['vlannodes'] %}
+# Virtual machines on {{ hostname }}.
+Host {{ hostvars[hostname].vmnames | join(' ') }}
+    User Stevedore
+    ProxyCommand ssh -W %h:%p -l {{ lookup('env','ESPERIA_USERNAME') }} -F {{ lookup('env','HOME') }}/.ssh/esperia-config lssthead
+    ServerAliveInterval 60
+    ServerAliveCountMax 5
+    ControlPath ~/.ssh/esperia-%r@%h:%p
+    ControlMaster auto
+    ControlPersist 5m
+
+{% endfor %}
