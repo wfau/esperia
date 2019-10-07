@@ -1,0 +1,174 @@
+#
+# <meta:header>
+#   <meta:licence>
+#     Copyright (c) 2018, ROE (http://www.roe.ac.uk/)
+#
+#     This information is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     This information is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#   </meta:licence>
+# </meta:header>
+#
+#
+
+# -----------------------------------------------------
+# Run our Ansible client.
+#[user@desktop]
+
+    source "${HOME}/esperia.settings"
+
+    cat << EOF
+ESPERIA_USER [${ESPERIA_USER:?}]
+ESPERIA_CODE [${ESPERIA_CODE:?}]
+EOF
+
+--START--
+ESPERIA_USER [dmr]
+ESPERIA_CODE [/var/local/projects/esperia/github-zrq]
+--END--
+
+
+    docker run \
+        --rm \
+        --tty \
+        --interactive \
+        --hostname ansible-client \
+        --env ESPERIA_USER=${ESPERIA_USER:?} \
+        --env SSH_AUTH_SOCK=/tmp/ssh_auth_sock \
+        --volume ${SSH_AUTH_SOCK}:/tmp/ssh_auth_sock \
+        --volume ${ESPERIA_CODE:?}/src/ansible:/etc/ansible:ro \
+        atolmis/ansible-client:latest \
+            bash
+
+
+# -----------------------------------------------------
+# Create our ssh config.
+#[root@ansible-client]
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/ssh-config.yml
+
+--START--
+....
+TASK [Check our ssh directory]
+changed: [localhost]
+
+TASK [Generate our ssh config file]
+changed: [localhost]
+....
+--END--
+
+
+# -----------------------------------------------------
+# Accept host keys for the gateway.
+#[root@ansible-client]
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/ssh-hostkeys.yml
+
+--START--
+....
+TASK [Check our ssh directory] **************************************************************************************************************************************************
+ok: [localhost]
+
+TASK [Accept the gateway host key] **********************************************************************************************************************************************
+changed: [localhost]
+....
+--END--
+
+
+# -----------------------------------------------------
+# Check we can connect.
+#[root@ansible-client]
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/ping-test.yml
+
+--START--
+....
+TASK [Check we can connect]
+ok: [lssthead]
+ok: [work02]
+ok: [work03]
+ok: [work04]
+ [WARNING]: Platform linux on host trop03 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change
+this. See https://docs.ansible.com/ansible/2.8/reference_appendices/interpreter_discovery.html for more information.
+
+ok: [trop03]
+ [WARNING]: Platform linux on host trop04 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change
+this. See https://docs.ansible.com/ansible/2.8/reference_appendices/interpreter_discovery.html for more information.
+
+ok: [trop04]
+ok: [work01]
+ok: [gaia01]
+ok: [gaia02]
+
+TASK [Check we can use sudo]
+ok: [lssthead]
+ok: [work02]
+ok: [work03]
+ok: [work01]
+ok: [work04]
+ok: [trop03]
+ok: [gaia01]
+ok: [gaia02]
+ok: [trop04]
+....
+--END--
+
+
+# -----------------------------------------------------
+# Update our admin ssh keys.
+#[root@ansible-client]
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/admin-keys.yml
+
+--START--
+....
+TASK [Update authorized keys for admin users]
+ok: [lssthead] => (item=msh)
+ok: [work03] => (item=msh)
+ok: [work01] => (item=msh)
+ok: [work04] => (item=msh)
+ok: [work02] => (item=msh)
+ok: [lssthead] => (item=dmr)
+ok: [work03] => (item=dmr)
+ok: [work02] => (item=dmr)
+ok: [work04] => (item=dmr)
+ok: [work01] => (item=dmr)
+ok: [work02] => (item=gfrancis)
+ok: [work03] => (item=gfrancis)
+ok: [work01] => (item=gfrancis)
+ok: [work04] => (item=gfrancis)
+ok: [gaia01] => (item=msh)
+ok: [gaia01] => (item=dmr)
+ok: [trop03] => (item=msh)
+ok: [trop04] => (item=msh)
+ok: [gaia02] => (item=msh)
+ok: [trop04] => (item=dmr)
+ [WARNING]: Platform linux on host trop04 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change
+this. See https://docs.ansible.com/ansible/2.8/reference_appendices/interpreter_discovery.html for more information.
+
+ok: [trop03] => (item=dmr)
+ [WARNING]: Platform linux on host trop03 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change
+this. See https://docs.ansible.com/ansible/2.8/reference_appendices/interpreter_discovery.html for more information.
+
+ok: [gaia02] => (item=dmr)
+....
+--END--
+
+
