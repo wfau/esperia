@@ -1,0 +1,80 @@
+#
+# <meta:header>
+#   <meta:licence>
+#     Copyright (c) 2019, ROE (http://www.roe.ac.uk/)
+#
+#     This information is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     This information is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#   </meta:licence>
+# </meta:header>
+#
+#
+
+---
+- hosts: lssthead
+  gather_facts: false
+  tasks:
+
+    - name: "Check the esperia config directory"
+      become: true
+      file:
+        path: '/etc/esperia'
+        mode: 'u=rwx,g=rx,o=rx'
+        state: directory
+        owner: root
+        group: root
+
+    - name: "Check the dnsmasq config directory"
+      become: true
+      file:
+        path: '/etc/esperia/dnsmasq'
+        mode: 'u=rwx,g=rx,o=rx'
+        state: directory
+        owner: root
+        group: root
+
+    - name: "Deploy the dnsmasq config file"
+      become: true
+      copy:
+        src:  'dnsmasq/dnsmasq-esperia.conf'
+        dest: '/etc/esperia/dnsmasq/esperia.conf'
+
+    - name: "Generate the dnsmasq DHCP config files"
+      become: true
+      template:
+        src:  'dnsmasq/dnsmasq-dhcp.j2'
+        dest: '/etc/esperia/dnsmasq/{{ item }}-dhcp.conf'
+      loop:
+        "{{ groups['dhcpnodes'] }}"
+
+    - name: "Generate the dnsmasq DNS config files"
+      become: true
+      template:
+        src:  'dnsmasq/dnsmasq-host.j2'
+        dest: '/etc/esperia/dnsmasq/{{ item }}-host.conf'
+      loop:
+        "{{ groups['dhcpnodes'] }}"
+
+    - name: "Generate the dnsmasq VLAN config file"
+      become: true
+      template:
+        src:  'dnsmasq/dnsmasq-vlan.j2'
+        dest: '/etc/esperia/dnsmasq/vlan.conf'
+
+    - name: "Generate the dnsmasq inet config file"
+      become: true
+      template:
+        src:  'dnsmasq/dnsmasq-inet.j2'
+        dest: '/etc/esperia/dnsmasq/inet.conf'
+
+

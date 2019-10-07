@@ -1,0 +1,10 @@
+# DHCP range for {{ item }}
+dhcp-range=set:{{ item }},{{ hostvars[item].ip4base + '.1'}},static,255.255.0.0,6h
+
+# DHCP hosts for {{ item }}
+{% for vmname in hostvars[item].vmnames -%}
+    dhcp-host=
+    {{- "%s:%02X"|format(hostvars[item].macbase, loop.index) -}},
+    {{- "%s.%d"|format(hostvars[item].ip4base, loop.index) -}},
+    {{- vmname }}
+{% endfor %}

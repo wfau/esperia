@@ -1,0 +1,80 @@
+#
+# <meta:header>
+#   <meta:licence>
+#     Copyright (c) 2019, ROE (http://www.roe.ac.uk/)
+#
+#     This information is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     This information is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#   </meta:licence>
+# </meta:header>
+#
+#
+
+    #
+    # Deprecated.
+    # Docker containers moved to the atolmis project.
+    #
+
+
+# -----------------------------------------------------
+# Build our containers.
+#[user@desktop]
+
+    source "${HOME}/esperia.settings"
+    pushd  "${ESPERIA_CODE:?}"
+        pushd src
+
+            buildtag=$(date '+%Y.%m.%d')
+            buildtime=$(date '+%Y-%m-%dT%H:%M:%S')
+
+            docker build \
+                --build-arg "buildtag=${buildtag:?}" \
+                --build-arg "buildtime=${buildtime:?}" \
+                --tag esperia/fedora:latest \
+                --tag esperia/fedora:${buildtag:?} \
+                docker/fedora
+
+            docker build \
+                --build-arg "buildtag=${buildtag:?}" \
+                --build-arg "buildtime=${buildtime:?}" \
+                --tag esperia/ansible-client:latest \
+                --tag esperia/ansible-client:${buildtag:?} \
+                docker/ansible-client
+
+        popd
+    popd
+
+# -----------------------------------------------------
+# Login to the Docker registry.
+#[user@desktop]
+
+    docker login \
+        --username $(secret docker.io.user) \
+        --password $(secret docker.io.pass)
+
+# -----------------------------------------------------
+# Push our images to Docker hub.
+#[user@desktop]
+
+    # This fails because 'esperia' organization already exists.
+    # (can't see it, but can't create it either)
+    # We could have the wfau organization, but we aren't that organized yet.
+
+#   docker push "esperia/fedora:${buildtag:?}"
+#   docker push "esperia/fedora:latest"
+#
+#   docker push "esperia/ansible-client:${buildtag:?}"
+#   docker push "esperia/ansible-client:latest"
+
+
+

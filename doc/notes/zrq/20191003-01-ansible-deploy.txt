@@ -1,0 +1,363 @@
+#
+# <meta:header>
+#   <meta:licence>
+#     Copyright (c) 2019, ROE (http://www.roe.ac.uk/)
+#
+#     This information is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     This information is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#   </meta:licence>
+# </meta:header>
+#
+#
+
+# -----------------------------------------------------
+# Run our Ansible client.
+#[user@desktop]
+
+    source "${HOME}/esperia.settings"
+    ESPERIA_USERNAME=dmr
+
+    docker run \
+        --rm \
+        --tty \
+        --interactive \
+        --hostname ansible-client \
+        --env ESPERIA_USERNAME=${ESPERIA_USERNAME:?} \
+        --env SSH_AUTH_SOCK=/tmp/ssh_auth_sock \
+        --volume ${SSH_AUTH_SOCK}:/tmp/ssh_auth_sock \
+        --volume ${ESPERIA_CODE:?}/src/ansible:/etc/ansible:ro \
+        atolmis/ansible-client:latest \
+            bash
+
+
+# -----------------------------------------------------
+# Create our ssh config.
+# TODO add this to the container startup.
+#[root@ansible-client]
+
+    rm -f "${HOME}/.ssh/config"
+
+    if [ ! -e "${HOME}/.ssh" ]
+    then
+        mkdir "${HOME}/.ssh"
+    fi
+
+    if [ ! -e "${HOME}/.ssh/config" ]
+    then
+        cp /etc/ansible/ssh.cfg ${HOME}/.ssh/config
+    fi
+
+    sed -i "
+        s/ESPERIA_USERNAME/${ESPERIA_USERNAME:?}/
+        " "${HOME}/.ssh/config"
+
+# -----------------------------------------------------
+# Check we can login to the gateway machine.
+#[root@ansible-client]
+
+    ssh \
+        lssthead \
+        '
+        date
+        hostname
+        id
+        '
+
+    >   The authenticity of host '192.41.108.44 (192.41.108.44)' can't be established.
+    >   ECDSA key fingerprint is SHA256:jCWHt7d/fVNH0VBOpuR+OZgxmPDaF4/9b9te7kPLo7E.
+    >   Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+    >   Warning: Permanently added '192.41.108.44' (ECDSA) to the list of known hosts.
+    >   Thu  3 Oct 00:17:40 BST 2019
+    >   lssthead
+    >   uid=1001(dmr) gid=1001(dmr) groups=1001(dmr),27(sudo),115(docker),999(esperia)
+
+
+# -----------------------------------------------------
+# Create our ansible group.
+#[root@ansible-client]
+
+    ansible-playbook \
+        --ask-become-pass \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/ansible-group.yml
+
+    >   ....
+    >   TASK [Create our ansible group]
+    >   ok: [work04]
+    >   ok: [work03]
+    >   ok: [work02]
+    >   changed: [lssthead]
+    >   ok: [work01]
+    >   ok: [gaia02]
+    >   ok: [gaia01]
+    >    [WARNING]: Platform linux on host trop03 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change this. See
+    >   https://docs.ansible.com/ansible/2.8/reference_appendices/interpreter_discovery.html for more information.
+    >   
+    >   ok: [trop03]
+    >    [WARNING]: Platform linux on host trop04 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change this. See
+    >   https://docs.ansible.com/ansible/2.8/reference_appendices/interpreter_discovery.html for more information.
+    >   
+    >   ok: [trop04]
+    >   
+    >   TASK [Install our sudoers config]
+    >   ok: [work03]
+    >   ok: [work04]
+    >   ok: [work02]
+    >   ok: [work01]
+    >   changed: [lssthead]
+    >   ok: [gaia01]
+    >   ok: [gaia02]
+    >   ok: [trop03]
+    >   ok: [trop04]
+    >   
+    >   TASK [Add our admin accounts to the ansible group]
+    >   ok: [work01] => (item=msh)
+    >   ok: [work03] => (item=msh)
+    >   ok: [work04] => (item=msh)
+    >   ok: [work02] => (item=msh)
+    >   changed: [lssthead] => (item=msh)
+    >   ok: [work01] => (item=dmr)
+    >   ok: [work04] => (item=dmr)
+    >   ok: [work02] => (item=dmr)
+    >   ok: [work03] => (item=dmr)
+    >   changed: [lssthead] => (item=dmr)
+    >   ok: [work01] => (item=gfrancis)
+    >   ok: [work04] => (item=gfrancis)
+    >   ok: [work02] => (item=gfrancis)
+    >   ok: [work03] => (item=gfrancis)
+    >   ok: [gaia01] => (item=msh)
+    >   ok: [gaia02] => (item=msh)
+    >   ok: [trop04] => (item=msh)
+    >   ok: [trop03] => (item=msh)
+    >   ok: [gaia01] => (item=dmr)
+    >   ok: [gaia02] => (item=dmr)
+    >   ok: [trop03] => (item=dmr)
+    >   ok: [trop04] => (item=dmr)
+    >   ....
+
+
+
+# -----------------------------------------------------
+# Create our ansible user.
+#[root@ansible-client]
+
+    ansible-playbook \
+        --ask-become-pass \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/ansible-user.yml
+
+    >   ....
+    >   PLAY [lssthead:lsstnodes:gaianodes:tropnodes] ***********************************************************************************************************************************************************************************************
+    >   
+    >   TASK [Create our ansible user] **************************************************************************************************************************************************************************************************************
+    >   fatal: [lssthead]: FAILED! => {"ansible_facts": {"discovered_interpreter_python": "/usr/bin/python3"}, "changed": false, "msg": "Group libvirt does not exist"}
+    >   ok: [work01]
+    >   ok: [work03]
+    >   ok: [work04]
+    >   ok: [work02]
+    >    [WARNING]: Platform linux on host trop04 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change this. See
+    >   https://docs.ansible.com/ansible/2.8/reference_appendices/interpreter_discovery.html for more information.
+    >   
+    >   ok: [trop04]
+    >    [WARNING]: Platform linux on host trop03 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change this. See
+    >   https://docs.ansible.com/ansible/2.8/reference_appendices/interpreter_discovery.html for more information.
+    >   
+    >   ok: [trop03]
+    >   ok: [gaia01]
+    >   ok: [gaia02]
+    >   ....
+
+
+# -----------------------------------------------------
+# Update our ansible SSH keys.
+#[root@ansible-client]
+
+    ansible-playbook \
+        --ask-become-pass \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/ansible-keys.yml
+
+    >   ....
+    >   ....
+
+
+# -----------------------------------------------------
+# Create our admin users.
+#[root@ansible-client]
+
+    ansible-playbook \
+        --ask-become-pass \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/admin-users.yml
+
+    >   ....
+    >   ....
+
+
+# -----------------------------------------------------
+# Update the authorized keys for our admin users.
+#[root@ansible-client]
+
+    ansible-playbook \
+        --ask-become-pass \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/admin-keys.yml
+
+    >   ....
+    >   ....
+
+
+# -----------------------------------------------------
+# Update the authorized keys for our root user.
+#[root@ansible-client]
+
+    ansible-playbook \
+        --ask-become-pass \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/super-keys.yml
+
+    >   ....
+    >   TASK [Update authorized keys for root]
+    >   ok: [work03] => (item=lssthead)
+    >   ok: [work02] => (item=lssthead)
+    >   ok: [work01] => (item=lssthead)
+    >   ok: [work04] => (item=lssthead)
+    >   ok: [lssthead] => (item=lssthead)
+    >   ok: [work01] => (item=khaba)
+    >   ok: [work02] => (item=khaba)
+    >   ok: [work03] => (item=khaba)
+    >   ok: [work04] => (item=khaba)
+    >   ok: [lssthead] => (item=khaba)
+    >   ok: [work02] => (item=msh)
+    >   ok: [work01] => (item=msh)
+    >   ok: [work03] => (item=msh)
+    >   changed: [lssthead] => (item=msh)
+    >   ok: [work04] => (item=msh)
+    >   ok: [work02] => (item=dmr)
+    >   ok: [work01] => (item=dmr)
+    >   changed: [lssthead] => (item=dmr)
+    >   ok: [work03] => (item=dmr)
+    >   ok: [work04] => (item=dmr)
+    >   ok: [trop03] => (item=lssthead)
+    >   ok: [trop04] => (item=lssthead)
+    >   ok: [gaia02] => (item=lssthead)
+    >   ok: [gaia01] => (item=lssthead)
+    >   ok: [trop03] => (item=khaba)
+    >   ok: [trop04] => (item=khaba)
+    >   ok: [gaia02] => (item=khaba)
+    >   ok: [gaia01] => (item=khaba)
+    >   ok: [trop03] => (item=msh)
+    >   ok: [trop04] => (item=msh)
+    >   ok: [gaia01] => (item=msh)
+    >   ok: [gaia02] => (item=msh)
+    >   ok: [trop03] => (item=dmr)
+    >    [WARNING]: Platform linux on host trop03 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change this. See
+    >   https://docs.ansible.com/ansible/2.8/reference_appendices/interpreter_discovery.html for more information.
+    >   
+    >   ok: [trop04] => (item=dmr)
+    >    [WARNING]: Platform linux on host trop04 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change this. See
+    >   https://docs.ansible.com/ansible/2.8/reference_appendices/interpreter_discovery.html for more information.
+    >   
+    >   ok: [gaia02] => (item=dmr)
+    >   ok: [gaia01] => (item=dmr)
+    >   ....
+
+
+# -----------------------------------------------------
+# Create our login users.
+#[root@ansible-client]
+
+    ansible-playbook \
+        --ask-become-pass \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/login-users.yml
+
+    >   ....
+    >   TASK [Create our login users]
+    >   changed: [lssthead] => (item=msh)
+    >   ok: [work01] => (item=msh)
+    >   ok: [work03] => (item=msh)
+    >   ok: [work02] => (item=msh)
+    >   ok: [work04] => (item=msh)
+    >   changed: [lssthead] => (item=dmr)
+    >   ok: [work02] => (item=dmr)
+    >   ok: [work01] => (item=dmr)
+    >   ok: [work03] => (item=dmr)
+    >   ok: [work04] => (item=dmr)
+    >   changed: [lssthead] => (item=stv)
+    >   ok: [work01] => (item=gfrancis)
+    >   ok: [work02] => (item=gfrancis)
+    >   ok: [work03] => (item=gfrancis)
+    >   ok: [work04] => (item=gfrancis)
+    >   changed: [lssthead] => (item=gfrancis)
+    >   ok: [trop04] => (item=msh)
+    >   ok: [trop03] => (item=msh)
+    >   ok: [gaia01] => (item=msh)
+    >   ok: [gaia02] => (item=msh)
+    >   ok: [trop04] => (item=dmr)
+    >    [WARNING]: Platform linux on host trop04 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change this. See
+    >   https://docs.ansible.com/ansible/2.8/reference_appendices/interpreter_discovery.html for more information.
+    >   
+    >   ok: [trop03] => (item=dmr)
+    >    [WARNING]: Platform linux on host trop03 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change this. See
+    >   https://docs.ansible.com/ansible/2.8/reference_appendices/interpreter_discovery.html for more information.
+    >   
+    >   ok: [gaia02] => (item=dmr)
+    >   ok: [gaia01] => (item=dmr)
+    >   ....
+
+
+# -----------------------------------------------------
+# Update the authorized keys for our login users.
+#[root@ansible-client]
+
+    ansible-playbook \
+        --ask-become-pass \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/login-keys.yml
+
+    >   ....
+    >   TASK [Update authorized keys for login users]
+    >   changed: [lssthead] => (item=msh)
+    >   changed: [work02] => (item=msh)
+    >   changed: [work04] => (item=msh)
+    >   changed: [work03] => (item=msh)
+    >   changed: [work01] => (item=msh)
+    >   ok: [lssthead] => (item=dmr)
+    >   ok: [work02] => (item=dmr)
+    >   ok: [work04] => (item=dmr)
+    >   ok: [work03] => (item=dmr)
+    >   ok: [work01] => (item=dmr)
+    >   changed: [lssthead] => (item=stv)
+    >   changed: [work02] => (item=gfrancis)
+    >   changed: [work04] => (item=gfrancis)
+    >   changed: [work03] => (item=gfrancis)
+    >   changed: [work01] => (item=gfrancis)
+    >   changed: [lssthead] => (item=gfrancis)
+    >   changed: [gaia01] => (item=msh)
+    >   changed: [gaia02] => (item=msh)
+    >   changed: [trop04] => (item=msh)
+    >   changed: [trop03] => (item=msh)
+    >   ok: [gaia01] => (item=dmr)
+    >   ok: [trop04] => (item=dmr)
+    >    [WARNING]: Platform linux on host trop04 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change this. See
+    >   https://docs.ansible.com/ansible/2.8/reference_appendices/interpreter_discovery.html for more information.
+    >   
+    >   ok: [gaia02] => (item=dmr)
+    >   ok: [trop03] => (item=dmr)
+    >    [WARNING]: Platform linux on host trop03 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change this. See
+    >   https://docs.ansible.com/ansible/2.8/reference_appendices/interpreter_discovery.html for more information.
+    >   ....
+
+
+

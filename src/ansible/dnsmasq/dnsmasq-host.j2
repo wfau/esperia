@@ -1,0 +1,8 @@
+# host records for {{ item }}
+
+{% for vmname in hostvars[item].vmnames -%}
+    host-record=
+    {{- vmname }},
+    {{- vmname }}.esperia,
+    {{- "%s.%d"|format(hostvars[item].ip4base, loop.index) }}
+{% endfor %}

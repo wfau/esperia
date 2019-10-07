@@ -1,5 +1,4 @@
 
-             
 work01 Onaukon    06:00:AC:10:00:01 172.16.0.1
 work01 Kedaessa   06:00:AC:10:00:02 172.16.0.2
 work01 Arardobwyn 06:00:AC:10:00:03 172.16.0.3
@@ -32,7 +31,7 @@ work01 Falidon    06:00:AC:10:00:1D 172.16.0.29
 work01 Brawia     06:00:AC:10:00:1E 172.16.0.30
 work01 Glaubard   06:00:AC:10:00:1F 172.16.0.31
 work01 Legendamwen 06:00:AC:10:00:20 172.16.0.32
-             
+
 work02 Nydiabaen  06:00:AC:10:02:01 172.16.2.1
 work02 Eraullan   06:00:AC:10:02:02 172.16.2.2
 work02 Dwerader   06:00:AC:10:02:03 172.16.2.3
@@ -65,7 +64,7 @@ work02 Anticla    06:00:AC:10:02:1D 172.16.2.29
 work02 Broocal    06:00:AC:10:02:1E 172.16.2.30
 work02 Saunobby   06:00:AC:10:02:1F 172.16.2.31
 work02 Hartatoria 06:00:AC:10:02:20 172.16.2.32
-             
+
 work03 Umynd      06:00:AC:10:03:01 172.16.3.1
 work03 Lothaedien 06:00:AC:10:03:02 172.16.3.2
 work03 Afaod      06:00:AC:10:03:03 172.16.3.3
@@ -98,7 +97,7 @@ work03 Payw       06:00:AC:10:03:1D 172.16.3.29
 work03 Paowien    06:00:AC:10:03:1E 172.16.3.30
 work03 Yorevudd   06:00:AC:10:03:1F 172.16.3.31
 work03 Haaewia    06:00:AC:10:03:20 172.16.3.32
-             
+
 work04 Rhaler     06:00:AC:10:04:01 172.16.4.1
 work04 Asaoria    06:00:AC:10:04:02 172.16.4.2
 work04 Miejar     06:00:AC:10:04:03 172.16.4.3
@@ -131,7 +130,7 @@ work04 Afeb       06:00:AC:10:04:1D 172.16.4.29
 work04 Ocianiel   06:00:AC:10:04:1E 172.16.4.30
 work04 Umywin     06:00:AC:10:04:1F 172.16.4.31
 work04 Grywen     06:00:AC:10:04:20 172.16.4.32
-             
+
 trop03 Umiawyth   06:00:AC:10:05:01 172.16.5.1
 trop03 Etalema    06:00:AC:10:05:02 172.16.5.2
 trop03 Greand     06:00:AC:10:05:03 172.16.5.3
@@ -164,7 +163,7 @@ trop03 Uloreth    06:00:AC:10:05:1D 172.16.5.29
 trop03 Comwen     06:00:AC:10:05:1E 172.16.5.30
 trop03 Etardowyn  06:00:AC:10:05:1F 172.16.5.31
 trop03 Legaleniel 06:00:AC:10:05:20 172.16.5.32
-             
+
 trop04 Wumar      06:00:AC:10:06:01 172.16.6.1
 trop04 Larilaweth 06:00:AC:10:06:02 172.16.6.2
 trop04 Ror        06:00:AC:10:06:03 172.16.6.3
@@ -197,11 +196,11 @@ trop04 Thelinidd  06:00:AC:10:06:1D 172.16.6.29
 trop04 Sendalin   06:00:AC:10:06:1E 172.16.6.30
 trop04 Dwalewen   06:00:AC:10:06:1F 172.16.6.31
 trop04 Gwoeric    06:00:AC:10:06:20 172.16.6.32
-             
+
 data01 unknown    06:00:AC:10:07:01 172.16.7.1
-             
+
 data02 unknown    06:00:AC:10:08:01 172.16.8.1
-             
+
 gaia01 Cinna      06:00:AC:10:09:01 172.16.9.1
 gaia01 Edieldan   06:00:AC:10:09:02 172.16.9.2
 gaia01 Adwiraven  06:00:AC:10:09:03 172.16.9.3
@@ -234,7 +233,7 @@ gaia01 Sevimma    06:00:AC:10:09:1D 172.16.9.29
 gaia01 Gledrili   06:00:AC:10:09:1E 172.16.9.30
 gaia01 Olalewiel  06:00:AC:10:09:1F 172.16.9.31
 gaia01 Tralidus   06:00:AC:10:09:20 172.16.9.32
-             
+
 gaia02 Kaaleder   06:00:AC:10:0A:01 172.16.10.1
 gaia02 Drardorien 06:00:AC:10:0A:02 172.16.10.2
 gaia02 Adaokin    06:00:AC:10:0A:03 172.16.10.3
@@ -267,8 +266,8 @@ gaia02 Adwaesean  06:00:AC:10:0A:1D 172.16.10.29
 gaia02 Verrasien  06:00:AC:10:0A:1E 172.16.10.30
 gaia02 Walewyn    06:00:AC:10:0A:1F 172.16.10.31
 gaia02 Thelithiel 06:00:AC:10:0A:20 172.16.10.32
-             
-             
-             
-             
-             
+
+
+
+
+

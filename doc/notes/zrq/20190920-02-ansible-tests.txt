@@ -1,0 +1,62 @@
+#
+# <meta:header>
+#   <meta:licence>
+#     Copyright (c) 2019, ROE (http://www.roe.ac.uk/)
+#
+#     This information is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     This information is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#   </meta:licence>
+# </meta:header>
+#
+#
+
+# -----------------------------------------------------
+# Run our Ansible client.
+#[user@laptop]
+
+    source "${HOME}/esperia.settings"
+
+    docker run \
+        --rm \
+        --tty \
+        --interactive \
+        --hostname ansible-client \
+        --env SSH_AUTH_SOCK=/tmp/ssh_auth_sock \
+        --volume ${SSH_AUTH_SOCK}:/tmp/ssh_auth_sock \
+        --volume ${ESPERIA_CODE:?}/src/ansible:/etc/ansible:ro \
+        esperia/ansible-client:latest \
+            bash
+
+# -----------------------------------------------------
+# Run our 'ping' playbook to check we can login using the sudo password.
+#[user@ansible-client]
+
+    ansible-playbook \
+        --user dmr \
+        --ask-become-pass \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/workers-ping.yml
+
+
+# -----------------------------------------------------
+# Run our playbooks to configure users, groups and ssh keys.
+#[user@ansible-client]
+
+    ansible-playbook \
+        --user dmr \
+        --ask-become-pass \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/workers-ping.yml
+
+
+

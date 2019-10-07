@@ -1,0 +1,110 @@
+#
+# <meta:header>
+#   <meta:licence>
+#     Copyright (c) 2019, ROE (http://www.roe.ac.uk/)
+#
+#     This information is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     This information is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#   </meta:licence>
+# </meta:header>
+#
+#
+
+# -----------------------------------------------------
+# Run our Ansible client.
+#[user@desktop]
+
+    source "${HOME}/esperia.settings"
+    ESPERIA_USERNAME=dmr
+
+    docker run \
+        --rm \
+        --tty \
+        --interactive \
+        --hostname ansible-client \
+        --env ESPERIA_USERNAME=${ESPERIA_USERNAME:?} \
+        --env SSH_AUTH_SOCK=/tmp/ssh_auth_sock \
+        --volume ${SSH_AUTH_SOCK}:/tmp/ssh_auth_sock \
+        --volume ${ESPERIA_CODE:?}/src/ansible:/etc/ansible:ro \
+        atolmis/ansible-client:latest \
+            bash
+
+
+# -----------------------------------------------------
+# Create our ssh config.
+# TODO add this to the container startup.
+#[root@ansible-client]
+
+    rm -f "${HOME}/.ssh/config"
+
+    if [ ! -e "${HOME}/.ssh" ]
+    then
+        mkdir "${HOME}/.ssh"
+    fi
+
+    if [ ! -e "${HOME}/.ssh/config" ]
+    then
+        cp /etc/ansible/ssh.cfg ${HOME}/.ssh/config
+    fi
+
+    sed -i "
+        s/ESPERIA_USERNAME/${ESPERIA_USERNAME:?}/
+        " "${HOME}/.ssh/config"
+
+# -----------------------------------------------------
+# Check we can login to the gateway machine.
+#[root@ansible-client]
+
+    ssh \
+        lssthead \
+        '
+        date
+        hostname
+        id
+        '
+
+    >   The authenticity of host '192.41.108.44 (192.41.108.44)' can't be established.
+    >   ECDSA key fingerprint is SHA256:jCWHt7d/fVNH0VBOpuR+OZgxmPDaF4/9b9te7kPLo7E.
+    >   Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+    >   Warning: Permanently added '192.41.108.44' (ECDSA) to the list of known hosts.
+    >   Tue  1 Oct 03:11:17 BST 2019
+    >   lssthead
+    >   uid=1001(dmr) gid=1001(dmr) groups=1001(dmr),27(sudo),115(docker),999(esperia)
+
+
+# -----------------------------------------------------
+# Check we can login via Ansible and use sudo.
+#[root@ansible-client]
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/test-001.yml
+
+
+# -----------------------------------------------------
+# Experiment with creating dnsmasq files.
+#[root@ansible-client]
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/test-002.yml
+
+# -----------------------------------------------------
+# Experiment with assigning admin users and keys.
+#[root@ansible-client]
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/test-003.yml
+
+
