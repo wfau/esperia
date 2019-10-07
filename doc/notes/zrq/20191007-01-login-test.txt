@@ -31,10 +31,8 @@ ESPERIA_USER [${ESPERIA_USER:?}]
 ESPERIA_CODE [${ESPERIA_CODE:?}]
 EOF
 
---START--
-ESPERIA_USER [dmr]
-ESPERIA_CODE [/var/local/projects/esperia/github-zrq]
---END--
+    >   ESPERIA_USER [dmr]
+    >   ESPERIA_CODE [/var/local/projects/esperia/github-zrq]
 
 
     docker run \

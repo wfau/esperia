@@ -73,15 +73,13 @@
         id
         '
 
---START--
-The authenticity of host '192.41.108.44 (192.41.108.44)' can't be established.
-ECDSA key fingerprint is SHA256:jCWHt7d/fVNH0VBOpuR+OZgxmPDaF4/9b9te7kPLo7E.
-Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
-Warning: Permanently added '192.41.108.44' (ECDSA) to the list of known hosts.
-Tue  1 Oct 03:11:17 BST 2019
-lssthead
-uid=1001(dmr) gid=1001(dmr) groups=1001(dmr),27(sudo),115(docker),999(esperia)
---END--
+    >   The authenticity of host '192.41.108.44 (192.41.108.44)' can't be established.
+    >   ECDSA key fingerprint is SHA256:jCWHt7d/fVNH0VBOpuR+OZgxmPDaF4/9b9te7kPLo7E.
+    >   Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+    >   Warning: Permanently added '192.41.108.44' (ECDSA) to the list of known hosts.
+    >   Tue  1 Oct 03:11:17 BST 2019
+    >   lssthead
+    >   uid=1001(dmr) gid=1001(dmr) groups=1001(dmr),27(sudo),115(docker),999(esperia)
 
 
 # -----------------------------------------------------
