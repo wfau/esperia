@@ -1,0 +1,136 @@
+#
+# <meta:header>
+#   <meta:licence>
+#     Copyright (c) 2019, ROE (http://www.roe.ac.uk/)
+#
+#     This information is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     This information is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#   </meta:licence>
+# </meta:header>
+#
+#
+
+# -----------------------------------------------------
+# Install the Ansible client.
+#[user@laptop]
+
+    sudo dnf install ansible
+
+    >   ....
+    >   Installed:
+    >     ansible-2.8.2-1.fc29.noarch              libsodium-1.0.18-1.fc29.x86_64
+    >     python3-paramiko-2.4.2-1.fc29.noarch     python3-bcrypt-3.1.4-6.fc29.x86_64
+    >     python3-jmespath-0.9.0-12.fc29.noarch    python3-pynacl-1.2.1-3.fc29.x86_64
+
+
+# -----------------------------------------------------
+# Install extra libraries for the Ansible scripts.
+#[user@laptop]
+
+    sudo dnf install python3-netaddr
+
+    >   ....
+    >   Installed:
+    >     python3-netaddr-0.7.19-11.fc29.noarch
+
+
+# -----------------------------------------------------
+# Set our local enviroment variables.
+#[user@laptop]
+
+    source "${HOME}/esperia.settings"
+
+    cat << EOF
+ESPERIA_USER [${ESPERIA_USER:?}]
+ESPERIA_CODE [${ESPERIA_CODE:?}]
+EOF
+
+    >   ESPERIA_USER [dmr]
+    >   ESPERIA_CODE [/var/local/projects/esperia/github-zrq]
+
+    export ESPERIA_USER
+    export ESPERIA_CODE
+
+# -----------------------------------------------------
+# Create our ssh config.
+#[user@laptop]
+
+    pushd "${ESPERIA_CODE}/src/ansible"
+
+        ansible-playbook \
+            --inventory "hosts.yml" \
+            "ssh-config.yml"
+
+    popd
+
+    >   ....
+    >   TASK [Generate our ssh config file]
+    >   changed: [localhost]
+    >   ....
+
+# -----------------------------------------------------
+# Accept host keys for the gateway.
+#[user@laptop]
+
+    pushd "${ESPERIA_CODE}/src/ansible"
+
+        ansible-playbook \
+            --inventory "hosts.yml" \
+            "ssh-hostkeys.yml"
+
+    >   ....
+    >   TASK [Accept the gateway host key]
+    >   changed: [localhost]
+    >   ....
+
+
+# -----------------------------------------------------
+# Check we can connect.
+#[user@laptop]
+
+    pushd "${ESPERIA_CODE}/src/ansible"
+
+        ansible-playbook \
+            --inventory "hosts.yml" \
+            "ping-test.yml"
+
+    >   ....
+    >   TASK [Check we can connect]
+    >   ok: [lssthead]
+    >   ok: [work04]
+    >   ok: [work01]
+    >   ok: [work03]
+    >   ok: [work02]
+    >    [WARNING]: Platform linux on host trop03 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change
+    >   this. See https://docs.ansible.com/ansible/2.8/reference_appendices/interpreter_discovery.html for more information.
+    >   
+    >   ok: [trop03]
+    >    [WARNING]: Platform linux on host trop04 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change
+    >   this. See https://docs.ansible.com/ansible/2.8/reference_appendices/interpreter_discovery.html for more information.
+    >   
+    >   ok: [trop04]
+    >   ok: [gaia01]
+    >   ok: [gaia02]
+    >   
+    >   TASK [Check we can use sudo]
+    >   ok: [lssthead]
+    >   ok: [work02]
+    >   ok: [work01]
+    >   ok: [work03]
+    >   ok: [work04]
+    >   ok: [trop03]
+    >   ok: [trop04]
+    >   ok: [gaia01]
+    >   ok: [gaia02]
+    >   ....
+
