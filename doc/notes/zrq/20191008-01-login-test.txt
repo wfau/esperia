@@ -88,6 +88,8 @@ EOF
             --inventory "hosts.yml" \
             "ssh-hostkeys.yml"
 
+    popd
+
     >   ....
     >   TASK [Accept the gateway host key]
     >   changed: [localhost]
@@ -104,6 +106,8 @@ EOF
             --inventory "hosts.yml" \
             "ping-test.yml"
 
+    popd
+
     >   ....
     >   TASK [Check we can connect]
     >   ok: [lssthead]
@@ -113,15 +117,15 @@ EOF
     >   ok: [work02]
     >    [WARNING]: Platform linux on host trop03 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change
     >   this. See https://docs.ansible.com/ansible/2.8/reference_appendices/interpreter_discovery.html for more information.
-    >   
+    >
     >   ok: [trop03]
     >    [WARNING]: Platform linux on host trop04 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change
     >   this. See https://docs.ansible.com/ansible/2.8/reference_appendices/interpreter_discovery.html for more information.
-    >   
+    >
     >   ok: [trop04]
     >   ok: [gaia01]
     >   ok: [gaia02]
-    >   
+    >
     >   TASK [Check we can use sudo]
     >   ok: [lssthead]
     >   ok: [work02]
