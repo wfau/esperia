@@ -35,10 +35,8 @@ ESPERIA_USER [${ESPERIA_USER:?}]
 ESPERIA_CODE [${ESPERIA_CODE:?}]
 EOF
 
---START--
-    >   ESPERIA_USER [dmr]
-    >   ESPERIA_CODE [/var/local/projects/esperia/github-zrq]
---END--
+    >       >   ESPERIA_USER [dmr]
+    >       >   ESPERIA_CODE [/var/local/projects/esperia/github-zrq]
 
 
     docker run \
@@ -62,13 +60,11 @@ EOF
         --inventory /etc/ansible/hosts.yml \
         /etc/ansible/ssh-config.yml
 
---START--
-TASK [Check our ssh directory] **************************************************************************************************************************************************************************************************************
-changed: [localhost]
-
-TASK [Generate our ssh config file] *********************************************************************************************************************************************************************************************************
-changed: [localhost]
---END--
+    >   TASK [Check our ssh directory] ..
+    >   changed: [localhost]
+    >   
+    >   TASK [Generate our ssh config file] ..
+    >   changed: [localhost]
 
 
 # -----------------------------------------------------
@@ -79,13 +75,11 @@ changed: [localhost]
         --inventory /etc/ansible/hosts.yml \
         /etc/ansible/ssh-hostkeys.yml
 
---START--
-TASK [Check our ssh directory] **************************************************************************************************************************************************************************************************************
-ok: [localhost]
-
-TASK [Accept the gateway host key] **********************************************************************************************************************************************************************************************************
-changed: [localhost]
---END--
+    >   TASK [Check our ssh directory] ..
+    >   ok: [localhost]
+    >   
+    >   TASK [Accept the gateway host key] ..
+    >   changed: [localhost]
 
 
 # -----------------------------------------------------
@@ -96,37 +90,33 @@ changed: [localhost]
         --inventory /etc/ansible/hosts.yml \
          /etc/ansible/ping-test.yml
 
---START--
-TASK [Check we can connect] *****************************************************************************************************************************************************************************************************************
-ok: [lsstukhead]
-ok: [lsstukwork2]
-ok: [lsstukwork1]
-ok: [lsstukwork3]
-ok: [lsstukwork4]
-[WARNING]: Platform linux on host trop03 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change this. See
-https://docs.ansible.com/ansible/2.9/reference_appendices/interpreter_discovery.html for more information.
+    >   TASK [Check we can connect] ..
+    >   ok: [lsstukhead]
+    >   ok: [lsstukwork2]
+    >   ok: [lsstukwork1]
+    >   ok: [lsstukwork3]
+    >   ok: [lsstukwork4]
+    >   [WARNING]: Platform linux on host trop03 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change this. See
+    >   https://docs.ansible.com/ansible/2.9/reference_appendices/interpreter_discovery.html for more information.
+    >   
+    >   ok: [trop03]
+    >   [WARNING]: Platform linux on host trop04 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change this. See
+    >   https://docs.ansible.com/ansible/2.9/reference_appendices/interpreter_discovery.html for more information.
+    >   
+    >   ok: [trop04]
+    >   ok: [gaia01]
+    >   ok: [gaia02]
 
-ok: [trop03]
-[WARNING]: Platform linux on host trop04 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change this. See
-https://docs.ansible.com/ansible/2.9/reference_appendices/interpreter_discovery.html for more information.
-
-ok: [trop04]
-ok: [gaia01]
-ok: [gaia02]
---END--
-
---START--
-TASK [Check we can use sudo] ****************************************************************************************************************************************************************************************************************
-ok: [lsstukhead]
-ok: [lsstukwork2]
-ok: [lsstukwork1]
-ok: [trop03]
-ok: [trop04]
-ok: [gaia01]
-ok: [gaia02]
-ok: [lsstukwork4]
-ok: [lsstukwork3]
---END--
+    >   TASK [Check we can use sudo] ..
+    >   ok: [lsstukhead]
+    >   ok: [lsstukwork2]
+    >   ok: [lsstukwork1]
+    >   ok: [trop03]
+    >   ok: [trop04]
+    >   ok: [gaia01]
+    >   ok: [gaia02]
+    >   ok: [lsstukwork4]
+    >   ok: [lsstukwork3]
 
 
 # -----------------------------------------------------
@@ -137,22 +127,20 @@ ok: [lsstukwork3]
         --inventory /etc/ansible/hosts.yml \
         /etc/ansible/static-hosts.yml
 
---START--
-TASK [Update static /etc/hosts entries] *****************************************************************************************************************************************************************************************************
-changed: [lsstukhead]
-changed: [lsstukwork1]
-changed: [lsstukwork3]
-changed: [lsstukwork4]
-changed: [lsstukwork2]
-[WARNING]: Platform linux on host trop03 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change this. See
-https://docs.ansible.com/ansible/2.9/reference_appendices/interpreter_discovery.html for more information.
-
-changed: [trop03]
-[WARNING]: Platform linux on host trop04 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change this. See
-https://docs.ansible.com/ansible/2.9/reference_appendices/interpreter_discovery.html for more information.
-
-changed: [trop04]
-changed: [gaia01]
-changed: [gaia02]
---END--
+    >   TASK [Update static /etc/hosts entries] ..
+    >   changed: [lsstukhead]
+    >   changed: [lsstukwork1]
+    >   changed: [lsstukwork3]
+    >   changed: [lsstukwork4]
+    >   changed: [lsstukwork2]
+    >   [WARNING]: Platform linux on host trop03 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change this. See
+    >   https://docs.ansible.com/ansible/2.9/reference_appendices/interpreter_discovery.html for more information.
+    >   
+    >   changed: [trop03]
+    >   [WARNING]: Platform linux on host trop04 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change this. See
+    >   https://docs.ansible.com/ansible/2.9/reference_appendices/interpreter_discovery.html for more information.
+    >   
+    >   changed: [trop04]
+    >   changed: [gaia01]
+    >   changed: [gaia02]
 
