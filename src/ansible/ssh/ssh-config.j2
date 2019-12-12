@@ -27,9 +27,9 @@
 {%- endmacro -%}
 
 # Gateway host.
-Host lssthead
+Host lsstukhead
     User {{ lookup('env','ESPERIA_USER') }}
-    HostName {{ hostvars['lssthead'].inetip4 | ipaddr('address') }}
+    HostName {{ hostvars['lsstukhead'].inetip4 | ipaddr('address') }}
     ServerAliveInterval 60
     ServerAliveCountMax 5
     ControlPath ~/.ssh/%r@%h:%p
@@ -41,7 +41,7 @@ Host lssthead
 Host {{ hostname }} {{ aliases(hostname, ' ') if hostvars[hostname].aliases is defined else '' }}
     HostName {{ hostname }}.esperia
     User {{ lookup('env','ESPERIA_USER') }}
-    ProxyCommand ssh -W %h:%p -l {{ lookup('env','ESPERIA_USER') }} -F {{ lookup('env','HOME') }}/.ssh/esperia-config lssthead
+    ProxyCommand ssh -W %h:%p -l {{ lookup('env','ESPERIA_USER') }} -F {{ lookup('env','HOME') }}/.ssh/esperia-config lsstukhead
     ServerAliveInterval 60
     ServerAliveCountMax 5
     ControlPath ~/.ssh/%r@%h:%p
@@ -54,7 +54,7 @@ Host {{ hostname }} {{ aliases(hostname, ' ') if hostvars[hostname].aliases is d
 # Virtual machines on {{ hostname }}.
 Host {{ hostvars[hostname].vmnames | join(' ') }}
     User Stevedore
-    ProxyCommand ssh -W %h:%p -l {{ lookup('env','ESPERIA_USER') }} -F {{ lookup('env','HOME') }}/.ssh/esperia-config lssthead
+    ProxyCommand ssh -W %h:%p -l {{ lookup('env','ESPERIA_USER') }} -F {{ lookup('env','HOME') }}/.ssh/esperia-config lsstukhead
     ServerAliveInterval 60
     ServerAliveCountMax 5
     ControlPath ~/.ssh/esperia-%r@%h:%p

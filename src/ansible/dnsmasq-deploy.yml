@@ -21,7 +21,7 @@
 #
 
 ---
-- hosts: lssthead
+- hosts: lsstukhead
   gather_facts: false
   tasks:
 
