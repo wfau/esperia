@@ -1,0 +1,158 @@
+#
+# <meta:header>
+#   <meta:licence>
+#     Copyright (c) 2019, ROE (http://www.roe.ac.uk/)
+#
+#     This information is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     This information is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#   </meta:licence>
+# </meta:header>
+#
+#zrq-notes-time
+#zrq-notes-indent
+#zrq-notes-ansible
+#zrq-notes-osformat
+#
+
+# -----------------------------------------------------
+# Run our Ansible client.
+#[user@desktop]
+
+    source "${HOME}/esperia.settings"
+
+    cat << EOF
+ESPERIA_USER [${ESPERIA_USER:?}]
+ESPERIA_CODE [${ESPERIA_CODE:?}]
+EOF
+
+--START--
+    >   ESPERIA_USER [dmr]
+    >   ESPERIA_CODE [/var/local/projects/esperia/github-zrq]
+--END--
+
+
+    docker run \
+        --rm \
+        --tty \
+        --interactive \
+        --hostname ansible-client \
+        --env ESPERIA_USER=${ESPERIA_USER:?} \
+        --env SSH_AUTH_SOCK=/tmp/ssh_auth_sock \
+        --volume ${SSH_AUTH_SOCK}:/tmp/ssh_auth_sock \
+        --volume ${ESPERIA_CODE:?}/src/ansible:/etc/ansible:ro \
+        atolmis/ansible-client:latest \
+            bash
+
+
+# -----------------------------------------------------
+# Create our ssh config.
+#[root@ansible-client]
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/ssh-config.yml
+
+--START--
+TASK [Check our ssh directory] **************************************************************************************************************************************************************************************************************
+changed: [localhost]
+
+TASK [Generate our ssh config file] *********************************************************************************************************************************************************************************************************
+changed: [localhost]
+--END--
+
+
+# -----------------------------------------------------
+# Accept host keys for the gateway.
+#[root@ansible-client]
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/ssh-hostkeys.yml
+
+--START--
+TASK [Check our ssh directory] **************************************************************************************************************************************************************************************************************
+ok: [localhost]
+
+TASK [Accept the gateway host key] **********************************************************************************************************************************************************************************************************
+changed: [localhost]
+--END--
+
+
+# -----------------------------------------------------
+# Check we can connect.
+#[root@ansible-client]
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+         /etc/ansible/ping-test.yml
+
+--START--
+TASK [Check we can connect] *****************************************************************************************************************************************************************************************************************
+ok: [lsstukhead]
+ok: [lsstukwork2]
+ok: [lsstukwork1]
+ok: [lsstukwork3]
+ok: [lsstukwork4]
+[WARNING]: Platform linux on host trop03 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change this. See
+https://docs.ansible.com/ansible/2.9/reference_appendices/interpreter_discovery.html for more information.
+
+ok: [trop03]
+[WARNING]: Platform linux on host trop04 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change this. See
+https://docs.ansible.com/ansible/2.9/reference_appendices/interpreter_discovery.html for more information.
+
+ok: [trop04]
+ok: [gaia01]
+ok: [gaia02]
+--END--
+
+--START--
+TASK [Check we can use sudo] ****************************************************************************************************************************************************************************************************************
+ok: [lsstukhead]
+ok: [lsstukwork2]
+ok: [lsstukwork1]
+ok: [trop03]
+ok: [trop04]
+ok: [gaia01]
+ok: [gaia02]
+ok: [lsstukwork4]
+ok: [lsstukwork3]
+--END--
+
+
+# -----------------------------------------------------
+# Update the static /etc/hosts files.
+#[root@ansible-client]
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/static-hosts.yml
+
+--START--
+TASK [Update static /etc/hosts entries] *****************************************************************************************************************************************************************************************************
+changed: [lsstukhead]
+changed: [lsstukwork1]
+changed: [lsstukwork3]
+changed: [lsstukwork4]
+changed: [lsstukwork2]
+[WARNING]: Platform linux on host trop03 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change this. See
+https://docs.ansible.com/ansible/2.9/reference_appendices/interpreter_discovery.html for more information.
+
+changed: [trop03]
+[WARNING]: Platform linux on host trop04 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change this. See
+https://docs.ansible.com/ansible/2.9/reference_appendices/interpreter_discovery.html for more information.
+
+changed: [trop04]
+changed: [gaia01]
+changed: [gaia02]
+--END--
+
