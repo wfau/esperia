@@ -21,19 +21,19 @@
 #
 
 ---
-- hosts: lssthead:lsstnodes:gaianodes:tropnodes
+- hosts: gateways:lsstnodes:gaianodes:tropnodes
   gather_facts: false
   tasks:
 
-    - name: "Create our login users"
+    - name: "Update our login users"
       become: true
       user:
-        name: "{{item}}"
+        name: "{{item.0}}"
         state: present
         groups:
-            - users
+            - "{{item.1}}"
         append: true
         create_home: true
       loop:
-        "{{ hostvars[inventory_hostname].logins }}"
+        "{{ hostvars[inventory_hostname].loginusers | product(hostvars[inventory_hostname].logingroups) | list }}"
 

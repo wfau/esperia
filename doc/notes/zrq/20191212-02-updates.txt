@@ -1,0 +1,526 @@
+#
+# <meta:header>
+#   <meta:licence>
+#     Copyright (c) 2019, ROE (http://www.roe.ac.uk/)
+#
+#     This information is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     (at your option) any later version.
+#     the Free Software Foundation, either version 3 of the License, or
+#
+#     This information is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#   </meta:licence>
+# </meta:header>
+#
+#zrq-notes-time
+#zrq-notes-indent
+#zrq-notes-ansible
+#zrq-notes-osformat
+#
+
+
+# -----------------------------------------------------
+# Run our Ansible client.
+#[user@desktop]
+
+    source "${HOME}/esperia.settings"
+
+    cat << EOF
+ESPERIA_USER [${ESPERIA_USER:?}]
+ESPERIA_CODE [${ESPERIA_CODE:?}]
+EOF
+
+--START--
+ESPERIA_USER [dmr]
+ESPERIA_CODE [/var/local/projects/esperia/github-zrq]
+--END--
+
+
+    docker run \
+        --rm \
+        --tty \
+        --interactive \
+        --hostname ansible-client \
+        --env ESPERIA_USER=${ESPERIA_USER:?} \
+        --env SSH_AUTH_SOCK=/tmp/ssh_auth_sock \
+        --volume ${SSH_AUTH_SOCK}:/tmp/ssh_auth_sock \
+        --volume ${ESPERIA_CODE:?}/src/ansible:/etc/ansible:ro \
+        atolmis/ansible-client:latest \
+            bash
+
+
+# -----------------------------------------------------
+# Create our ssh config.
+#[root@ansible-client]
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/ssh-config.yml
+
+--START--
+....
+TASK [Check our ssh directory] **************************************************************************************************************************************************************************************************************
+changed: [localhost]
+
+TASK [Generate our ssh config file] *********************************************************************************************************************************************************************************************************
+changed: [localhost]
+....
+--END--
+
+
+# -----------------------------------------------------
+# Accept host keys for the gateway.
+#[root@ansible-client]
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/ssh-hostkeys.yml
+
+--START--
+....
+TASK [Check our ssh directory] **************************************************************************************************************************************************************************************************************
+ok: [localhost]
+
+TASK [Accept the gateway host key] **********************************************************************************************************************************************************************************************************
+changed: [localhost]
+....
+--END--
+
+
+# -----------------------------------------------------
+# Check we can connect.
+#[root@ansible-client]
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+         /etc/ansible/ping-test.yml
+
+--START--
+....
+TASK [Check we can connect] *****************************************************************************************************************************************************************************************************************
+ok: [lsstukhead]
+ok: [lsstukwork1]
+ok: [lsstukwork3]
+ok: [lsstukwork2]
+ok: [lsstukwork4]
+[WARNING]: Platform linux on host trop03 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change this. See
+https://docs.ansible.com/ansible/2.9/reference_appendices/interpreter_discovery.html for more information.
+
+ok: [trop03]
+[WARNING]: Platform linux on host trop04 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change this. See
+https://docs.ansible.com/ansible/2.9/reference_appendices/interpreter_discovery.html for more information.
+
+ok: [trop04]
+ok: [gaia02]
+ok: [gaia01]
+....
+--END--
+
+--START--
+....
+TASK [Check we can use sudo] ****************************************************************************************************************************************************************************************************************
+ok: [lsstukhead]
+ok: [lsstukwork2]
+ok: [lsstukwork3]
+ok: [lsstukwork4]
+ok: [lsstukwork1]
+ok: [trop03]
+ok: [trop04]
+ok: [gaia02]
+ok: [gaia01]
+....
+--END--
+
+
+# -----------------------------------------------------
+# Update the dnsmasq records.
+#[root@ansible-client]
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/dnsmasq-config.yml
+
+--START--
+....
+TASK [Check the esperia config directory] ***************************************************************************************************************************************************************************************************
+ok: [lsstukhead]
+
+TASK [Check the dnsmasq config directory] ***************************************************************************************************************************************************************************************************
+ok: [lsstukhead]
+
+TASK [Deploy the dnsmasq config file] *******************************************************************************************************************************************************************************************************
+ok: [lsstukhead]
+
+TASK [Generate the dnsmasq DHCP config files] ***********************************************************************************************************************************************************************************************
+ok: [lsstukhead] => (item=lsstukwork1)
+ok: [lsstukhead] => (item=lsstukwork2)
+ok: [lsstukhead] => (item=lsstukwork3)
+ok: [lsstukhead] => (item=lsstukwork4)
+ok: [lsstukhead] => (item=gaia01)
+ok: [lsstukhead] => (item=gaia02)
+ok: [lsstukhead] => (item=trop03)
+ok: [lsstukhead] => (item=trop04)
+
+TASK [Generate the dnsmasq DNS config files] ************************************************************************************************************************************************************************************************
+ok: [lsstukhead] => (item=lsstukwork1)
+ok: [lsstukhead] => (item=lsstukwork2)
+ok: [lsstukhead] => (item=lsstukwork3)
+ok: [lsstukhead] => (item=lsstukwork4)
+ok: [lsstukhead] => (item=gaia01)
+ok: [lsstukhead] => (item=gaia02)
+ok: [lsstukhead] => (item=trop03)
+ok: [lsstukhead] => (item=trop04)
+
+TASK [Generate the dnsmasq VLAN config file] ************************************************************************************************************************************************************************************************
+ok: [lsstukhead]
+
+TASK [Generate the dnsmasq inet config file] ************************************************************************************************************************************************************************************************
+ok: [lsstukhead]
+....
+--END--
+
+
+# -----------------------------------------------------
+# Restart the dnsmasq container.
+#[root@ansible-client]
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/dnsmasq-deploy.yml
+
+--START--
+....
+TASK [Deploy the dnsmasq service] ***********************************************************************************************************************************************************************************************************
+changed: [lsstukhead]
+....
+--END--
+
+
+# -----------------------------------------------------
+# Update the user accounts.
+#[root@ansible-client]
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/login-users.yml
+
+--START--
+....
+TASK [Update our login users] ***************************************************************************************************************************************************************************************************************
+ok: [lsstukwork1] => (item=['msh', 'users'])
+ok: [lsstukhead] => (item=['dmr', 'users'])
+ok: [lsstukwork4] => (item=['msh', 'users'])
+ok: [lsstukwork2] => (item=['msh', 'users'])
+ok: [lsstukwork3] => (item=['msh', 'users'])
+ok: [lsstukwork1] => (item=['msh', 'docker'])
+ok: [lsstukhead] => (item=['dmr', 'docker'])
+ok: [lsstukwork3] => (item=['msh', 'libvirt'])
+ok: [lsstukwork2] => (item=['msh', 'libvirt'])
+ok: [lsstukwork4] => (item=['msh', 'libvirt'])
+ok: [lsstukhead] => (item=['msh', 'users'])
+ok: [lsstukwork1] => (item=['msh', 'libvirt'])
+ok: [lsstukwork3] => (item=['dmr', 'users'])
+ok: [lsstukwork2] => (item=['dmr', 'users'])
+ok: [lsstukhead] => (item=['msh', 'docker'])
+ok: [lsstukwork4] => (item=['dmr', 'users'])
+ok: [lsstukwork1] => (item=['dmr', 'users'])
+ok: [lsstukhead] => (item=['stv', 'users'])
+ok: [lsstukwork2] => (item=['dmr', 'libvirt'])
+ok: [lsstukwork3] => (item=['dmr', 'libvirt'])
+ok: [lsstukwork4] => (item=['dmr', 'libvirt'])
+ok: [lsstukhead] => (item=['stv', 'docker'])
+ok: [lsstukwork1] => (item=['dmr', 'docker'])
+ok: [lsstukwork2] => (item=['gfrancis', 'users'])
+ok: [lsstukwork3] => (item=['gfrancis', 'users'])
+ok: [lsstukwork4] => (item=['gfrancis', 'users'])
+ok: [lsstukhead] => (item=['aibsen', 'users'])
+ok: [lsstukwork1] => (item=['dmr', 'libvirt'])
+ok: [lsstukwork2] => (item=['gfrancis', 'libvirt'])
+ok: [lsstukwork3] => (item=['gfrancis', 'libvirt'])
+ok: [lsstukhead] => (item=['aibsen', 'docker'])
+ok: [lsstukwork4] => (item=['gfrancis', 'libvirt'])
+ok: [lsstukwork1] => (item=['aibsen', 'users'])
+ok: [lsstukhead] => (item=['gfrancis', 'users'])
+ok: [lsstukwork1] => (item=['aibsen', 'docker'])
+ok: [gaia01] => (item=['msh', 'users'])
+ok: [gaia02] => (item=['msh', 'users'])
+ok: [trop03] => (item=['msh', 'users'])
+ok: [lsstukhead] => (item=['gfrancis', 'docker'])
+ok: [lsstukwork1] => (item=['aibsen', 'libvirt'])
+ok: [gaia01] => (item=['msh', 'libvirt'])
+ok: [gaia02] => (item=['msh', 'libvirt'])
+ok: [trop03] => (item=['msh', 'libvirt'])
+ok: [lsstukwork1] => (item=['gfrancis', 'users'])
+ok: [trop04] => (item=['msh', 'users'])
+ok: [gaia01] => (item=['dmr', 'users'])
+ok: [gaia02] => (item=['dmr', 'users'])
+ok: [trop03] => (item=['dmr', 'users'])
+ok: [trop04] => (item=['msh', 'libvirt'])
+ok: [lsstukwork1] => (item=['gfrancis', 'docker'])
+ok: [gaia01] => (item=['dmr', 'libvirt'])
+ok: [gaia02] => (item=['dmr', 'libvirt'])
+ok: [trop03] => (item=['dmr', 'libvirt'])
+[WARNING]: Platform linux on host trop03 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change this. See
+https://docs.ansible.com/ansible/2.9/reference_appendices/interpreter_discovery.html for more information.
+
+ok: [lsstukwork1] => (item=['gfrancis', 'libvirt'])
+ok: [trop04] => (item=['dmr', 'users'])
+ok: [trop04] => (item=['dmr', 'libvirt'])
+[WARNING]: Platform linux on host trop04 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change this. See
+https://docs.ansible.com/ansible/2.9/reference_appendices/interpreter_discovery.html for more information.
+....
+--END--
+
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/login-keys.yml
+
+--START--
+....
+TASK [Update authorized keys for login users] ***********************************************************************************************************************************************************************************************
+ok: [lsstukhead] => (item=dmr)
+ok: [lsstukwork3] => (item=msh)
+ok: [lsstukwork1] => (item=msh)
+ok: [lsstukwork2] => (item=msh)
+ok: [lsstukwork4] => (item=msh)
+ok: [lsstukhead] => (item=msh)
+ok: [lsstukwork3] => (item=dmr)
+ok: [lsstukwork1] => (item=dmr)
+ok: [lsstukwork4] => (item=dmr)
+ok: [lsstukwork2] => (item=dmr)
+ok: [lsstukhead] => (item=stv)
+ok: [lsstukwork3] => (item=gfrancis)
+ok: [lsstukwork4] => (item=gfrancis)
+ok: [lsstukwork1] => (item=aibsen)
+ok: [lsstukhead] => (item=aibsen)
+ok: [lsstukwork2] => (item=gfrancis)
+ok: [lsstukhead] => (item=gfrancis)
+ok: [lsstukwork1] => (item=gfrancis)
+ok: [gaia01] => (item=msh)
+ok: [trop03] => (item=msh)
+ok: [gaia02] => (item=msh)
+ok: [trop04] => (item=msh)
+ok: [gaia01] => (item=dmr)
+ok: [trop03] => (item=dmr)
+[WARNING]: Platform linux on host trop03 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change this. See
+https://docs.ansible.com/ansible/2.9/reference_appendices/interpreter_discovery.html for more information.
+
+ok: [gaia02] => (item=dmr)
+ok: [trop04] => (item=dmr)
+[WARNING]: Platform linux on host trop04 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change this. See
+https://docs.ansible.com/ansible/2.9/reference_appendices/interpreter_discovery.html for more information.
+....
+--END--
+
+
+# -----------------------------------------------------
+# Update the admin accounts.
+#[root@ansible-client]
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/admin-users.yml
+
+--START--
+....
+TASK [Update admin users] *******************************************************************************************************************************************************************************************************************
+ok: [lsstukhead] => (item=['msh', 'sudo'])
+ok: [lsstukhead] => (item=['msh', 'users'])
+ok: [lsstukwork2] => (item=['msh', 'sudo'])
+ok: [lsstukwork3] => (item=['msh', 'sudo'])
+ok: [lsstukwork1] => (item=['msh', 'sudo'])
+ok: [lsstukwork4] => (item=['msh', 'sudo'])
+ok: [lsstukhead] => (item=['msh', 'ansible'])
+ok: [lsstukwork3] => (item=['msh', 'users'])
+ok: [lsstukwork2] => (item=['msh', 'users'])
+ok: [lsstukwork1] => (item=['msh', 'users'])
+ok: [lsstukwork4] => (item=['msh', 'users'])
+ok: [lsstukhead] => (item=['dmr', 'sudo'])
+ok: [lsstukwork3] => (item=['msh', 'ansible'])
+ok: [lsstukwork1] => (item=['msh', 'ansible'])
+ok: [lsstukwork2] => (item=['msh', 'ansible'])
+ok: [lsstukwork4] => (item=['msh', 'ansible'])
+ok: [lsstukhead] => (item=['dmr', 'users'])
+ok: [lsstukwork1] => (item=['msh', 'libvirt'])
+ok: [lsstukwork3] => (item=['msh', 'libvirt'])
+ok: [lsstukwork2] => (item=['msh', 'libvirt'])
+ok: [lsstukhead] => (item=['dmr', 'ansible'])
+ok: [lsstukwork4] => (item=['msh', 'libvirt'])
+ok: [lsstukwork2] => (item=['dmr', 'sudo'])
+ok: [lsstukwork1] => (item=['dmr', 'sudo'])
+ok: [lsstukwork3] => (item=['dmr', 'sudo'])
+ok: [lsstukwork4] => (item=['dmr', 'sudo'])
+ok: [lsstukwork2] => (item=['dmr', 'users'])
+ok: [lsstukwork3] => (item=['dmr', 'users'])
+ok: [lsstukwork1] => (item=['dmr', 'users'])
+ok: [gaia01] => (item=['msh', 'sudo'])
+ok: [lsstukwork4] => (item=['dmr', 'users'])
+ok: [lsstukwork2] => (item=['dmr', 'ansible'])
+ok: [lsstukwork3] => (item=['dmr', 'ansible'])
+ok: [gaia01] => (item=['msh', 'users'])
+ok: [lsstukwork1] => (item=['dmr', 'ansible'])
+ok: [lsstukwork4] => (item=['dmr', 'ansible'])
+ok: [lsstukwork2] => (item=['dmr', 'libvirt'])
+ok: [lsstukwork3] => (item=['dmr', 'libvirt'])
+ok: [gaia01] => (item=['msh', 'ansible'])
+ok: [lsstukwork1] => (item=['dmr', 'libvirt'])
+ok: [lsstukwork4] => (item=['dmr', 'libvirt'])
+ok: [lsstukwork2] => (item=['gfrancis', 'sudo'])
+ok: [lsstukwork3] => (item=['gfrancis', 'sudo'])
+ok: [lsstukwork1] => (item=['gfrancis', 'sudo'])
+ok: [gaia01] => (item=['msh', 'libvirt'])
+ok: [lsstukwork4] => (item=['gfrancis', 'sudo'])
+ok: [lsstukwork3] => (item=['gfrancis', 'users'])
+ok: [lsstukwork2] => (item=['gfrancis', 'users'])
+ok: [gaia01] => (item=['dmr', 'sudo'])
+ok: [lsstukwork1] => (item=['gfrancis', 'users'])
+ok: [lsstukwork4] => (item=['gfrancis', 'users'])
+ok: [lsstukwork3] => (item=['gfrancis', 'ansible'])
+ok: [lsstukwork1] => (item=['gfrancis', 'ansible'])
+ok: [gaia01] => (item=['dmr', 'users'])
+ok: [lsstukwork2] => (item=['gfrancis', 'ansible'])
+ok: [lsstukwork4] => (item=['gfrancis', 'ansible'])
+ok: [lsstukwork3] => (item=['gfrancis', 'libvirt'])
+ok: [lsstukwork1] => (item=['gfrancis', 'libvirt'])
+ok: [gaia01] => (item=['dmr', 'ansible'])
+ok: [lsstukwork2] => (item=['gfrancis', 'libvirt'])
+ok: [lsstukwork4] => (item=['gfrancis', 'libvirt'])
+ok: [gaia01] => (item=['dmr', 'libvirt'])
+ok: [trop03] => (item=['msh', 'sudo'])
+ok: [trop04] => (item=['msh', 'sudo'])
+ok: [gaia02] => (item=['msh', 'sudo'])
+ok: [trop03] => (item=['msh', 'users'])
+ok: [trop04] => (item=['msh', 'users'])
+ok: [gaia02] => (item=['msh', 'users'])
+ok: [trop03] => (item=['msh', 'ansible'])
+ok: [trop04] => (item=['msh', 'ansible'])
+ok: [gaia02] => (item=['msh', 'ansible'])
+ok: [trop03] => (item=['msh', 'libvirt'])
+ok: [trop04] => (item=['msh', 'libvirt'])
+ok: [gaia02] => (item=['msh', 'libvirt'])
+ok: [trop03] => (item=['dmr', 'sudo'])
+ok: [trop04] => (item=['dmr', 'sudo'])
+ok: [gaia02] => (item=['dmr', 'sudo'])
+ok: [trop03] => (item=['dmr', 'users'])
+ok: [trop04] => (item=['dmr', 'users'])
+ok: [gaia02] => (item=['dmr', 'users'])
+ok: [trop03] => (item=['dmr', 'ansible'])
+ok: [trop04] => (item=['dmr', 'ansible'])
+ok: [gaia02] => (item=['dmr', 'ansible'])
+ok: [trop03] => (item=['dmr', 'libvirt'])
+[WARNING]: Platform linux on host trop03 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change this. See
+https://docs.ansible.com/ansible/2.9/reference_appendices/interpreter_discovery.html for more information.
+
+ok: [trop04] => (item=['dmr', 'libvirt'])
+[WARNING]: Platform linux on host trop04 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change this. See
+https://docs.ansible.com/ansible/2.9/reference_appendices/interpreter_discovery.html for more information.
+
+ok: [gaia02] => (item=['dmr', 'libvirt'])
+....
+--END--
+
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/admin-keys.yml
+
+--START--
+....
+TASK [Update authorized keys for admin users] ***********************************************************************************************************************************************************************************************
+ok: [lsstukwork4] => (item=msh)
+ok: [lsstukwork3] => (item=msh)
+ok: [lsstukwork1] => (item=msh)
+ok: [lsstukwork2] => (item=msh)
+ok: [lsstukhead] => (item=msh)
+ok: [lsstukwork4] => (item=dmr)
+ok: [lsstukwork2] => (item=dmr)
+ok: [lsstukwork3] => (item=dmr)
+ok: [lsstukwork1] => (item=dmr)
+ok: [lsstukhead] => (item=dmr)
+ok: [lsstukwork4] => (item=gfrancis)
+ok: [lsstukwork2] => (item=gfrancis)
+ok: [lsstukwork3] => (item=gfrancis)
+ok: [lsstukwork1] => (item=gfrancis)
+ok: [gaia02] => (item=msh)
+ok: [trop04] => (item=msh)
+ok: [trop03] => (item=msh)
+ok: [gaia01] => (item=msh)
+ok: [gaia02] => (item=dmr)
+ok: [trop04] => (item=dmr)
+[WARNING]: Platform linux on host trop04 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change this. See
+https://docs.ansible.com/ansible/2.9/reference_appendices/interpreter_discovery.html for more information.
+
+ok: [trop03] => (item=dmr)
+[WARNING]: Platform linux on host trop03 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change this. See
+https://docs.ansible.com/ansible/2.9/reference_appendices/interpreter_discovery.html for more information.
+
+ok: [gaia01] => (item=dmr)
+....
+--END--
+
+
+# -----------------------------------------------------
+# Update the root account ssh keys.
+#[root@ansible-client]
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/super-keys.yml
+
+--START--
+....
+TASK [Update authorized keys for root] ******************************************************************************************************************************************************************************************************
+ok: [lsstukhead] => (item=lsstukhead)
+ok: [lsstukwork4] => (item=lsstukhead)
+ok: [lsstukwork2] => (item=lsstukhead)
+ok: [lsstukwork3] => (item=lsstukhead)
+ok: [lsstukwork1] => (item=lsstukhead)
+ok: [lsstukhead] => (item=khaba)
+ok: [lsstukwork3] => (item=khaba)
+ok: [lsstukwork4] => (item=khaba)
+ok: [lsstukwork1] => (item=khaba)
+ok: [lsstukwork2] => (item=khaba)
+ok: [lsstukhead] => (item=msh)
+ok: [lsstukwork3] => (item=msh)
+ok: [lsstukwork4] => (item=msh)
+ok: [lsstukwork2] => (item=msh)
+ok: [lsstukwork1] => (item=msh)
+ok: [lsstukhead] => (item=dmr)
+ok: [lsstukwork3] => (item=dmr)
+ok: [lsstukwork4] => (item=dmr)
+ok: [lsstukwork2] => (item=dmr)
+ok: [lsstukwork1] => (item=dmr)
+ok: [gaia01] => (item=lsstukhead)
+ok: [trop04] => (item=lsstukhead)
+ok: [trop03] => (item=lsstukhead)
+ok: [gaia02] => (item=lsstukhead)
+ok: [gaia01] => (item=khaba)
+ok: [trop04] => (item=khaba)
+ok: [trop03] => (item=khaba)
+ok: [gaia01] => (item=msh)
+ok: [gaia02] => (item=khaba)
+ok: [trop04] => (item=msh)
+ok: [trop03] => (item=msh)
+ok: [gaia01] => (item=dmr)
+ok: [gaia02] => (item=msh)
+ok: [trop04] => (item=dmr)
+[WARNING]: Platform linux on host trop04 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change this. See
+https://docs.ansible.com/ansible/2.9/reference_appendices/interpreter_discovery.html for more information.
+
+ok: [trop03] => (item=dmr)
+[WARNING]: Platform linux on host trop03 is using the discovered Python interpreter at /usr/bin/python, but future installation of another Python interpreter could change this. See
+https://docs.ansible.com/ansible/2.9/reference_appendices/interpreter_discovery.html for more information.
+
+ok: [gaia02] => (item=dmr)
+....
+--END--
+
+
+

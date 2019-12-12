@@ -6,3 +6,14 @@
     {{- hostvars[name].vlanip4 | ipaddr('address') }}
 {% endfor %}
 
+# DNS aliases for VLAN nodes.
+{% for name in groups['vlannodes'] -%}
+    {%- if hostvars[name].aliases is defined -%}
+        cname=
+            {%- for alias in hostvars[name].aliases -%}
+                {{- alias -}},
+            {%- endfor -%}
+        {{- name }}.esperia
+{% endif %}
+{% endfor %}
+

@@ -32,7 +32,7 @@
         state: directory
 
     - name: "Accept the gateway host key"
-      shell: "ssh-keyscan {{ hostvars['lssthead'].inetip4 | ipaddr('address') }} >> {{ lookup('env','HOME') }}/.ssh/known_hosts"
+      shell: "ssh-keyscan {{ hostvars['lsstukhead'].inetip4 | ipaddr('address') }} >> {{ lookup('env','HOME') }}/.ssh/known_hosts"
 
 # TODO
 # Use separate tasks:

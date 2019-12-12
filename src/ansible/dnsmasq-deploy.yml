@@ -21,7 +21,7 @@
 #
 
 ---
-- hosts: lssthead
+- hosts: lsstukhead
   gather_facts: false
   tasks:
 
@@ -31,6 +31,7 @@
         name:  'dnsmasq'
         image: 'storytel/dnsmasq'
         state: 'started'
+        restart: 'yes'
         detach: true
         privileged: true
         network_mode: 'host'
