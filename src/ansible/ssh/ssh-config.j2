@@ -20,6 +20,12 @@
 #
 #
 
+{%- macro aliases(hostname, demlimiter) -%}
+    {%- if hostvars[hostname].aliases is defined -%}
+        {{ hostvars[hostname].aliases | join(demlimiter) }}
+    {%- endif -%}
+{%- endmacro -%}
+
 # Gateway host.
 Host lssthead
     User {{ lookup('env','ESPERIA_USER') }}
@@ -30,8 +36,10 @@ Host lssthead
     ControlMaster auto
     ControlPersist 5m
 
-# Physical hosts.
-Host {{ groups['vlannodes'] | join(' ') }}
+{% for hostname in groups['vlannodes'] %}
+# VLAN host {{ hostname }}.
+Host {{ hostname }} {{ aliases(hostname, ' ') if hostvars[hostname].aliases is defined else '' }}
+    HostName {{ hostname }}.esperia
     User {{ lookup('env','ESPERIA_USER') }}
     ProxyCommand ssh -W %h:%p -l {{ lookup('env','ESPERIA_USER') }} -F {{ lookup('env','HOME') }}/.ssh/esperia-config lssthead
     ServerAliveInterval 60
@@ -39,6 +47,8 @@ Host {{ groups['vlannodes'] | join(' ') }}
     ControlPath ~/.ssh/%r@%h:%p
     ControlMaster auto
     ControlPersist 5m
+
+{% endfor %}
 
 {% for hostname in groups['vlannodes'] %}
 # Virtual machines on {{ hostname }}.
@@ -52,3 +62,4 @@ Host {{ hostvars[hostname].vmnames | join(' ') }}
     ControlPersist 5m
 
 {% endfor %}
+

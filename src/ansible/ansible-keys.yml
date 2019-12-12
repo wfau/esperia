@@ -32,6 +32,6 @@
         state: present
         key: "{{ lookup('file', 'ssh/keys/' + users[item].sshkey) }}"
       loop:
-        "{{ hostvars[inventory_hostname].admins }}"
+        "{{ hostvars[inventory_hostname].adminusers }}"
 
 
