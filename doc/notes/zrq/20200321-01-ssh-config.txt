@@ -54,11 +54,114 @@ EOF
 
 
 # -----------------------------------------------------
-# Create our ssh config.
+# Create our external ssh config.
 #[root@ansible-client]
 
     ansible-playbook \
         --inventory /etc/ansible/hosts.yml \
         /etc/ansible/ssh-external.yml
+
+--START--
+TASK [Check our ssh directory] **************************************************************************************************************************************************************************************************************
+ok: [localhost]
+
+TASK [Generate our ssh config file] *********************************************************************************************************************************************************************************************************
+changed: [localhost]
+--END--
+
+
+# -----------------------------------------------------
+# Check we can login.
+#[root@ansible-client]
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/ping-test.yml
+
+--START--
+TASK [Check we can connect] *****************************************************************************************************************************************************************************************************************
+ok: [lsstukwork4]
+ok: [lsstukhead]
+ok: [lsstukwork3]
+ok: [lsstukwork1]
+ok: [lsstukwork2]
+ok: [trop03]
+ok: [trop04]
+ok: [gaia01]
+ok: [gaia02]
+
+TASK [Check we can use sudo] ****************************************************************************************************************************************************************************************************************
+ok: [lsstukhead]
+ok: [lsstukwork3]
+ok: [lsstukwork1]
+ok: [lsstukwork4]
+ok: [lsstukwork2]
+ok: [trop03]
+ok: [trop04]
+ok: [gaia01]
+ok: [gaia02]
+--END--
+
+
+# -----------------------------------------------------
+# Update our login users.
+#[root@ansible-client]
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/login-users.yml
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/login-groups.yml
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/login-keys.yml
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/login-ssh.yml
+
+# -----------------------------------------------------
+# Update the admin users.
+#[root@ansible-client]
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/admin-users.yml
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/admin-groups.yml
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/admin-keys.yml
+
+# -----------------------------------------------------
+# Update our root users.
+#[root@ansible-client]
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/root-users.yml
+
+# -----------------------------------------------------
+# Update the ansible user.
+#[root@ansible-client]
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/ansible-group.yml
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/ansible-user.yml
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/ansible-keys.yml
+
 
 

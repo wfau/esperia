@@ -38,14 +38,6 @@
         src: ansible-sudoers
         dest: /etc/sudoers.d/ansible-sudoers
 
-    - name: "Add our admin accounts to the ansible group"
-      become: true
-      user:
-        name: "{{ item }}"
-        groups: ansible
-        append: yes
-      loop:
-        "{{ hostvars[inventory_hostname].admins }}"
 
 
 

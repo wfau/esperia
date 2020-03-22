@@ -25,12 +25,13 @@
   gather_facts: false
   tasks:
 
-    - name: "Create admin users"
+    - name: "Update user groups"
       become: true
       user:
-        name: "{{item}}"
-        state: present
-        create_home: true
+        name: "{{item.0}}"
+        groups:
+            - "{{item.1}}"
+        append: true
       loop:
-        "{{ hostvars[inventory_hostname].adminusers }}"
+        "{{ hostvars[inventory_hostname].loginusers | product(hostvars[inventory_hostname].logingroups) | list }}"
 

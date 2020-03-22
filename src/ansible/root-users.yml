@@ -25,12 +25,13 @@
   gather_facts: false
   tasks:
 
-    - name: "Create admin users"
+    - name: "Update authorized root keys"
       become: true
-      user:
-        name: "{{item}}"
+      authorized_key:
+        user:  root
         state: present
-        create_home: true
+        key: "{{ lookup('file', 'ssh/keys/' + users[item].sshkey) }}"
       loop:
-        "{{ hostvars[inventory_hostname].adminusers }}"
+        "{{ hostvars[inventory_hostname].rootusers }}"
+
 
