@@ -34,7 +34,6 @@ PasswordAuthentication no
 # Gateway host.
 Host lsstukhead
     User {{ lookup('env','ESPERIA_USER') }}
-    HostName {{ hostname }}
     ServerAliveInterval 60
     ServerAliveCountMax 5
     ControlPath ~/.ssh/%r@%h:%p
