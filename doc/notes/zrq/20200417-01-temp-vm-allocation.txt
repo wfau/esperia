@@ -1,0 +1,159 @@
+#
+# <meta:header>
+#   <meta:licence>
+#     Copyright (c) 2020, ROE (http://www.roe.ac.uk/)
+#
+#     This information is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     This information is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#   </meta:licence>
+# </meta:header>
+#
+#zrq-notes-time
+#zrq-notes-indent
+#zrq-notes-crypto
+#zrq-notes-ansible
+#zrq-notes-osformat
+#
+
+    #
+    # Request from Mark for a set of static name/address allocations on work03 
+
+        52:54:00:6A:0D:01 - mark
+        52:54:00:6A:0D:02 - mark-mon
+        52:54:00:6A:0D:03 - teng
+        52:54:00:6A:0D:04 - teng-mon
+        52:54:00:6A:0D:05 - craig
+        52:54:00:6A:0D:06 - craig-mon
+        52:54:00:6A:0D:07 - gareth
+        52:54:00:6A:0D:08 - gareth-mon
+        52:54:00:6A:0D:09 - ken
+        52:54:00:6A:0D:10 - ken-mon
+        52:54:00:6A:0D:11 - dave
+        52:54:00:6A:0D:12 - dave-mon
+
+
+# -----------------------------------------------------
+# Manually added these to the dnamasq files
+#[user@lsstukhead]
+
+    pushd /etc/esperia/dnsmasq$
+
+        sudo vi lsstukwork3-dhcp.conf
+        
+            dhcp-host=52:54:00:6A:0D:01,172.16.3.40,mark
+            dhcp-host=52:54:00:6A:0D:02,172.16.3.41,mark-mon
+            dhcp-host=52:54:00:6A:0D:03,172.16.3.42,teng
+            dhcp-host=52:54:00:6A:0D:04,172.16.3.43,teng-mon
+            dhcp-host=52:54:00:6A:0D:05,172.16.3.44,craig
+            dhcp-host=52:54:00:6A:0D:06,172.16.3.45,craig-mon
+            dhcp-host=52:54:00:6A:0D:07,172.16.3.46,gareth
+            dhcp-host=52:54:00:6A:0D:08,172.16.3.47,gareth-mon
+            dhcp-host=52:54:00:6A:0D:09,172.16.3.48,ken
+            dhcp-host=52:54:00:6A:0D:10,172.16.3.49,ken-mon
+            dhcp-host=52:54:00:6A:0D:11,172.16.3.50,dave
+            dhcp-host=52:54:00:6A:0D:12,172.16.3.51,dave-mon
+
+        sudo vi lsstukwork3-host.conf 
+
+            host-record=mark,172.16.3.40
+            host-record=mark-mon,172.16.3.41
+            host-record=teng,172.16.3.42
+            host-record=teng-mon,172.16.3.43
+            host-record=craig,172.16.3.44
+            host-record=craig-mon,172.16.3.45
+            host-record=gareth,172.16.3.46
+            host-record=gareth-mon,172.16.3.47
+            host-record=ken,172.16.3.48
+            host-record=ken-mon,172.16.3.49
+            host-record=dave,172.16.3.50
+            host-record=dave-mon,172.16.3.51
+
+
+# -----------------------------------------------------
+# Run our Ansible client.
+#[user@desktop]
+
+    source "${HOME}/esperia.env"
+
+    cat << EOF
+ESPERIA_USER [${ESPERIA_USER:?}]
+ESPERIA_CODE [${ESPERIA_CODE:?}]
+EOF
+
+    >   ESPERIA_USER [dmr]
+    >   ESPERIA_CODE [/var/local/projects/esperia/github-zrq]
+
+
+    podman run \
+        --rm \
+        --tty \
+        --interactive \
+        --hostname ansible-client \
+        --env ESPERIA_USER=${ESPERIA_USER:?} \
+        --env SSH_AUTH_SOCK=/tmp/ssh_auth_sock \
+        --volume ${SSH_AUTH_SOCK}:/tmp/ssh_auth_sock \
+        --volume ${ESPERIA_CODE:?}/src/ansible:/etc/ansible:Z \
+        atolmis/ansible-client:latest \
+            bash
+
+--START--
+....
+....
+--END--
+
+
+# -----------------------------------------------------
+# Create our external ssh config.
+#[root@ansible-client]
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/ssh-external.yml
+
+
+--START--
+....
+PLAY RECAP **********************************************************************************************************************************************************************************************************************************
+localhost                  : ok=2    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+--END--
+
+
+# -----------------------------------------------------
+# Check we can login.
+#[root@ansible-client]
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/ping-test.yml
+
+--START--
+....
+....
+--END--
+
+
+# -----------------------------------------------------
+# Restart the dnsmasq service.
+#[root@ansible-client]
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/dnsmasq-deploy.yml
+
+--START--
+....
+....
+--END--
+
+
+
