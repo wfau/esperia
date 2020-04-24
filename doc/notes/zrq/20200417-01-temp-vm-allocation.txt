@@ -26,7 +26,7 @@
 #
 
     #
-    # Request from Mark for a set of static name/address allocations on work03 
+    # Request from Mark for a set of static name/address allocations on work03
 
         52:54:00:6A:0D:01 - mark
         52:54:00:6A:0D:02 - mark-mon
@@ -42,43 +42,74 @@
         52:54:00:6A:0D:12 - dave-mon
 
 
+        52:54:00:6a:0d:20 - alistair
+        52:54:00:6a:0d:21 - amy
+        52:54:00:6a:0d:22 - callum
+        52:54:00:6a:0d:23 - donald
+        52:54:00:6a:0d:24 - iakovos
+        52:54:00:6a:0d:25 - johnny
+        52:54:00:6a:0d:26 - malcolm
+        52:54:00:6a:0d:27 - neelofer
+
+
 # -----------------------------------------------------
 # Manually added these to the dnamasq files
-#[user@lsstukhead]
+#[user@desktop]
 
-    pushd /etc/esperia/dnsmasq$
+    ssh esperia
 
-        sudo vi lsstukwork3-dhcp.conf
-        
-            dhcp-host=52:54:00:6A:0D:01,172.16.3.40,mark
-            dhcp-host=52:54:00:6A:0D:02,172.16.3.41,mark-mon
-            dhcp-host=52:54:00:6A:0D:03,172.16.3.42,teng
-            dhcp-host=52:54:00:6A:0D:04,172.16.3.43,teng-mon
-            dhcp-host=52:54:00:6A:0D:05,172.16.3.44,craig
-            dhcp-host=52:54:00:6A:0D:06,172.16.3.45,craig-mon
-            dhcp-host=52:54:00:6A:0D:07,172.16.3.46,gareth
-            dhcp-host=52:54:00:6A:0D:08,172.16.3.47,gareth-mon
-            dhcp-host=52:54:00:6A:0D:09,172.16.3.48,ken
-            dhcp-host=52:54:00:6A:0D:10,172.16.3.49,ken-mon
-            dhcp-host=52:54:00:6A:0D:11,172.16.3.50,dave
-            dhcp-host=52:54:00:6A:0D:12,172.16.3.51,dave-mon
+        pushd /etc/esperia/dnsmasq
 
-        sudo vi lsstukwork3-host.conf 
+            sudo vi lsstukwork3-dhcp.conf
 
-            host-record=mark,172.16.3.40
-            host-record=mark-mon,172.16.3.41
-            host-record=teng,172.16.3.42
-            host-record=teng-mon,172.16.3.43
-            host-record=craig,172.16.3.44
-            host-record=craig-mon,172.16.3.45
-            host-record=gareth,172.16.3.46
-            host-record=gareth-mon,172.16.3.47
-            host-record=ken,172.16.3.48
-            host-record=ken-mon,172.16.3.49
-            host-record=dave,172.16.3.50
-            host-record=dave-mon,172.16.3.51
+                dhcp-host=52:54:00:6A:0D:01,172.16.3.40,mark
+                dhcp-host=52:54:00:6A:0D:02,172.16.3.41,mark-mon
+                dhcp-host=52:54:00:6A:0D:03,172.16.3.42,teng
+                dhcp-host=52:54:00:6A:0D:04,172.16.3.43,teng-mon
+                dhcp-host=52:54:00:6A:0D:05,172.16.3.44,craig
+                dhcp-host=52:54:00:6A:0D:06,172.16.3.45,craig-mon
+                dhcp-host=52:54:00:6A:0D:07,172.16.3.46,gareth
+                dhcp-host=52:54:00:6A:0D:08,172.16.3.47,gareth-mon
+                dhcp-host=52:54:00:6A:0D:09,172.16.3.48,ken
+                dhcp-host=52:54:00:6A:0D:10,172.16.3.49,ken-mon
+                dhcp-host=52:54:00:6A:0D:11,172.16.3.50,dave
+                dhcp-host=52:54:00:6A:0D:12,172.16.3.51,dave-mon
+
+                dhcp-host=52:54:00:6a:0d:20,172.16.3.60,alistair
+                dhcp-host=52:54:00:6a:0d:21,172.16.3.61,amy
+                dhcp-host=52:54:00:6a:0d:22,172.16.3.62,callum
+                dhcp-host=52:54:00:6a:0d:23,172.16.3.63,donald
+                dhcp-host=52:54:00:6a:0d:24,172.16.3.64,iakovos
+                dhcp-host=52:54:00:6a:0d:25,172.16.3.65,johnny
+                dhcp-host=52:54:00:6a:0d:26,172.16.3.66,malcolm
+                dhcp-host=52:54:00:6a:0d:27,172.16.3.67,neelofer
+
+            sudo vi lsstukwork3-host.conf
+
+                host-record=mark,172.16.3.40
+                host-record=mark-mon,172.16.3.41
+                host-record=teng,172.16.3.42
+                host-record=teng-mon,172.16.3.43
+                host-record=craig,172.16.3.44
+                host-record=craig-mon,172.16.3.45
+                host-record=gareth,172.16.3.46
+                host-record=gareth-mon,172.16.3.47
+                host-record=ken,172.16.3.48
+                host-record=ken-mon,172.16.3.49
+                host-record=dave,172.16.3.50
+                host-record=dave-mon,172.16.3.51
+
+                host-record=alistair,172.16.3.60
+                host-record=amy,172.16.3.61
+                host-record=callum,172.16.3.62
+                host-record=donald,172.16.3.63
+                host-record=iakovos,172.16.3.64
+                host-record=johnny,172.16.3.65
+                host-record=malcolm,172.16.3.66
+                host-record=neelofer,172.16.3.67
 
 
+# -----------------------------------------------------
 # -----------------------------------------------------
 # Run our Ansible client.
 #[user@desktop]
@@ -124,7 +155,7 @@ EOF
 --START--
 ....
 PLAY RECAP **********************************************************************************************************************************************************************************************************************************
-localhost                  : ok=2    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+localhost                  : ok=2    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 --END--
 
 
@@ -155,5 +186,12 @@ localhost                  : ok=2    changed=2    unreachable=0    failed=0    s
 ....
 --END--
 
+
+# -----------------------------------------------------
+# -----------------------------------------------------
+# Tail the service logs.
+#[user@desktop]
+
+    ssh esperia
 
 
