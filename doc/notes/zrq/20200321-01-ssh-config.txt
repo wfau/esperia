@@ -18,11 +18,6 @@
 #   </meta:licence>
 # </meta:header>
 #
-#zrq-notes-time
-#zrq-notes-indent
-#zrq-notes-crypto
-#zrq-notes-ansible
-#zrq-notes-osformat
 #
 
 # -----------------------------------------------------
@@ -61,13 +56,11 @@ EOF
         --inventory /etc/ansible/hosts.yml \
         /etc/ansible/ssh-external.yml
 
---START--
-TASK [Check our ssh directory] **************************************************************************************************************************************************************************************************************
-ok: [localhost]
-
-TASK [Generate our ssh config file] *********************************************************************************************************************************************************************************************************
-changed: [localhost]
---END--
+    >   TASK [Check our ssh directory] ..
+    >   ok: [localhost]
+    >   
+    >   TASK [Generate our ssh config file] ..
+    >   changed: [localhost]
 
 
 # -----------------------------------------------------
@@ -78,29 +71,27 @@ changed: [localhost]
         --inventory /etc/ansible/hosts.yml \
         /etc/ansible/ping-test.yml
 
---START--
-TASK [Check we can connect] *****************************************************************************************************************************************************************************************************************
-ok: [lsstukwork4]
-ok: [lsstukhead]
-ok: [lsstukwork3]
-ok: [lsstukwork1]
-ok: [lsstukwork2]
-ok: [trop03]
-ok: [trop04]
-ok: [gaia01]
-ok: [gaia02]
-
-TASK [Check we can use sudo] ****************************************************************************************************************************************************************************************************************
-ok: [lsstukhead]
-ok: [lsstukwork3]
-ok: [lsstukwork1]
-ok: [lsstukwork4]
-ok: [lsstukwork2]
-ok: [trop03]
-ok: [trop04]
-ok: [gaia01]
-ok: [gaia02]
---END--
+    >   TASK [Check we can connect] ..
+    >   ok: [lsstukwork4]
+    >   ok: [lsstukhead]
+    >   ok: [lsstukwork3]
+    >   ok: [lsstukwork1]
+    >   ok: [lsstukwork2]
+    >   ok: [trop03]
+    >   ok: [trop04]
+    >   ok: [gaia01]
+    >   ok: [gaia02]
+    >   
+    >   TASK [Check we can use sudo] ..
+    >   ok: [lsstukhead]
+    >   ok: [lsstukwork3]
+    >   ok: [lsstukwork1]
+    >   ok: [lsstukwork4]
+    >   ok: [lsstukwork2]
+    >   ok: [trop03]
+    >   ok: [trop04]
+    >   ok: [gaia01]
+    >   ok: [gaia02]
 
 
 # -----------------------------------------------------

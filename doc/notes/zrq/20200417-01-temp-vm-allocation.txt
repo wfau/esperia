@@ -18,11 +18,6 @@
 #   </meta:licence>
 # </meta:header>
 #
-#zrq-notes-time
-#zrq-notes-indent
-#zrq-notes-crypto
-#zrq-notes-ansible
-#zrq-notes-osformat
 #
 
     #
@@ -137,10 +132,8 @@ EOF
         atolmis/ansible-client:latest \
             bash
 
---START--
-....
-....
---END--
+    >   ....
+    >   ....
 
 
 # -----------------------------------------------------
@@ -152,11 +145,9 @@ EOF
         /etc/ansible/ssh-external.yml
 
 
---START--
-....
-PLAY RECAP **********************************************************************************************************************************************************************************************************************************
-localhost                  : ok=2    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
---END--
+    >   ....
+    >   PLAY RECAP ..
+    >   localhost                  : ok=2    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 
 
 # -----------------------------------------------------
@@ -167,10 +158,8 @@ localhost                  : ok=2    changed=2    unreachable=0    failed=0    s
         --inventory /etc/ansible/hosts.yml \
         /etc/ansible/ping-test.yml
 
---START--
-....
-....
---END--
+    >   ....
+    >   ....
 
 
 # -----------------------------------------------------
@@ -181,10 +170,8 @@ localhost                  : ok=2    changed=2    unreachable=0    failed=0    s
         --inventory /etc/ansible/hosts.yml \
         /etc/ansible/dnsmasq-deploy.yml
 
---START--
-....
-....
---END--
+    >   ....
+    >   ....
 
 
 # -----------------------------------------------------
@@ -193,5 +180,32 @@ localhost                  : ok=2    changed=2    unreachable=0    failed=0    s
 #[user@desktop]
 
     ssh esperia
+
+        docker logs -f dnsmasq
+
+    >   ....
+    >   dnsmasq[1]: started, version 2.78 cachesize 150
+    >   dnsmasq[1]: compile time options: IPv6 GNU-getopt no-DBus no-i18n no-IDN DHCP DHCPv6 no-Lua TFTP no-conntrack ipset auth no-DNSSEC loop-detect inotify
+    >   dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.0.1, lease time 6h
+    >   dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.6.1, lease time 6h
+    >   dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.2.1, lease time 6h
+    >   dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.5.1, lease time 6h
+    >   dnsmasq-dhcp[1]: DHCP, IP range 172.16.252.1 -- 172.16.252.252, lease time 6h
+    >   dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.10.1, lease time 6h
+    >   dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.3.1, lease time 6h
+    >   dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.4.1, lease time 6h
+    >   dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.9.1, lease time 6h
+    >   dnsmasq-dhcp[1]: DHCP, sockets bound exclusively to interface br1
+    >   dnsmasq[1]: using local addresses only for domain esperia
+    >   dnsmasq[1]: using local addresses only for domain 16.172.in-addr.arpa
+    >   dnsmasq[1]: using nameserver 8.8.8.8#53
+    >   dnsmasq[1]: using nameserver 195.194.120.2#53
+    >   dnsmasq[1]: using nameserver 195.194.120.1#53
+    >   dnsmasq[1]: cleared cache
+    >   dnsmasq-dhcp[1]: DHCPREQUEST(br1) 172.16.252.104 00:1b:4d:45:45:49
+    >   dnsmasq-dhcp[1]: DHCPACK(br1) 172.16.252.104 00:1b:4d:45:45:49 00-1b-4d-45-45-49
+    >   dnsmasq-dhcp[1]: DHCPREQUEST(br1) 172.16.252.203 0c:c4:7a:ad:ba:0d
+    >   dnsmasq-dhcp[1]: DHCPACK(br1) 172.16.252.203 0c:c4:7a:ad:ba:0d 0c-c4-7a-ad-ba-0d
+    >   ....
 
 
