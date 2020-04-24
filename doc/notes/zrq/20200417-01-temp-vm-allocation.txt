@@ -70,6 +70,7 @@
                 dhcp-host=52:54:00:6A:0D:11,172.16.3.50,dave
                 dhcp-host=52:54:00:6A:0D:12,172.16.3.51,dave-mon
 
+                dhcp-host=52:54:00:6a:0d:19,172.16.3.59,stack
                 dhcp-host=52:54:00:6a:0d:20,172.16.3.60,alistair
                 dhcp-host=52:54:00:6a:0d:21,172.16.3.61,amy
                 dhcp-host=52:54:00:6a:0d:22,172.16.3.62,callum
@@ -78,6 +79,7 @@
                 dhcp-host=52:54:00:6a:0d:25,172.16.3.65,johnny
                 dhcp-host=52:54:00:6a:0d:26,172.16.3.66,malcolm
                 dhcp-host=52:54:00:6a:0d:27,172.16.3.67,neelofer
+
 
             sudo vi lsstukwork3-host.conf
 
@@ -93,6 +95,8 @@
                 host-record=ken-mon,172.16.3.49
                 host-record=dave,172.16.3.50
                 host-record=dave-mon,172.16.3.51
+
+                host-record=stack,172.16.3.59
 
                 host-record=alistair,172.16.3.60
                 host-record=amy,172.16.3.61
