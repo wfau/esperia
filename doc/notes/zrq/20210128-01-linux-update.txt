@@ -1,0 +1,656 @@
+#
+# <meta:header>
+#   <meta:licence>
+#     Copyright (c) 2021, ROE (http://www.roe.ac.uk/)
+#
+#     This information is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     This information is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#   </meta:licence>
+# </meta:header>
+#
+#
+
+    Target:
+
+        Upgrade the system on our servers.
+        https://cve.mitre.org/cgi-bin/cvename.cgi?name=2021-3156
+        https://www.sudo.ws/alerts/unescape_overflow.html
+
+    Result:
+
+        Not a greate success.
+        All the machines still report a seg fault.
+
+    TODO:
+
+        Need to update the virtual machines.
+        Need to update the virtual machine images.
+
+        trop01 - updated, still vulnerable
+        trop02 - updated, still vulnerable
+        trop03 - updated, still vulnerable
+        trop04 - updated, still vulnerable
+
+        gaia01 - not checked
+        gaia02 - not checked
+
+        work01 - not checked
+        work02 - not checked
+        work03 - not checked
+        work04 - not checked
+
+        esperia - not checked
+
+# -----------------------------------------------------
+# Update trop04.
+#[user@trop04]
+
+    sudo apt update
+
+    >   Ign:1 http://ftp.uk.debian.org/debian stretch InRelease
+    >   Get:2 http://ftp.uk.debian.org/debian stretch-updates InRelease [93.6 kB]
+    >   Hit:3 http://ftp.uk.debian.org/debian stretch Release
+    >   Fetched 93.6 kB in 4s (21.6 kB/s)
+    >   Reading package lists... Done
+    >   Building dependency tree
+    >   Reading state information... Done
+    >   1 package can be upgraded. Run 'apt list --upgradable' to see it.
+
+
+    sudo apt upgrade
+
+    >   ....
+    >   The following NEW packages will be installed:
+    >     linux-image-4.9.0-13-amd64
+    >   The following packages will be upgraded:
+    >     linux-image-amd64
+    >   1 upgraded, 1 newly installed, 0 to remove and 0 not upgraded.
+    >   ....
+    >   ....
+    >   Setting up linux-image-4.9.0-13-amd64 (4.9.228-1) ...
+    >   Setting up linux-image-amd64 (4.9+80+deb9u11) ...
+
+
+    uname -a
+
+    >   Linux trop04 4.9.0-9-amd64 #1 SMP Debian 4.9.168-1 (2019-04-12) x86_64 GNU/Linux
+
+
+# -----------------------------------------------------
+# Check for the vulnerability as root.
+#[root@trop04]
+
+    sudoedit -s '\' `perl -e 'print "A" x 65536'`
+
+    >   *** Error in `sudoedit': realloc(): invalid next size: 0x00005577394006e0 ***
+    >   ======= Backtrace: =========
+    >   /lib/x86_64-linux-gnu/libc.so.6(+0x70bfb)[0x7f470fc77bfb]
+    >   ....
+    >   ....
+
+    # Probably NOT fixed !
+
+
+# -----------------------------------------------------
+# Check for the vulnerability as normal user.
+#[user@trop04]
+
+    sudoedit -s '\' `perl -e 'print "A" x 65536'`
+
+    >   Segmentation fault
+
+    # Probably NOT fixed !
+
+
+# -----------------------------------------------------
+# List the virtual machines.
+#[user@trop04]
+
+    source libvirt.env
+    virsh -c $libvirtcon list --all
+
+    >    Id    Name                           State
+    >   ----------------------------------------------------
+
+
+# -----------------------------------------------------
+# List the available virtual machine images.
+#[user@trop04]
+
+    sudo ls -1 /var/lib/libvirt/images/base
+
+    >   fedora-30-docker-base-20190903.qcow
+    >   fedora-31-docker-base-20200722.qcow
+
+    # TODO:
+    # Need to replace these with a newer version.
+
+
+# -----------------------------------------------------
+# Try rebooting the system.
+#[user@trop04]
+
+    reboot
+
+    >   Connection to trop04.roe.ac.uk closed by remote host.
+    >   Connection to trop04.roe.ac.uk closed.
+
+
+# -----------------------------------------------------
+# Check for the vulnerability as root.
+#[root@trop04]
+
+    sudoedit -s '\' `perl -e 'print "A" x 65536'`
+
+    >   *** Error in `sudoedit': realloc(): invalid next size: 0x000056468b5e26e0 ***
+    >   ======= Backtrace: =========
+    >   /lib/x86_64-linux-gnu/libc.so.6(+0x70bfb)[0x7fc3c2fc2bfb]
+    >   /lib/x86_64-linux-gnu/libc.so.6(+0x76fc6)[0x7fc3c2fc8fc6]
+    >   ....
+    >   ....
+
+    # Probably NOT fixed !
+
+
+# -----------------------------------------------------
+# Check for the vulnerability as normal user.
+#[user@trop04]
+
+    sudoedit -s '\' `perl -e 'print "A" x 65536'`
+
+    >   Segmentation fault
+
+    # Probably NOT fixed !
+
+
+# -----------------------------------------------------
+# -----------------------------------------------------
+# Update trop03.
+#[user@trop03]
+
+    sudo apt update
+
+    >   Ign:1 http://ftp.uk.debian.org/debian stretch InRelease
+    >   Get:2 http://ftp.uk.debian.org/debian stretch-updates InRelease [93.6 kB]
+    >   Get:3 http://ftp.uk.debian.org/debian stretch-backports InRelease [91.8 kB]
+    >   Hit:4 http://ftp.uk.debian.org/debian stretch Release
+    >   Fetched 185 kB in 0s (301 kB/s)
+    >   Reading package lists... Done
+    >   Building dependency tree
+    >   Reading state information... Done
+    >   1 package can be upgraded. Run 'apt list --upgradable' to see it.
+
+
+    sudo apt upgrade
+
+    >   ....
+    >   The following NEW packages will be installed:
+    >     linux-image-4.9.0-13-amd64
+    >   The following packages will be upgraded:
+    >     linux-image-amd64
+    >   1 upgraded, 1 newly installed, 0 to remove and 0 not upgraded.
+    >   ....
+    >   ....
+    >   Setting up linux-image-4.9.0-13-amd64 (4.9.228-1) ...
+    >   ....
+    >   Setting up linux-image-amd64 (4.9+80+deb9u11) ...
+
+
+    uname -a
+
+    >   Linux trop03 4.9.0-9-amd64 #1 SMP Debian 4.9.168-1 (2019-04-12) x86_64 GNU/Linux
+
+
+# -----------------------------------------------------
+# Check for the vulnerability as root.
+#[root@trop03]
+
+    sudoedit -s '\' `perl -e 'print "A" x 65536'`
+
+    >   *** Error in `sudoedit': realloc(): invalid next size: 0x0000563793dcc4b0 ***
+    >   ======= Backtrace: =========
+    >   /lib/x86_64-linux-gnu/libc.so.6(+0x70bfb)[0x7f7a50334bfb]
+    >   /lib/x86_64-linux-gnu/libc.so.6(+0x76fc6)[0x7f7a5033afc6]
+    >   ....
+    >   ....
+
+    # Probably NOT fixed !
+
+
+# -----------------------------------------------------
+# Check for the vulnerability as normal user.
+#[user@trop03]
+
+    sudoedit -s '\' `perl -e 'print "A" x 65536'`
+
+    >   Segmentation fault
+
+    # Probably NOT fixed !
+
+
+# -----------------------------------------------------
+# List the virtual machines.
+#[user@trop03]
+
+    source libvirt.env
+    virsh -c $libvirtcon list --all
+
+    >    Id    Name                           State
+    >   ----------------------------------------------------
+    >    -     Angece                         shut off
+    >    -     Edwalafia                      shut off
+    >    -     Fosauri                        shut off
+    >    -     Marpus                         shut off
+    >    -     Onoza                          shut off
+    >    -     Stedigo                        shut off
+    >    -     Umiawyth                       shut off
+
+
+# -----------------------------------------------------
+# Delete all the unused virtual machines.
+#[user@trop03]
+
+
+    for vmname in $(
+        virsh -c $libvirtcon list --all --name
+        )
+    do
+        echo "---- ----"
+        echo "VM [${vmname:?}]"
+        virsh -c $libvirtcon undefine "${vmname:?}"
+    done
+
+    >   ---- ----
+    >   VM [Angece]
+    >   Domain Angece has been undefined
+    >   
+    >   ---- ----
+    >   VM [Edwalafia]
+    >   Domain Edwalafia has been undefined
+    >   
+    >   ---- ----
+    >   VM [Fosauri]
+    >   Domain Fosauri has been undefined
+    >   
+    >   ---- ----
+    >   VM [Marpus]
+    >   Domain Marpus has been undefined
+    >   
+    >   ---- ----
+    >   VM [Onoza]
+    >   Domain Onoza has been undefined
+    >   
+    >   ---- ----
+    >   VM [Stedigo]
+    >   Domain Stedigo has been undefined
+    >   
+    >   ---- ----
+    >   VM [Umiawyth]
+    >   Domain Umiawyth has been undefined
+
+
+# -----------------------------------------------------
+# List the virtual machines.
+#[user@trop03]
+
+    source libvirt.env
+    virsh -c $libvirtcon list --all
+
+    >    Id    Name                           State
+    >   ----------------------------------------------------
+
+
+# -----------------------------------------------------
+# List the available virtual machine images.
+#[user@trop03]
+
+    sudo ls -1 /var/lib/libvirt/images/base
+
+    >   centos-7.7.1908-20200417-inst.qcow
+    >   fedora-29-docker-base-20190715.qcow
+    >   fedora-30-docker-base-20190903.qcow
+    >   fedora-31-docker-base-20200722.qcow
+
+    # TODO:
+    # Need to replace these with a newer version.
+
+
+# -----------------------------------------------------
+# -----------------------------------------------------
+# Update trop02.
+#[root@trop02]
+
+    apt update
+
+    >   Hit http://security.debian.org jessie/updates InRelease
+    >   Ign http://ftp.uk.debian.org jessie InRelease
+    >   ....
+    >   ....
+    >   Hit http://ftp.uk.debian.org jessie/main Translation-en
+    >   Hit http://ftp.uk.debian.org jessie/non-free Translation-en
+    >   Reading package lists... Done
+    >   Building dependency tree
+    >   Reading state information... Done
+    >   3 packages can be upgraded. Run 'apt list --upgradable' to see them.
+
+    sudo apt upgrade
+
+    >   ....
+    >   ....
+    >   The following NEW packages will be installed:
+    >     firmware-linux-free irqbalance iso-codes linux-image-3.16.0-11-amd64 lsb-release python-apt python-apt-common python-cffi
+    >     python-cryptography python-ndg-httpsclient python-openssl python-ply python-pyasn1 python-pycparser python-requests python-urllib3
+    >     xz-utils
+    >   The following packages will be upgraded:
+    >     linux-image-amd64 python-reportbug reportbug
+    >   3 upgraded, 17 newly installed, 0 to remove and 0 not upgraded.
+    >   ....
+    >   ....
+    >   Setting up linux-image-3.16.0-11-amd64 (3.16.84-1) ...
+    >   Setting up python-apt-common (0.9.3.13) ...
+    >   Setting up python-apt (0.9.3.13) ...
+    >   Setting up python-urllib3 (1.9.1-3+deb8u1) ...
+    >   Setting up python-requests (2.4.3-6) ...
+    >   Setting up python-reportbug (6.6.3+deb8u2) ...
+    >   Setting up reportbug (6.6.3+deb8u2) ...
+    >   Setting up xz-utils (5.1.1alpha+20120614-2+b3) ...
+    >   Setting up firmware-linux-free (3.3) ...
+    >   Setting up iso-codes (3.57-1) ...
+    >   Setting up linux-image-amd64 (3.16+63+deb8u7) ...
+    >   Setting up lsb-release (4.1+Debian13+nmu1) ...
+    >   Setting up python-ply (3.4-5) ...
+    >   Setting up python-pycparser (2.10+dfsg-3) ...
+    >   Setting up python-cffi (0.8.6-1) ...
+    >   Setting up python-cryptography (0.6.1-1+deb8u1) ...
+    >   Setting up python-openssl (0.14-1) ...
+    >   Setting up python-ndg-httpsclient (0.3.2-1) ...
+    >   Setting up python-pyasn1 (0.1.7-1) ...
+    >   Setting up irqbalance (1.0.6-3+deb8u1) ...
+    >   ....
+
+
+    uname -a
+
+    >   Linux trop02 3.16.0-4-amd64 #1 SMP Debian 3.16.51-3 (2017-12-13) x86_64 GNU/Linux
+
+
+# -----------------------------------------------------
+# Check for the vulnerability as root.
+#[root@trop02]
+
+    sudoedit -s '\' `perl -e 'print "A" x 65536'`
+
+    >   *** Error in `sudoedit': realloc(): invalid next size: 0x000056195c242650 ***
+    >   Aborted
+
+
+# -----------------------------------------------------
+# Check for the vulnerability as normal user.
+#[user@trop02]
+
+    sudoedit -s '\' `perl -e 'print "A" x 65536'`
+
+    >   Segmentation fault
+
+    # Probably NOT fixed !
+
+
+# -----------------------------------------------------
+# List the virtual machines.
+#[user@trop02]
+
+    source libvirt.env
+    virsh -c $libvirtcon list --all
+
+    >    Id    Name                           State
+    >   ----------------------------------------------------
+    >    2     Acilamwen                      running
+    >    23    Ulov                           running
+    >    25    Eterathiel                     running
+    >    26    Araybwyn                       running
+
+
+    for vmname in $(
+        virsh -c $libvirtcon list --all --name
+        )
+    do
+        echo "---- ----"
+        echo "VM [${vmname:?}]"
+        ssh "${vmname:?}" \
+            '
+            date
+            hostname
+            uname -a
+            '
+    done
+
+    >   ---- ----
+    >   VM [Acilamwen]
+    >   Thu 28 Jan 15:16:48 GMT 2021
+    >   Acilamwen
+    >   Linux Acilamwen 4.17.3-200.fc28.x86_64 #1 SMP Tue Jun 26 14:17:07 UTC 2018 x86_64 x86_64 x86_64 GNU/Linux
+    >   ---- ----
+    >   VM [Ulov]
+    >   Thu 28 Jan 15:16:49 GMT 2021
+    >   Ulov
+    >   Linux Ulov 4.18.13-200.fc28.x86_64 #1 SMP Wed Oct 10 17:29:59 UTC 2018 x86_64 x86_64 x86_64 GNU/Linux
+    >   ---- ----
+    >   VM [Eterathiel]
+    >   Thu 28 Jan 15:16:50 GMT 2021
+    >   Eterathiel
+    >   Linux Eterathiel 4.18.13-200.fc28.x86_64 #1 SMP Wed Oct 10 17:29:59 UTC 2018 x86_64 x86_64 x86_64 GNU/Linux
+    >   ---- ----
+    >   VM [Araybwyn]
+    >   Thu 28 Jan 15:16:50 GMT 2021
+    >   Araybwyn
+    >   Linux Araybwyn 4.18.13-200.fc28.x86_64 #1 SMP Wed Oct 10 17:29:59 UTC 2018 x86_64 x86_64 x86_64 GNU/Linux
+
+    # TODO:
+    # These all need updating to a newer version of Fedora
+
+
+# -----------------------------------------------------
+# List the available virtual machine images.
+#[root@trop02]
+
+    ls -1 /var/lib/libvirt/images/base
+
+    >   fedora-28-16G-docker-base-20181016.qcow
+    >   fedora-28-32G-docker-base-20181016.qcow
+    >   fedora-28-8G-docker-base-20181016.qcow
+    >   fedora-28-docker-base-20180708.qcow
+
+    # TODO:
+    # Need to replace these with a newer version.
+
+
+
+# -----------------------------------------------------
+# -----------------------------------------------------
+# Check for the vulnerability as root.
+#[root@trop01]
+
+    sudoedit -s '\' `perl -e 'print "A" x 65536'`
+
+    >   *** Error in `sudoedit': realloc(): invalid next size: 0x00005611a7cfc410 ***
+    >   Aborted
+
+
+# -----------------------------------------------------
+# Update the system.
+#[root@trop01]
+
+    apt update
+
+    >   Hit http://security.debian.org jessie/updates InRelease
+    >   Ign http://ftp.uk.debian.org jessie InRelease
+    >   ....
+    >   ....
+    >   Ign http://ftp.uk.debian.org jessie-backports/main Translation-en
+    >   Err http://ftp.uk.debian.org jessie-backports/main Sources
+    >     404  Not Found [IP: 78.129.164.123 80]
+    >   Err http://ftp.uk.debian.org jessie-backports/main amd64 Packages
+    >     404  Not Found [IP: 78.129.164.123 80]
+    >   Ign https://apt.dockerproject.org debian-jessie/main Translation-en_GB
+    >   Ign https://apt.dockerproject.org debian-jessie/main Translation-en
+    >   Err https://apt.dockerproject.org debian-jessie/main amd64 Packages
+    >     Could not resolve host: apt.dockerproject.org
+    >   W: Failed to fetch http://ftp.uk.debian.org/debian/dists/jessie-backports/main/source/Sources  404  Not Found [IP: 78.129.164.123 80]
+    >   
+    >   W: Failed to fetch http://ftp.uk.debian.org/debian/dists/jessie-backports/main/binary-amd64/Packages  404  Not Found [IP: 78.129.164.123 80]
+    >   
+    >   W: Failed to fetch https://apt.dockerproject.org/repo/dists/debian-jessie/main/binary-amd64/Packages  Could not resolve host: apt.dockerproject.org
+    >   
+    >   E: Some index files failed to download. They have been ignored, or old ones used instead.
+
+
+    sudo apt upgrade
+
+    >   ....
+    >   ....
+    >   The following NEW packages will be installed:
+    >     firmware-linux-free irqbalance linux-image-3.16.0-11-amd64 python-cffi python-cryptography python-ndg-httpsclient python-openssl
+    >     python-ply python-pyasn1 python-pycparser python-requests python-urllib3
+    >   The following packages will be upgraded:
+    >     linux-image-amd64 python-reportbug reportbug
+    >   3 upgraded, 12 newly installed, 0 to remove and 0 not upgraded.
+    >   ....
+    >   ....
+    >   Setting up linux-image-3.16.0-11-amd64 (3.16.84-1) ...
+    >   Setting up python-urllib3 (1.9.1-3+deb8u1) ...
+    >   Setting up python-requests (2.4.3-6) ...
+    >   Setting up python-reportbug (6.6.3+deb8u2) ...
+    >   Setting up reportbug (6.6.3+deb8u2) ...
+    >   Setting up firmware-linux-free (3.3) ...
+    >   Setting up linux-image-amd64 (3.16+63+deb8u7) ...
+    >   Setting up python-ply (3.4-5) ...
+    >   Setting up python-pycparser (2.10+dfsg-3) ...
+    >   Setting up python-cffi (0.8.6-1) ...
+    >   Setting up python-cryptography (0.6.1-1+deb8u1) ...
+    >   Setting up python-openssl (0.14-1) ...
+    >   Setting up python-ndg-httpsclient (0.3.2-1) ...
+    >   Setting up python-pyasn1 (0.1.7-1) ...
+    >   Setting up irqbalance (1.0.6-3+deb8u1) ...
+    >   ....
+
+    uname -a
+
+    >   Linux trop01 3.16.0-4-amd64 #1 SMP Debian 3.16.51-3 (2017-12-13) x86_64 GNU/Linux
+
+
+# -----------------------------------------------------
+# Check for the vulnerability as root.
+#[root@trop01]
+
+    sudoedit -s '\' `perl -e 'print "A" x 65536'`
+
+    >   *** Error in `sudoedit': realloc(): invalid next size: 0x000055c01ace3410 ***
+    >   Aborted
+
+
+# -----------------------------------------------------
+# Check for the vulnerability as normal user.
+#[user@trop01]
+
+    sudoedit -s '\' `perl -e 'print "A" x 65536'`
+
+    >   Segmentation fault
+
+
+# -----------------------------------------------------
+# List the virtual machines.
+#[user@trop01]
+
+    source libvirt.env
+    virsh -c $libvirtcon list --all
+
+    >    Id    Name                           State
+    >   ----------------------------------------------------
+    >    4     Astoalith                      running
+    >    7     Froeseth                       running
+    >    8     Cadelicia                      running
+
+
+    for vmname in $(
+        virsh -c $libvirtcon list --all --name
+        )
+    do
+        echo "---- ----"
+        echo "VM [${vmname:?}]"
+        ssh "${vmname:?}" \
+            '
+            date
+            hostname
+            uname -a
+            '
+    done
+
+    >   VM [Astoalith]
+    >   Received disconnect from 192.168.201.13: 2: Too many authentication failures
+    >   ---- ----
+    >   VM [Froeseth]
+    >   Thu 28 Jan 17:53:59 GMT 2021
+    >   Froeseth
+    >   Linux Froeseth 4.18.13-200.fc28.x86_64 #1 SMP Wed Oct 10 17:29:59 UTC 2018 x86_64 x86_64 x86_64 GNU/Linux
+    >   ---- ----
+    >   VM [Cadelicia]
+    >   Thu 28 Jan 17:53:59 GMT 2021
+    >   Cadelicia
+    >   Linux Cadelicia 4.18.13-200.fc28.x86_64 #1 SMP Wed Oct 10 17:29:59 UTC 2018 x86_64 x86_64 x86_64 GNU/Linux
+
+    # TODO:
+    # These all need updating to a newer version of Fedora
+
+
+# -----------------------------------------------------
+# List the available virtual machine images.
+#[root@trop01]
+
+    ls -1 /var/lib/libvirt/images/base
+
+    >   fedora-28-16G-docker-base-20181016.qcow
+    >   fedora-28-32G-docker-base-20181016.qcow
+    >   fedora-28-8G-docker-base-20181016.qcow
+    >   fedora-28-docker-base-20180708.qcow
+
+    # TODO:
+    # Need to replace these with a newer version.
+
+
+
+# -----------------------------------------------------
+# -----------------------------------------------------
+# Login to all of the machines and check the sudo version.
+#[root@trop01]
+
+    targets=(
+        trop01
+        trop02
+        trop03
+        trop04
+        )
+
+    for target in ${targets[@]}
+    do
+        echo ""
+        echo "Target [${target:?}]"
+        ssh ${target:?} \
+            "
+            date
+            hostname
+            sudo --version
+            "
+    done
+
+
+

@@ -1,0 +1,62 @@
+#
+# <meta:header>
+#   <meta:licence>
+#     Copyright (c) 2021, ROE (http://www.roe.ac.uk/)
+#
+#     This information is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     This information is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#   </meta:licence>
+# </meta:header>
+#
+#
+
+    Target:
+
+        Check and update the Esperia gateway machine.
+
+    Result:
+
+        Work in progress
+
+
+# -----------------------------------------------------
+# Check the esperia gateway.
+#[user@lssthead]
+
+    uname -a
+
+    >   Linux lsstukhead 4.15.0-112-generic #113-Ubuntu SMP Thu Jul 9 23:41:39 UTC 2020 x86_64 x86_64 x86_64 GNU/Linux
+
+
+    cat /etc/debian_version
+
+    >   buster/sid
+
+
+# -----------------------------------------------------
+# Check for the vulnerability.
+#[user@lssthead]
+
+    sudoedit -s '\' `perl -e 'print "A" x 65536'`
+
+    >   usage: sudoedit [-AknS] [-r role] [-t type] [-C num] [-g group] [-h host] [-p
+    >                   prompt] [-T timeout] [-u user] file ...
+
+    #
+    # Already fixed.
+    #
+
+
+
+
+
