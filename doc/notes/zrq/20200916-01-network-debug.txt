@@ -1,0 +1,150 @@
+#
+# <meta:header>
+#   <meta:licence>
+#     Copyright (c) 2020, ROE (http://www.roe.ac.uk/)
+#
+#     This information is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     This information is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#   </meta:licence>
+# </meta:header>
+#
+#
+
+    Deugging network on lsstdata1.
+
+# -----------------------------------------------------
+# Check the IP tables rules.
+#[root@lsstdata1]
+
+    iptables --list
+
+    >   Chain INPUT (policy DROP)
+    >   target     prot opt source               destination
+    >   ACCEPT     udp  --  anywhere             anywhere             udp dpt:bootps
+    >   ACCEPT     tcp  --  anywhere             anywhere             tcp dpt:bootps
+    >   override   all  --  anywhere             anywhere
+    >   ACCEPT     all  --  anywhere             anywhere
+    >   ACCEPT     tcp  --  anywhere             anywhere             tcp dpt:9092
+    >   ACCEPT     tcp  --  anywhere             anywhere             tcp dpt:http
+    >   ACCEPT     tcp  --  anywhere             anywhere             tcp dpt:https
+    >   ACCEPT     udp  --  172.16.0.0/16        anywhere
+    >   ACCEPT     tcp  --  172.16.0.0/16        anywhere
+    >   ACCEPT     udp  --  192.168.122.0/24     anywhere
+    >   ACCEPT     tcp  --  192.168.122.0/24     anywhere
+    >   ACCEPT     tcp  --  195.194.120.0/22     anywhere             tcp dpt:ssh
+    >   ACCEPT     tcp  --  195.194.121.0/24     anywhere             tcp dpt:ssh
+    >   ACCEPT     tcp  --  192.108.120.0/24     anywhere             tcp dpt:ssh
+    >   ACCEPT     tcp  --  192.41.108.0/24      anywhere             tcp dpt:ssh
+    >   ACCEPT     tcp  --  EdLAN.net.ed.ac.uk/16  anywhere             tcp dpt:ssh
+    >   ACCEPT     tcp  --  192-41-0-0.c7dc.com/16  anywhere             tcp dpt:ssh
+    >   ACCEPT     tcp  --  10.65.128.0/17       anywhere             tcp dpt:ssh
+    >   ACCEPT     tcp  --  polymer.andrews.metagrid.co.uk  anywhere             tcp dpt:ssh
+    >   ACCEPT     tcp  --  monomer.andrews.metagrid.co.uk  anywhere             tcp dpt:ssh
+    >   ACCEPT     tcp  --  143.117.157.0/24     anywhere             tcp dpt:ssh
+    >   ACCEPT     tcp  --  143.117.37.0/24      anywhere             tcp dpt:ssh
+    >   ACCEPT     tcp  --  psweb.mp.qub.ac.uk   anywhere             tcp spt:34511
+    >   DROP       udp  --  anywhere             anywhere             udp dpt:bootps
+    >   DROP       tcp  --  anywhere             anywhere             tcp dpt:bootps
+    >   DROP       udp  --  anywhere             anywhere             udp dpt:bootps
+    >   DROP       tcp  --  anywhere             anywhere             tcp dpt:bootps
+    >   LOG        all  --  anywhere             anywhere             LOG level warning prefix "drop "
+    >   DROP       all  --  anywhere             anywhere
+    >   
+    >   Chain FORWARD (policy DROP)
+    >   target     prot opt source               destination
+    >   ACCEPT     tcp  --  anywhere             lasair-dev-node0     tcp dpt:mysql state NEW,RELATED,ESTABLISHED
+    >   ACCEPT     all  --  anywhere             192.168.122.0/24     state RELATED,ESTABLISHED
+    >   ACCEPT     all  --  192.168.122.0/24     anywhere
+    >   ACCEPT     all  --  anywhere             anywhere
+    >   REJECT     all  --  anywhere             anywhere             reject-with icmp-port-unreachable
+    >   REJECT     all  --  anywhere             anywhere             reject-with icmp-port-unreachable
+    >   LOG        all  --  anywhere             anywhere             LOG level warning prefix "drop "
+    >   DROP       all  --  anywhere             anywhere
+    >   
+    >   Chain OUTPUT (policy DROP)
+    >   target     prot opt source               destination
+    >   ACCEPT     udp  --  anywhere             anywhere             udp dpt:bootpc
+    >   override   all  --  anywhere             anywhere
+    >   ACCEPT     all  --  anywhere             anywhere
+    >   ACCEPT     udp  --  anywhere             anywhere             udp spts:1024:65535 dpt:domain
+    >   ACCEPT     tcp  --  anywhere             anywhere             tcp spts:1024:65535 dpt:domain
+    >   ACCEPT     udp  --  anywhere             anywhere             udp dpt:ntp
+    >   ACCEPT     tcp  --  anywhere             anywhere
+    >   LOG        all  --  anywhere             anywhere             LOG level warning prefix "drop "
+    >   DROP       all  --  anywhere             anywhere
+    >   
+    >   Chain frasynrel (1 references)
+    >   target     prot opt source               destination
+    >   ACCEPT     all  -f  anywhere             anywhere
+    >   ACCEPT     all  --  anywhere             anywhere             state ESTABLISHED
+    >   ACCEPT     tcp  --  anywhere             anywhere             tcp flags:SYN,RST,ACK/SYN state RELATED
+    >   
+    >   Chain override (2 references)
+    >   target     prot opt source               destination
+    >   frasynrel  all  --  anywhere             anywhere
+    >   vitalicmp  all  --  anywhere             anywhere
+    >   
+    >   Chain vitalicmp (1 references)
+    >   target     prot opt source               destination
+    >   ACCEPT     icmp --  anywhere             anywhere             icmp destination-unreachable
+    >   ACCEPT     icmp --  anywhere             anywhere             icmp parameter-problem
+    >   ACCEPT     icmp --  anywhere             anywhere             icmp source-quench
+    >   ACCEPT     icmp --  anywhere             anywhere             icmp time-exceeded
+
+
+# -----------------------------------------------------
+# Check the IP routes.
+#[root@lsstdata1]
+
+    ip route
+
+    >   default via 172.16.1.11 dev enp96s0f1 proto static
+    >   default via 192.41.108.126 dev enp96s0f0 proto static
+    >   172.16.0.0/16 dev enp96s0f1 proto kernel scope link src 172.16.1.7
+    >   192.41.108.0/24 dev enp96s0f0 proto kernel scope link src 192.41.108.45
+    >   192.168.122.0/24 dev virbr0 proto kernel scope link src 192.168.122.1
+
+
+# -----------------------------------------------------
+# Check the network config.
+#[root@lsstdata1]
+
+
+    cat /etc/netplan/01-netcfg.yaml
+
+        # This file describes the network interfaces available on your system
+        # For more information, see netplan(5).
+        network:
+          version: 2
+          renderer: networkd
+          ethernets:
+            enp96s0f0:
+              dhcp4: false
+              addresses: [ 192.41.108.45/24 ]
+              gateway4: 192.41.108.126
+              nameservers:
+                  search: [ roe.ac.uk ]
+                  addresses:
+                      - "195.194.120.1"
+                      - "195.194.120.2"
+                      - "8.8.8.8"
+            enp96s0f1:
+              addresses: [ 172.16.1.7/16 ]
+              gateway4: 172.16.1.11
+              nameservers:
+                  search: [ esperia ]
+                  addresses:
+                      - "172.16.1.11"
+
+
+
