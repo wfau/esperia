@@ -25,12 +25,22 @@
   gather_facts: false
   tasks:
 
-    - name: "Create admin users"
+    - name: "Check SSH config directory"
       become: true
-      user:
-        name: "{{item}}"
-        state: present
-        create_home: true
+      file:
+        path: "~{{item}}/.ssh"
+        mode: 'u=rwx,g=rx,o=rx'
+        state: directory
+        owner: "{{item}}"
       loop:
-        "{{ hostvars[inventory_hostname].adminusers }}"
+        "{{ hostvars[inventory_hostname].loginusers }}"
+
+    - name: "Create SSH config file"
+      become: true
+      template:
+        src:  'ssh/internal-config.j2'
+        dest: "~{{item}}/.ssh/config"
+      loop:
+        "{{ hostvars[inventory_hostname].loginusers }}"
+
 

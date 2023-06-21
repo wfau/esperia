@@ -1,0 +1,215 @@
+#
+# <meta:header>
+#   <meta:licence>
+#     Copyright (c) 2020, ROE (http://www.roe.ac.uk/)
+#
+#     This information is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     This information is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#   </meta:licence>
+# </meta:header>
+#
+#
+
+    #
+    # Request from Mark for a set of static name/address allocations on work03
+
+        52:54:00:6A:0D:01 - mark
+        52:54:00:6A:0D:02 - mark-mon
+        52:54:00:6A:0D:03 - teng
+        52:54:00:6A:0D:04 - teng-mon
+        52:54:00:6A:0D:05 - craig
+        52:54:00:6A:0D:06 - craig-mon
+        52:54:00:6A:0D:07 - gareth
+        52:54:00:6A:0D:08 - gareth-mon
+        52:54:00:6A:0D:09 - ken
+        52:54:00:6A:0D:10 - ken-mon
+        52:54:00:6A:0D:11 - dave
+        52:54:00:6A:0D:12 - dave-mon
+
+
+        52:54:00:6a:0d:20 - alistair
+        52:54:00:6a:0d:21 - amy
+        52:54:00:6a:0d:22 - callum
+        52:54:00:6a:0d:23 - donald
+        52:54:00:6a:0d:24 - iakovos
+        52:54:00:6a:0d:25 - johnny
+        52:54:00:6a:0d:26 - malcolm
+        52:54:00:6a:0d:27 - neelofer
+
+
+# -----------------------------------------------------
+# Manually added these to the dnamasq files
+#[user@desktop]
+
+    ssh esperia
+
+        pushd /etc/esperia/dnsmasq
+
+            sudo vi lsstukwork3-dhcp.conf
+
+                dhcp-host=52:54:00:6A:0D:01,172.16.3.40,mark
+                dhcp-host=52:54:00:6A:0D:02,172.16.3.41,mark-mon
+                dhcp-host=52:54:00:6A:0D:03,172.16.3.42,teng
+                dhcp-host=52:54:00:6A:0D:04,172.16.3.43,teng-mon
+                dhcp-host=52:54:00:6A:0D:05,172.16.3.44,craig
+                dhcp-host=52:54:00:6A:0D:06,172.16.3.45,craig-mon
+                dhcp-host=52:54:00:6A:0D:07,172.16.3.46,gareth
+                dhcp-host=52:54:00:6A:0D:08,172.16.3.47,gareth-mon
+                dhcp-host=52:54:00:6A:0D:09,172.16.3.48,ken
+                dhcp-host=52:54:00:6A:0D:10,172.16.3.49,ken-mon
+                dhcp-host=52:54:00:6A:0D:11,172.16.3.50,dave
+                dhcp-host=52:54:00:6A:0D:12,172.16.3.51,dave-mon
+
+                dhcp-host=52:54:00:6a:0d:19,172.16.3.59,stack
+                dhcp-host=52:54:00:6a:0d:20,172.16.3.60,alistair
+                dhcp-host=52:54:00:6a:0d:21,172.16.3.61,amy
+                dhcp-host=52:54:00:6a:0d:22,172.16.3.62,callum
+                dhcp-host=52:54:00:6a:0d:23,172.16.3.63,donald
+                dhcp-host=52:54:00:6a:0d:24,172.16.3.64,iakovos
+                dhcp-host=52:54:00:6a:0d:25,172.16.3.65,johnny
+                dhcp-host=52:54:00:6a:0d:26,172.16.3.66,malcolm
+                dhcp-host=52:54:00:6a:0d:27,172.16.3.67,neelofer
+
+
+            sudo vi lsstukwork3-host.conf
+
+                host-record=mark,172.16.3.40
+                host-record=mark-mon,172.16.3.41
+                host-record=teng,172.16.3.42
+                host-record=teng-mon,172.16.3.43
+                host-record=craig,172.16.3.44
+                host-record=craig-mon,172.16.3.45
+                host-record=gareth,172.16.3.46
+                host-record=gareth-mon,172.16.3.47
+                host-record=ken,172.16.3.48
+                host-record=ken-mon,172.16.3.49
+                host-record=dave,172.16.3.50
+                host-record=dave-mon,172.16.3.51
+
+                host-record=stack,172.16.3.59
+
+                host-record=alistair,172.16.3.60
+                host-record=amy,172.16.3.61
+                host-record=callum,172.16.3.62
+                host-record=donald,172.16.3.63
+                host-record=iakovos,172.16.3.64
+                host-record=johnny,172.16.3.65
+                host-record=malcolm,172.16.3.66
+                host-record=neelofer,172.16.3.67
+
+
+# -----------------------------------------------------
+# -----------------------------------------------------
+# Run our Ansible client.
+#[user@desktop]
+
+    source "${HOME}/esperia.env"
+
+    cat << EOF
+ESPERIA_USER [${ESPERIA_USER:?}]
+ESPERIA_CODE [${ESPERIA_CODE:?}]
+EOF
+
+    >   ESPERIA_USER [dmr]
+    >   ESPERIA_CODE [/var/local/projects/esperia/github-zrq]
+
+
+    podman run \
+        --rm \
+        --tty \
+        --interactive \
+        --hostname ansible-client \
+        --env ESPERIA_USER=${ESPERIA_USER:?} \
+        --env SSH_AUTH_SOCK=/tmp/ssh_auth_sock \
+        --volume ${SSH_AUTH_SOCK}:/tmp/ssh_auth_sock \
+        --volume ${ESPERIA_CODE:?}/src/ansible:/etc/ansible:Z \
+        atolmis/ansible-client:latest \
+            bash
+
+    >   ....
+    >   ....
+
+
+# -----------------------------------------------------
+# Create our external ssh config.
+#[root@ansible-client]
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/ssh-external.yml
+
+
+    >   ....
+    >   PLAY RECAP ..
+    >   localhost                  : ok=2    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+
+
+# -----------------------------------------------------
+# Check we can login.
+#[root@ansible-client]
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/ping-test.yml
+
+    >   ....
+    >   ....
+
+
+# -----------------------------------------------------
+# Restart the dnsmasq service.
+#[root@ansible-client]
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/dnsmasq-deploy.yml
+
+    >   ....
+    >   ....
+
+
+# -----------------------------------------------------
+# -----------------------------------------------------
+# Tail the service logs.
+#[user@desktop]
+
+    ssh esperia
+
+        docker logs -f dnsmasq
+
+    >   ....
+    >   dnsmasq[1]: started, version 2.78 cachesize 150
+    >   dnsmasq[1]: compile time options: IPv6 GNU-getopt no-DBus no-i18n no-IDN DHCP DHCPv6 no-Lua TFTP no-conntrack ipset auth no-DNSSEC loop-detect inotify
+    >   dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.0.1, lease time 6h
+    >   dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.6.1, lease time 6h
+    >   dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.2.1, lease time 6h
+    >   dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.5.1, lease time 6h
+    >   dnsmasq-dhcp[1]: DHCP, IP range 172.16.252.1 -- 172.16.252.252, lease time 6h
+    >   dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.10.1, lease time 6h
+    >   dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.3.1, lease time 6h
+    >   dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.4.1, lease time 6h
+    >   dnsmasq-dhcp[1]: DHCP, static leases only on 172.16.9.1, lease time 6h
+    >   dnsmasq-dhcp[1]: DHCP, sockets bound exclusively to interface br1
+    >   dnsmasq[1]: using local addresses only for domain esperia
+    >   dnsmasq[1]: using local addresses only for domain 16.172.in-addr.arpa
+    >   dnsmasq[1]: using nameserver 8.8.8.8#53
+    >   dnsmasq[1]: using nameserver 195.194.120.2#53
+    >   dnsmasq[1]: using nameserver 195.194.120.1#53
+    >   dnsmasq[1]: cleared cache
+    >   dnsmasq-dhcp[1]: DHCPREQUEST(br1) 172.16.252.104 00:1b:4d:45:45:49
+    >   dnsmasq-dhcp[1]: DHCPACK(br1) 172.16.252.104 00:1b:4d:45:45:49 00-1b-4d-45-45-49
+    >   dnsmasq-dhcp[1]: DHCPREQUEST(br1) 172.16.252.203 0c:c4:7a:ad:ba:0d
+    >   dnsmasq-dhcp[1]: DHCPACK(br1) 172.16.252.203 0c:c4:7a:ad:ba:0d 0c-c4-7a-ad-ba-0d
+    >   ....
+
+

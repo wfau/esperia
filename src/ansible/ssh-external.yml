@@ -33,7 +33,7 @@
 
     - name: "Generate our ssh config file"
       template:
-        src:  'ssh/ssh-config.j2'
+        src:  'ssh/external-config.j2'
         dest: "{{ lookup('env','HOME') }}/.ssh/esperia-config"
 
 

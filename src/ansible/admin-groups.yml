@@ -25,13 +25,13 @@
   gather_facts: false
   tasks:
 
-    - name: "Update authorized keys for root"
+    - name: "Update admin groups"
       become: true
-      authorized_key:
-        user:  root
-        state: present
-        key: "{{ lookup('file', 'ssh/keys/' + users[item].sshkey) }}"
+      user:
+        name: "{{item.0}}"
+        groups:
+            - "{{item.1}}"
+        append: true
       loop:
-        "{{ hostvars[inventory_hostname].supers }}"
-
+        "{{ hostvars[inventory_hostname].adminusers | product(hostvars[inventory_hostname].admingroups) | list }}"
 

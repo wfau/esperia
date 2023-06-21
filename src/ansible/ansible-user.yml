@@ -36,7 +36,6 @@
             - sudo
             - users
             - ansible
-            - libvirt
         append: true
         create_home: true
         home: '/home/ansible'

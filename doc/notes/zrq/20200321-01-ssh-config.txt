@@ -1,0 +1,158 @@
+#
+# <meta:header>
+#   <meta:licence>
+#     Copyright (c) 2020, ROE (http://www.roe.ac.uk/)
+#
+#     This information is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     This information is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#   </meta:licence>
+# </meta:header>
+#
+#
+
+# -----------------------------------------------------
+# Run our Ansible client.
+#[user@desktop]
+
+    source "${HOME}/esperia.env"
+
+    cat << EOF
+ESPERIA_USER [${ESPERIA_USER:?}]
+ESPERIA_CODE [${ESPERIA_CODE:?}]
+EOF
+
+    >   ESPERIA_USER [dmr]
+    >   ESPERIA_CODE [/var/local/projects/esperia/github-zrq]
+
+
+    podman run \
+        --rm \
+        --tty \
+        --interactive \
+        --hostname ansible-client \
+        --env ESPERIA_USER=${ESPERIA_USER:?} \
+        --env SSH_AUTH_SOCK=/tmp/ssh_auth_sock \
+        --volume ${SSH_AUTH_SOCK}:/tmp/ssh_auth_sock \
+        --volume ${ESPERIA_CODE:?}/src/ansible:/etc/ansible:Z \
+        atolmis/ansible-client:latest \
+            bash
+
+
+# -----------------------------------------------------
+# Create our external ssh config.
+#[root@ansible-client]
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/ssh-external.yml
+
+    >   TASK [Check our ssh directory] ..
+    >   ok: [localhost]
+    >   
+    >   TASK [Generate our ssh config file] ..
+    >   changed: [localhost]
+
+
+# -----------------------------------------------------
+# Check we can login.
+#[root@ansible-client]
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/ping-test.yml
+
+    >   TASK [Check we can connect] ..
+    >   ok: [lsstukwork4]
+    >   ok: [lsstukhead]
+    >   ok: [lsstukwork3]
+    >   ok: [lsstukwork1]
+    >   ok: [lsstukwork2]
+    >   ok: [trop03]
+    >   ok: [trop04]
+    >   ok: [gaia01]
+    >   ok: [gaia02]
+    >   
+    >   TASK [Check we can use sudo] ..
+    >   ok: [lsstukhead]
+    >   ok: [lsstukwork3]
+    >   ok: [lsstukwork1]
+    >   ok: [lsstukwork4]
+    >   ok: [lsstukwork2]
+    >   ok: [trop03]
+    >   ok: [trop04]
+    >   ok: [gaia01]
+    >   ok: [gaia02]
+
+
+# -----------------------------------------------------
+# Update our login users.
+#[root@ansible-client]
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/login-users.yml
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/login-groups.yml
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/login-keys.yml
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/login-ssh.yml
+
+# -----------------------------------------------------
+# Update the admin users.
+#[root@ansible-client]
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/admin-users.yml
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/admin-groups.yml
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/admin-keys.yml
+
+# -----------------------------------------------------
+# Update our root users.
+#[root@ansible-client]
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/root-users.yml
+
+# -----------------------------------------------------
+# Update the ansible user.
+#[root@ansible-client]
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/ansible-group.yml
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/ansible-user.yml
+
+    ansible-playbook \
+        --inventory /etc/ansible/hosts.yml \
+        /etc/ansible/ansible-keys.yml
+
+
+

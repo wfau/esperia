@@ -20,16 +20,20 @@
 #
 #
 
-{%- macro aliases(hostname, demlimiter) -%}
+{% macro aliases(hostname, demlimiter) -%}
     {%- if hostvars[hostname].aliases is defined -%}
         {{ hostvars[hostname].aliases | join(demlimiter) }}
     {%- endif -%}
-{%- endmacro -%}
+{%- endmacro %}
+
+Protocol 2
+Compression no
+ForwardAgent yes
+PasswordAuthentication no
 
 # Gateway host.
 Host lsstukhead
     User {{ lookup('env','ESPERIA_USER') }}
-    HostName {{ hostvars['lsstukhead'].inetip4 | ipaddr('address') }}
     ServerAliveInterval 60
     ServerAliveCountMax 5
     ControlPath ~/.ssh/%r@%h:%p
@@ -39,9 +43,8 @@ Host lsstukhead
 {% for hostname in groups['vlannodes'] %}
 # VLAN host {{ hostname }}.
 Host {{ hostname }} {{ aliases(hostname, ' ') if hostvars[hostname].aliases is defined else '' }}
-    HostName {{ hostname }}.esperia
+    HostName {{ hostname }}
     User {{ lookup('env','ESPERIA_USER') }}
-    ProxyCommand ssh -W %h:%p -l {{ lookup('env','ESPERIA_USER') }} -F {{ lookup('env','HOME') }}/.ssh/esperia-config lsstukhead
     ServerAliveInterval 60
     ServerAliveCountMax 5
     ControlPath ~/.ssh/%r@%h:%p
@@ -54,7 +57,6 @@ Host {{ hostname }} {{ aliases(hostname, ' ') if hostvars[hostname].aliases is d
 # Virtual machines on {{ hostname }}.
 Host {{ hostvars[hostname].vmnames | join(' ') }}
     User Stevedore
-    ProxyCommand ssh -W %h:%p -l {{ lookup('env','ESPERIA_USER') }} -F {{ lookup('env','HOME') }}/.ssh/esperia-config lsstukhead
     ServerAliveInterval 60
     ServerAliveCountMax 5
     ControlPath ~/.ssh/esperia-%r@%h:%p
